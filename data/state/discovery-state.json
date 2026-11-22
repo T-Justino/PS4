@@ -4,7 +4,7 @@
   "seen": {
     "apollo-releases#213764292#250718366": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
@@ -45,7 +45,7 @@
     },
     "apollo-releases#258999632#311606567": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
@@ -86,7 +86,7 @@
     },
     "apollo-releases#287360361#360177363": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
@@ -127,7 +127,7 @@
     },
     "apollo-releases#313201081#405334055": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
@@ -168,7 +168,7 @@
     },
     "apollo-releases#410919334#648516222": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
@@ -209,7 +209,7 @@
     },
     "gh-search#AldySan/ps4_remote_pkg_installer_nextgen#440257560#731137266": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-RPIN00001_00-RPINEXTGEN000000",
         "detail": "prefixo RPIN não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -250,7 +250,7 @@
     },
     "gh-search#AldySan/ps4_remote_pkg_installer_nextgen#451447953#767975095": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-RPIN00001_00-RPINEXTGEN000000",
         "detail": "prefixo RPIN não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -291,7 +291,7 @@
     },
     "gh-search#EmiiBytee/np2kai-ps4#360841730#492294586": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-BREW00984_00-NP2KAIBOOTSTRAP0",
         "detail": "prefixo BREW não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -332,7 +332,7 @@
     },
     "gh-search#EmiiBytee/np2kai-ps4#437209069#719075310": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-BREW00984_00-NP2KAIBOOTSTRAP0",
         "detail": "prefixo BREW não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -373,7 +373,7 @@
     },
     "gh-search#Loopayeh/pkg-sender#396356608#587696044": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -412,7 +412,7 @@
     },
     "gh-search#Loopayeh/pkg-sender#402946661#609547158": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -451,7 +451,7 @@
     },
     "gh-search#Loopayeh/pkg-viewer#447989571#757291790": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -490,7 +490,7 @@
     },
     "gh-search#Loopayeh/pkg-viewer#447989571#757296799": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -529,7 +529,7 @@
     },
     "gh-search#Loopayeh/pkg-viewer#447989571#757296800": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -568,7 +568,7 @@
     },
     "gh-search#LowganDev/PlaytubePS4#446090785#751136027": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0001-PLTB00000_00-PLTB000000100000",
         "detail": "prefixo PLTB não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -609,7 +609,7 @@
     },
     "gh-search#LowganDev/PlaytubePS4#449876884#763094868": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0001-PLTB00000_00-PLTB000000100000",
         "detail": "prefixo PLTB não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -650,7 +650,7 @@
     },
     "gh-search#LowganDev/PlaytubePS4#453848926#776275110": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0001-PLTB00000_00-PLTB000000100000",
         "detail": "prefixo PLTB não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -691,7 +691,7 @@
     },
     "gh-search#MoHadiShibli/Control4Free#409601254#630470397": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-CFRE00001_00-CONTROL4FREE0000",
         "detail": "prefixo CFRE não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -732,7 +732,7 @@
     },
     "gh-search#MoHadiShibli/Control4Free#409601254#630470399": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-CFRE00001_00-CONTROL4FREE0000",
         "detail": "prefixo CFRE não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -773,7 +773,7 @@
     },
     "gh-search#MoHadiShibli/Control4Free#420959592#666440689": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-CFRE00001_00-CONTROL4FREE0000",
         "detail": "prefixo CFRE não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -814,7 +814,7 @@
     },
     "gh-search#MoHadiShibli/Control4Free#420959592#666440695": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-CFRE00001_00-CONTROL4FREE0000",
         "detail": "prefixo CFRE não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -855,7 +855,7 @@
     },
     "gh-search#MoHadiShibli/Control4Free#422384056#670666524": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-CFRE00001_00-CONTROL4FREE0000",
         "detail": "prefixo CFRE não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -896,7 +896,7 @@
     },
     "gh-search#MoHadiShibli/Control4Free#422384056#670666525": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-CFRE00001_00-CONTROL4FREE0000",
         "detail": "prefixo CFRE não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -937,7 +937,7 @@
     },
     "gh-search#Xyhlo/SSPI#402612768#608208301": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-SRCH00001_00-GAMESEARCH000000",
         "detail": "prefixo SRCH não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -978,7 +978,7 @@
     },
     "gh-search#aidam1980/ps4-plugins-manager#433901664#709458166": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-PLUG00001_00-PLUGINEDITOR0001",
         "detail": "prefixo PLUG não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1057,7 +1057,7 @@
     },
     "gh-search#arturofuentes1988/EmuSuNi#435391502#713892107": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-EMSN00001_00-EMUSUNI000000000",
         "detail": "prefixo EMSN não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1098,7 +1098,7 @@
     },
     "gh-search#arturofuentes1988/EmuSuNi#442465941#737926573": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-EMSN00001_00-EMUSUNI000000000",
         "detail": "prefixo EMSN não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1139,7 +1139,7 @@
     },
     "gh-search#arturofuentes1988/EmuSuNi#454634961#779929378": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-EMSN00001_00-EMUSUNI000000000",
         "detail": "prefixo EMSN não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1180,7 +1180,7 @@
     },
     "gh-search#asp11edgr/XCloud4#427535067#687611773": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-XCLD00003_00-XCLOUD4PUBLIC000",
         "detail": "prefixo XCLD não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1221,7 +1221,7 @@
     },
     "gh-search#asp11edgr/XCloud4#427535067#687611776": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1260,7 +1260,7 @@
     },
     "gh-search#asp11edgr/XCloud4#439673567#729073038": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1299,7 +1299,7 @@
     },
     "gh-search#asp11edgr/XCloud4#439673567#729073042": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-XCLD00003_00-XCLOUD4PUBLIC000",
         "detail": "prefixo XCLD não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1340,7 +1340,7 @@
     },
     "gh-search#ducky-ux1/PStream#437754411#721527506": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0001-PSTR00004_00-PSTREAMPS4000001",
         "detail": "prefixo PSTR não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1381,7 +1381,7 @@
     },
     "gh-search#ducky-ux1/PStream#437754411#721527537": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1420,7 +1420,7 @@
     },
     "gh-search#ducky-ux1/PStream#437754411#721527571": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1459,7 +1459,7 @@
     },
     "gh-search#ducky-ux1/PStream#437754411#721527608": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1498,7 +1498,7 @@
     },
     "gh-search#lastrowcritic/null-store-ps4#447372514#758606916": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-NULL00001_00-NULLSTOR00000000",
         "detail": "prefixo NULL não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1539,7 +1539,7 @@
     },
     "gh-search#lastrowcritic/null-store-ps4#447372514#758606928": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-NULL00002_00-NULLSTORSERVICE0",
         "detail": "prefixo NULL não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1580,7 +1580,7 @@
     },
     "gh-search#maxton/LibOrbisPkg#26581302#20780023": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1619,7 +1619,7 @@
     },
     "gh-search#maxton/LibOrbisPkg#26581302#20780024": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1658,7 +1658,7 @@
     },
     "gh-search#maxton/LibOrbisPkg#26581302#20780025": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1697,7 +1697,7 @@
     },
     "gh-search#maxton/LibOrbisPkg#26581302#20780026": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1736,7 +1736,7 @@
     },
     "gh-search#maxton/LibOrbisPkg#26581302#20780027": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1775,7 +1775,7 @@
     },
     "gh-search#maxton/LibOrbisPkg#26581302#20780028": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1814,7 +1814,7 @@
     },
     "gh-search#maxton/LibOrbisPkg#26581302#20780029": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1853,7 +1853,7 @@
     },
     "gh-search#maxton/LibOrbisPkg#26581302#20780030": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1892,7 +1892,7 @@
     },
     "gh-search#nueex/ps-mtp-explorer#421964589#669436832": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-NUEX00001_00-NUEEXMTP00000000",
         "detail": "prefixo NUEX não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -1933,7 +1933,7 @@
     },
     "gh-search#nueex/ps-mtp-explorer#421964589#669440826": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -1972,7 +1972,7 @@
     },
     "gh-search#nueex/ps-mtp-explorer#430122553#696200728": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-NUEX00001_00-NUEEXMTP00000000",
         "detail": "prefixo NUEX não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -2013,7 +2013,7 @@
     },
     "gh-search#nueex/ps-mtp-explorer#453864790#776350355": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-NUEX00001_00-NUEEXMTP00000000",
         "detail": "prefixo NUEX não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -2054,7 +2054,7 @@
     },
     "gh-search#s0liton/RommPS#441229120#734079782": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -2093,7 +2093,7 @@
     },
     "gh-search#s0liton/RommPS#441229120#734079796": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-ROMM00002_00-ROMMSYNCPS400000",
         "detail": "prefixo ROMM não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -2134,7 +2134,7 @@
     },
     "gh-search#s0liton/RommPS#442532948#738209260": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -2173,7 +2173,7 @@
     },
     "gh-search#s0liton/RommPS#442532948#738209298": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-ROMM00002_00-ROMMSYNCPS400000",
         "detail": "prefixo ROMM não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -2214,7 +2214,7 @@
     },
     "gh-search#xXxTheDarkprogramerxXx/PS4_Tools#55964288#52554916": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "ED1633-XDPX20004_00-0000000000000000",
         "detail": "prefixo XDPX não comprovado no console",
         "finalHost": "release-assets.githubusercontent.com",
@@ -2255,7 +2255,7 @@
     },
     "lightningmods-ps4-store#103659769#167233612": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0002-NPXS39041_00-STOREUPD00000000",
         "detail": "prefixo NPXS recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
@@ -2296,7 +2296,7 @@
     },
     "lightningmods-ps4-store#103659769#238357415": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "ZIP único: assinatura ok; a identidade interna só aparece depois de extrair (o SSPI instala ZIP/7z/RAR únicos pelo caminho de download direto)",
         "finalHost": null,
@@ -2335,7 +2335,7 @@
     },
     "lightningmods-ps4-store#103659769#268177439": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0002-NPXS39041_00-STOREUPD00000000",
         "detail": "prefixo NPXS recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
@@ -2376,7 +2376,7 @@
     },
     "lightningmods-ps4-store#103659769#268177642": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0002-NPXS39041_00-STOREUPD00000000",
         "detail": "prefixo NPXS recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
@@ -2437,7 +2437,7 @@
     },
     "own-contents#9175adc36da1a81dbe354ff94b5500ed55f894b4": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "",
         "finalHost": "raw.githubusercontent.com",
@@ -2473,7 +2473,7 @@
     },
     "own-contents#cac7d81c05d22f17d7419743dfb36634cf693282": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo",
         "finalHost": "raw.githubusercontent.com",
@@ -2509,7 +2509,7 @@
     },
     "own-contents#fedfa6645b2994d6aa90f9fd375c3da62713c9ee": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo",
         "finalHost": "raw.githubusercontent.com",
@@ -2545,7 +2545,7 @@
     },
     "own-rar#224ec742f664b4ed9c5b99d252a1f95baa3b6337": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 11): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2581,7 +2581,7 @@
     },
     "own-rar#567c27c6ac37af86187ea37c7cc9592c13754bea": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 1): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2617,7 +2617,7 @@
     },
     "own-rar#67bc45dd83ba36b0d7cb5d812d27709c208572e8": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 8): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2653,7 +2653,7 @@
     },
     "own-rar#81e8c73f16f7568725e2b0dbb79f9442384ff8f6": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 6): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2689,7 +2689,7 @@
     },
     "own-rar#86ea9b57a8dd2a366f808833f9719a8e98df045f": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 4): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2725,7 +2725,7 @@
     },
     "own-rar#b859579907a16ddfb8cc96ac0e73c56055d1fe4d": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 9): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2761,7 +2761,7 @@
     },
     "own-rar#b8c009aa5610fc8ee410ea2f2cd828dc14f01497": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 2): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2797,7 +2797,7 @@
     },
     "own-rar#c582e22c8be6adee60c85a8ca6e684706d7fa7ee": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 7): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2833,7 +2833,7 @@
     },
     "own-rar#d61ea80b3221b5488fefa331750d190e4ca87005": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 10): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2869,7 +2869,7 @@
     },
     "own-rar#e24605b133a5df14a1c601ee5734521cd9f396b9": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 5): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2905,7 +2905,7 @@
     },
     "own-rar#eb4523ea87fd2dbf782fa8a6878ba6cfad1718e5": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 3): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -4890,13 +4890,35 @@
     },
     "pkg-zone#CUSA16881#ps4#1.00#2024-05-10T18:19:41.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "UT0001-CUSA16881_00-UNTRTHEME0100000",
-        "detail": "tipo 'dlc' (CATEGORY=ac): só 'base' é publicado; update/DLC não testados",
+        "detail": "tipo 'dlc': só 'base' é publicado; update/DLC não testados",
         "finalHost": "api.pkg-zone.com",
         "kind": "dlc",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈360 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21600
+        },
         "name": "Uncharted & Tomb.R_Theme_by latioboy",
         "reason": "KIND_UNTESTED",
+        "restricted": true,
         "stage": "pkg_verificado",
         "titleId": "CUSA16881",
         "totalSize": 15073280,
@@ -6082,13 +6104,35 @@
     },
     "pkg-zone#LAPY10014#ps4#1.00#2024-05-10T18:19:42.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "ED1234-LAPY10014_00-0000000000000000",
         "detail": "prefixo LAPY não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈360 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21600
+        },
         "name": "Lapy's River Raid",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": true,
         "stage": "pkg_verificado",
         "titleId": "LAPY10014",
         "totalSize": 87490560,
@@ -7574,13 +7618,35 @@
     },
     "pkg-zone#NPXX50003#ps4#1.00#2024-05-10T18:19:45.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "ED1633-NPXX50003_00-0000000000000000",
         "detail": "prefixo NPXX não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈359 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21599
+        },
         "name": "tank game",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": true,
         "stage": "pkg_verificado",
         "titleId": "NPXX50003",
         "totalSize": 118620160,
@@ -7594,13 +7660,35 @@
     },
     "pkg-zone#NPXX50004#ps4#1.00#2024-05-10T18:19:44.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "ED1633-NPXX50004_00-0000000000000000",
         "detail": "prefixo NPXX não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈360 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21600
+        },
         "name": "SpaceShooter",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": true,
         "stage": "pkg_verificado",
         "titleId": "NPXX50004",
         "totalSize": 84475904,
@@ -7656,13 +7744,35 @@
     },
     "pkg-zone#NPXX51363#ps4#1.00#2024-05-10T18:19:41.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "ED1634-NPXX51363_00-0000000000000000",
         "detail": "prefixo NPXX não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈360 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21600
+        },
         "name": "MediaPlayer PS4",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "NPXX51363",
         "totalSize": 116129792,
@@ -7804,19 +7914,42 @@
     },
     "pkg-zone#NPXX51373#ps4#1.00#2024-05-10T18:19:44.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "ED1633-NPXX51362_00-0000000000000000",
         "detail": "prefixo NPXX não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈360 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21600
+        },
         "name": "Strike Elite",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": true,
         "stage": "pkg_verificado",
         "titleId": "NPXX51362",
         "totalSize": 605224960,
         "version": "01.00",
         "warnings": [
-          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado",
+          "o catálogo da fonte declara NPXX51373, mas o PKG é NPXX51362: vale o ID lido do PKG"
         ]
       },
       "firstSeen": "2026-11-22T14:07:24Z",
@@ -7867,19 +8000,42 @@
     },
     "pkg-zone#NPXX51385#ps4#1.01#2024-05-10T18:19:41.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "ED1685-NPXX52385_00-0000000000000000",
         "detail": "prefixo NPXX não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈360 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21600
+        },
         "name": "PS4-GBEmu",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "NPXX52385",
         "totalSize": 66519040,
         "version": "01.00",
         "warnings": [
-          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado",
+          "o catálogo da fonte declara NPXX51385, mas o PKG é NPXX52385: vale o ID lido do PKG"
         ]
       },
       "firstSeen": "2026-11-22T14:07:24Z",
@@ -8047,7 +8203,7 @@
     },
     "pkg-zone#NUEX00001#ps4#2.0.0#2026-11-17T15:22:50.564Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -8198,13 +8354,35 @@
     },
     "pkg-zone#PCMN99999#ps4#1.00#2024-05-10T18:19:45.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "TX0000-PCMN99999_00-0000000000PACMAN",
         "detail": "prefixo PCMN não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈360 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21600
+        },
         "name": "pacman",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": true,
         "stage": "pkg_verificado",
         "titleId": "PCMN99999",
         "totalSize": 67764224,
@@ -9187,7 +9365,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.7.4#2025-07-15T09:45:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9220,7 +9398,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.7.5#2025-09-16T16:45:11.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9253,7 +9431,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.7.6#2025-10-22T14:00:11.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9286,7 +9464,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.7.7#2025-11-17T03:15:11.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9319,7 +9497,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.8.0#2025-12-06T09:00:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9352,7 +9530,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.8.1#2025-12-09T05:00:11.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9385,7 +9563,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.8.2#2025-12-19T11:00:13.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9418,7 +9596,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.8.3#2026-02-02T11:30:33.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9451,7 +9629,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.0#2026-05-07T07:16:00.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9484,7 +9662,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.1#2026-06-18T06:45:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9517,7 +9695,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.2#2026-07-22T11:15:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9550,7 +9728,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.3#2026-07-27T03:30:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9583,7 +9761,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.4#2026-09-02T08:00:10.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9616,7 +9794,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.5#2026-11-13T04:45:17.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T19:45:04Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -9918,13 +10096,35 @@
     },
     "pkg-zone#SNEK99999#ps4#1.00#2024-05-10T18:19:46.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "TX0000-SNEK99999_00-0000000000000000",
         "detail": "prefixo SNEK não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈360 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21600
+        },
         "name": "snake",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": true,
         "stage": "pkg_verificado",
         "titleId": "SNEK99999",
         "totalSize": 72810496,
@@ -10140,13 +10340,35 @@
     },
     "pkg-zone#TEFO11111#ps4#1.00#2024-05-10T18:19:40.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T19:48:37Z",
         "contentId": "ED1633-TEFO11111_00-0000000000000000",
         "detail": "prefixo TEFO não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "etagStrong": true,
+          "kind": "redirect",
+          "lastModified": false,
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar",
+            "URL assinada expira em ≈360 min (a estável gera outra)"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true,
+          "ttlSeconds": 21600
+        },
         "name": "The Enchanted Forest",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": true,
         "stage": "pkg_verificado",
         "titleId": "TEFO11111",
         "totalSize": 318504960,
