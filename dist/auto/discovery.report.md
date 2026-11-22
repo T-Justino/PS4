@@ -1,4 +1,4 @@
-# Relatório de descoberta — 2026-11-22T14:36:05Z
+# Relatório de descoberta — 2026-11-22T14:45:44Z
 
 > Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.
 
@@ -13,13 +13,13 @@
 - `pkg-zone` (): ok, 191 .pkg
 
 Catálogo atualizado: **sim**
-Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.1 · títulos: CUSA95417 · contentSha256 `b364e4a8d9319029…`
+Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.2 · títulos: CUSA95417 · contentSha256 `a24abda25f781e0a…`
 
 ## Entradas
 
 | Novo | Fase | Estágio | Resultado | Título | Arquivo | Detalhe |
 |---|---|---|---|---|---|---|
-| sim | PUBLICAVEL | publicado | **publicado** | CUSA95417 | IV0000-CUSA95417_00-PS4STOREBRTEST00.pkg (4721179) |  |
+| sim | PUBLICAVEL | publicado | **publicado** | CUSA95417 | PS4StoreBRTest_CUSA95417_v1.00.pkg (fedfa66) |  |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | MOZI00001 | MOZI00001_ps4_v1.0.0.pkg (1.0.0) | prefixo MOZI não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | PLTB00000 | PLTB00000_ps4_v1.2.0.pkg (1.2.0) | prefixo PLTB não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | AMIN00048 | AMIN00048_ps4_v1.00.pkg (1.00) | prefixo AMIN não comprovado no console |

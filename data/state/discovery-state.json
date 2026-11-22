@@ -1,5 +1,5 @@
 {
-  "catalogHash": "f3d2a6a6137c3f13f5ea8384e12eceea00ec431e16479b037d4100987fe27572",
+  "catalogHash": "bb6835e65cf754bc20b9f060b19cf507e37db94b4d13ad07418467be98631c60",
   "schema": "ps4storebr.discovery-state/v1",
   "seen": {
     "own-contents#47211795f25e46073e255b846e446d43ff761970": {
@@ -20,6 +20,24 @@
         ]
       },
       "firstSeen": "2026-11-22T14:36:05Z",
+      "lastStage": "publicado"
+    },
+    "own-contents#fedfa6645b2994d6aa90f9fd375c3da62713c9ee": {
+      "check": {
+        "checkedAt": "2026-11-22T14:45:44Z",
+        "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
+        "detail": "",
+        "finalHost": "raw.githubusercontent.com",
+        "kind": "base",
+        "name": "PS4 Store BR Test",
+        "reason": null,
+        "stage": "publicado",
+        "titleId": "CUSA95417",
+        "totalSize": 6619136,
+        "version": "1.00",
+        "warnings": []
+      },
+      "firstSeen": "2026-11-22T14:45:44Z",
       "lastStage": "publicado"
     },
     "pkg-zone#AMIN00048#ps4#1.00#2026-11-21T17:49:50.237Z": {
@@ -3829,5 +3847,5 @@
       "lastStage": "pkg_verificado"
     }
   },
-  "versionCounter": 1
+  "versionCounter": 2
 }

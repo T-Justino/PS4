@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-22T14:36:05Z",
+  "generatedAt": "2026-11-22T14:45:44Z",
   "dryRun": false,
   "note": "Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.",
   "sources": [
@@ -55,12 +55,12 @@
   "catalogError": null,
   "entries": [
     {
-      "key": "own-contents#47211795f25e46073e255b846e446d43ff761970",
+      "key": "own-contents#fedfa6645b2994d6aa90f9fd375c3da62713c9ee",
       "fase": "PUBLICAVEL",
       "source": "own-contents",
-      "release": "4721179",
-      "asset": "IV0000-CUSA95417_00-PS4STOREBRTEST00.pkg",
-      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/t8/IV0000-CUSA95417_00-PS4STOREBRTEST00.pkg",
+      "release": "fedfa66",
+      "asset": "PS4StoreBRTest_CUSA95417_v1.00.pkg",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/pkgs/PS4StoreBRTest_CUSA95417_v1.00.pkg",
       "sizeFeed": 6619136,
       "stage": "publicado",
       "rejected": false,
@@ -76,9 +76,7 @@
       "finalHost": "raw.githubusercontent.com",
       "isNew": true,
       "meta": {},
-      "warnings": [
-        "raw.githubusercontent.com: TLS não confirmado no SSPI (download em teste no T8 (22/11/2026); resultado pendente)"
-      ]
+      "warnings": []
     },
     {
       "key": "pkg-zone#MOZI00001#ps4#1.0.0#2026-11-21T19:40:45.765Z",
@@ -6379,9 +6377,9 @@
   ],
   "artifact": {
     "path": "dist/auto/ps4storebr-auto.gssource",
-    "version": "1.0.1",
-    "sha256": "232f8aae4e2fd404e5a552c4bf844edaf3b6d453c16c0f6da0f69f2bf1a0b650",
-    "contentSha256": "b364e4a8d93190291a2c55a9ddb31c15172f1e6ab4e5ee32194c1861fac5d875",
+    "version": "1.0.2",
+    "sha256": "a702ad2acc4020418174c4b6e562a8499e6c6821b296a60279ce27c344f6d67f",
+    "contentSha256": "a24abda25f781e0aef310efc10d041785ddc64d30cacd666512d5a9793f31da0",
     "titles": [
       "CUSA95417"
     ]

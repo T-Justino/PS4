@@ -21,6 +21,7 @@ cp "$TC/samples/graphics/sce_sys/about/right.sprx" sce_sys/about/right.sprx   # 
 # ("dados corrompidos"). Causa do defeito do T8 original (22/11/2026).
 cp "$TC/samples/graphics/sce_module/libc.prx" "$TC/samples/graphics/sce_module/libSceFios2.prx" sce_module/
 APP_VERSION="${APP_VERSION:-1.00}"
+rm -f sce_sys/param.sfo pkg.gp4 eboot.bin *.pkg   # o make clean do sample não apaga o param.sfo: sem isto a versão fica velha
 make clean >/dev/null 2>&1 || true
 make VERSION="$APP_VERSION" EXTRAFLAGS="-DAPP_VERSION=\\\"$APP_VERSION\\\""
 PKG="$(pwd)/IV0000-CUSA95417_00-PS4STOREBRTEST00.pkg"
