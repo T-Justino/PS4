@@ -1,10 +1,10 @@
-# Relatório de descoberta — 2026-11-22T15:39:11Z
+# Relatório de descoberta — 2026-11-22T15:39:38Z
 
 > Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.
 
 | Descobertos | Acessíveis | PKG verificado | Compatíveis (regras) | Publicados | Novos | Rejeitados |
 |---|---|---|---|---|---|---|
-| 194 | 187 | 185 | 22 | 1 | 0 | 193 |
+| 205 | 198 | 185 | 22 | 1 | 11 | 204 |
 
 ## Fontes
 - `own-releases` (T-Justino/PS4): ok, 0 .pkg
@@ -12,6 +12,7 @@
 - `apollo-releases` (bucanero/apollo-ps4): erro — HTTP 403 em api.github.com
 - `pkg-zone` (): ok, 191 .pkg
 - `lightningmods-ps4-store` (LightningMods/PS4-Store): erro — HTTP 403 em api.github.com
+- `own-rar` (T-Justino/PS4): ok, 11 .pkg
 
 Catálogo atualizado: **sim**
 Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.4 · títulos: CUSA95417 · contentSha256 `cd66d10a51c72e7b…`
@@ -214,3 +215,14 @@ Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.4 · títulos: CUSA95417 · 
 |  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA02644 | CUSA02644_ps4_v1.34.pkg (1.34) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA01850 | CUSA01850_ps4_v2.03.pkg (2.03) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | BBAR00505 | BBAR00505_ps4_v1.00.pkg (1.00) | prefixo BBAR não comprovado no console |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part01.rar (567c27c) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 1): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part02.rar (b8c009a) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 2): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part03.rar (eb4523e) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 3): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part04.rar (86ea9b5) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 4): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part05.rar (e24605b) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 5): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part06.rar (81e8c73) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 6): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part07.rar (c582e22) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 7): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part08.rar (67bc45d) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 8): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part09.rar (b859579) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 9): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part10.rar (d61ea80) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 10): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
+| sim | DESCOBERTO | acessivel | rejeitado: `ARCHIVE_MULTIPART` |  | PS4StoreBRTest_v1.02_rar.part11.rar (224ec74) | RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 11): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |

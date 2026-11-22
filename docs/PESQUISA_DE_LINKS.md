@@ -63,7 +63,7 @@ PYTHONPATH=src python3 -m ps4store run --refresh-links 10   # descobre → valid
 1. **Catálogo só aceita `CUSA`:** 163 itens não podem ir por catálogo. Solução tecnicamente viável: **colar o link** (caminho B), a testar no console (T10).
 2. **Restritos (99):** excluídos por política; não vou listá-los para download.
 3. **Redirect assinado do PKG-Zone:** previsto como compatível, **não testado no SSPI** (T10, parte B).
-4. **11 sem verificação de identidade:** 7 PS5 (fora do alvo) e 4 com `param.sfo` fora da janela; solução simples: uma 2ª requisição `Range` só do `param.sfo` (não implementada, ganho pequeno).
+4. **Identidade fora da janela de 64 KiB:** resolvido: o robô faz **uma 2ª faixa pequena** só do `param.sfo` (feito; 4 → 2 pendentes ao reprocessar; restam os 7 PS5, fora do alvo).
 5. **Cobertura de medição:** 22 de 191 links do PKG-Zone com dados completos (33 de 202 no total); o resto sobe pelo `--refresh-links` (ou `--recheck`, que é sondagem em massa: evitei).
 6. **GitHub Releases de terceiros** (Apollo, Store): descobertos e verificados, mas baixam via `github.com` (TLS falho no seu console): não entram nas listas até um teste mostrar o contrário.
 7. **Multipartes:** nenhuma fonte atual os usa; mecanismo de detecção pronto, publicação é o Gate 5.

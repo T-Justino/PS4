@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-22T15:39:11Z",
+  "generatedAt": "2026-11-22T15:39:38Z",
   "dryRun": false,
   "note": "Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.",
   "sources": [
@@ -34,34 +34,40 @@
       "status": "erro",
       "error": "HTTP 403 em api.github.com",
       "critical": false
+    },
+    {
+      "source": "own-rar",
+      "repo": "T-Justino/PS4",
+      "status": "ok",
+      "discovered": 11
     }
   ],
   "counts": {
-    "descobertos": 194,
-    "acessiveis": 187,
+    "descobertos": 205,
+    "acessiveis": 198,
     "pkgVerificados": 185,
     "compativeisSspi": 22,
     "publicados": 1,
     "fases": {
-      "DESCOBERTO": 9,
+      "DESCOBERTO": 20,
       "VERIFICADO": 184,
       "PUBLICAVEL": 1
     },
-    "novos": 0,
+    "novos": 11,
     "links": {
-      "classificados": 31,
-      "sspiBaixaveis": 31,
+      "classificados": 42,
+      "sspiBaixaveis": 42,
       "redirectTemporario": 28,
       "semRange": 0,
       "tipos": {
-        "direto": 3,
+        "direto": 14,
         "redirect": 28
       }
     },
     "restritos": 102,
     "duplicados": 2,
     "listaPessoal": 21,
-    "rejeitados": 193,
+    "rejeitados": 204,
     "motivos": {
       "SUPERSEDED": 2,
       "PREFIX_UNPROVEN": 155,
@@ -70,7 +76,8 @@
       "PREFIX_REJECTED_BY_SSPI": 2,
       "PLACEHOLDER_ID": 2,
       "SFO_OUTSIDE_WINDOW": 2,
-      "KIND_UNTESTED": 4
+      "KIND_UNTESTED": 4,
+      "ARCHIVE_MULTIPART": 11
     }
   },
   "catalogUpdated": true,
@@ -7706,9 +7713,641 @@
         "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado",
         "resultado reaproveitado do cache (não sondado nesta execução)"
       ]
+    },
+    {
+      "key": "own-rar#567c27c6ac37af86187ea37c7cc9592c13754bea",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "567c27c",
+      "asset": "PS4StoreBRTest_v1.02_rar.part01.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part01.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 1): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 1
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#b8c009aa5610fc8ee410ea2f2cd828dc14f01497",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "b8c009a",
+      "asset": "PS4StoreBRTest_v1.02_rar.part02.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part02.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 2): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 2
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#eb4523ea87fd2dbf782fa8a6878ba6cfad1718e5",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "eb4523e",
+      "asset": "PS4StoreBRTest_v1.02_rar.part03.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part03.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 3): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 3
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#86ea9b57a8dd2a366f808833f9719a8e98df045f",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "86ea9b5",
+      "asset": "PS4StoreBRTest_v1.02_rar.part04.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part04.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 4): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 4
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#e24605b133a5df14a1c601ee5734521cd9f396b9",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "e24605b",
+      "asset": "PS4StoreBRTest_v1.02_rar.part05.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part05.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 5): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 5
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#81e8c73f16f7568725e2b0dbb79f9442384ff8f6",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "81e8c73",
+      "asset": "PS4StoreBRTest_v1.02_rar.part06.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part06.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 6): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 6
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#c582e22c8be6adee60c85a8ca6e684706d7fa7ee",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "c582e22",
+      "asset": "PS4StoreBRTest_v1.02_rar.part07.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part07.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 7): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 7
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#67bc45dd83ba36b0d7cb5d812d27709c208572e8",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "67bc45d",
+      "asset": "PS4StoreBRTest_v1.02_rar.part08.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part08.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 8): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 8
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#b859579907a16ddfb8cc96ac0e73c56055d1fe4d",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "b859579",
+      "asset": "PS4StoreBRTest_v1.02_rar.part09.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part09.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 9): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 9
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#d61ea80b3221b5488fefa331750d190e4ca87005",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "d61ea80",
+      "asset": "PS4StoreBRTest_v1.02_rar.part10.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part10.rar",
+      "sizeFeed": 614400,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 10): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 614400,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 10
+        }
+      },
+      "warnings": []
+    },
+    {
+      "key": "own-rar#224ec742f664b4ed9c5b99d252a1f95baa3b6337",
+      "fase": "DESCOBERTO",
+      "source": "own-rar",
+      "release": "224ec74",
+      "asset": "PS4StoreBRTest_v1.02_rar.part11.rar",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part11.rar",
+      "sizeFeed": 477558,
+      "stage": "acessivel",
+      "rejected": true,
+      "reason": "ARCHIVE_MULTIPART",
+      "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 11): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
+      "titleId": null,
+      "contentId": null,
+      "name": null,
+      "kind": null,
+      "version": null,
+      "sizeVerified": 477558,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": null,
+      "fileType": "rar-multiparte",
+      "link": {
+        "kind": "direto",
+        "status": 206,
+        "redirects": 0,
+        "chain": [
+          "raw.githubusercontent.com"
+        ],
+        "temporaryFinalUrl": false,
+        "rangeOk": true,
+        "singleLane": false,
+        "etag": true,
+        "sspiUsable": true,
+        "notes": []
+      },
+      "restricted": false,
+      "duplicateOf": null,
+      "isNew": true,
+      "meta": {
+        "multipart": {
+          "style": "part-rar",
+          "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+          "index": 11
+        }
+      },
+      "warnings": []
     }
   ],
-  "rarSets": [],
+  "rarSets": [
+    {
+      "source": "own-rar",
+      "set": "PS4StoreBRTest_v1.02_rar.part*.rar",
+      "volumes": 11,
+      "indexes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "missing": [],
+      "duplicates": [],
+      "allAccessible": true,
+      "complete": true,
+      "totalBytes": 6621558,
+      "parts": [
+        {
+          "index": 1,
+          "name": "PS4StoreBRTest_v1.02_rar.part01.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part01.rar"
+        },
+        {
+          "index": 2,
+          "name": "PS4StoreBRTest_v1.02_rar.part02.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part02.rar"
+        },
+        {
+          "index": 3,
+          "name": "PS4StoreBRTest_v1.02_rar.part03.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part03.rar"
+        },
+        {
+          "index": 4,
+          "name": "PS4StoreBRTest_v1.02_rar.part04.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part04.rar"
+        },
+        {
+          "index": 5,
+          "name": "PS4StoreBRTest_v1.02_rar.part05.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part05.rar"
+        },
+        {
+          "index": 6,
+          "name": "PS4StoreBRTest_v1.02_rar.part06.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part06.rar"
+        },
+        {
+          "index": 7,
+          "name": "PS4StoreBRTest_v1.02_rar.part07.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part07.rar"
+        },
+        {
+          "index": 8,
+          "name": "PS4StoreBRTest_v1.02_rar.part08.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part08.rar"
+        },
+        {
+          "index": 9,
+          "name": "PS4StoreBRTest_v1.02_rar.part09.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part09.rar"
+        },
+        {
+          "index": 10,
+          "name": "PS4StoreBRTest_v1.02_rar.part10.rar",
+          "bytes": 614400,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part10.rar"
+        },
+        {
+          "index": 11,
+          "name": "PS4StoreBRTest_v1.02_rar.part11.rar",
+          "bytes": 477558,
+          "accessible": true,
+          "rangeOk": true,
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/PS4StoreBRTest_v1.02_rar.part11.rar"
+        }
+      ],
+      "note": "colar os links NA ORDEM (até 50 por vez); se os nomes forem reconhecidos o SSPI agrupa sozinho, senão marcar 'These links are parts of one RAR archive, in volume order'. Espaço de pico: arquivos + pacote extraído"
+    }
+  ],
   "artifact": {
     "path": "dist/auto/ps4storebr-auto.gssource",
     "version": "1.0.4",

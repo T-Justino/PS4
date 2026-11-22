@@ -9,7 +9,7 @@ config/sources.json ──► ps4store run ──► descobre → verifica (Rang
 ```
 - **Automático:** `.github/workflows/catalogo.yml` a cada 6 h (UTC `23 */6 * * *`) e sob demanda (*Actions → catalogo → Run workflow*). Roda os testes primeiro; se falharem, nada é publicado.
   Só commita se `.gssource`, catálogo ou estado mudaram. Relatório completo no *Summary* do job.
-- **Manual local:** `PYTHONPATH=src python3 -m ps4store run` (`--refresh-links N` enriquece N links em cache por execução; `--dry-run` não grava nada; `--recheck` ignora o cache e sonda tudo, use com moderação).
+- **Manual local:** `PYTHONPATH=src python3 -m ps4store run` (`--probe-title ID` re-sonda só aquele título; `--refresh-links N` enriquece N links em cache por execução; `--dry-run` não grava nada; `--recheck` ignora o cache e sonda tudo, use com moderação).
 - **Link que o PS4 importa:** `https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/auto/ps4storebr-auto.gssource` (cache de 5 min do GitHub).
 
 ### Regras de segurança do pipeline
@@ -65,7 +65,7 @@ Política de TLS: `tls.known_bad_hosts` (bloqueia a publicação, ex. `github.co
 6. **Desativar/remover:** `"enabled": false` (o item some do catálogo na próxima execução; o relatório mantém o histórico no estado).
 
 ## 3. Testes
-`PYTHONPATH=src python3 -m pytest -q` → **131 testes**, sem rede (Python 3.11, 3.12 no Actions e 3.13). Cobrem: formato `.gssource` e validador, regras do canônico, leitura de PKG, conectores
+`PYTHONPATH=src python3 -m pytest -q` → **135 testes**, sem rede (Python 3.11, 3.12 no Actions e 3.13). Cobrem: formato `.gssource` e validador, regras do canônico, leitura de PKG, conectores
 (Releases, Contents, PKG-Zone), fases e rejeições, autorização por item, cache e teto de sondagens, uma versão por ID, fonte crítica, rede segura (servidor local com Range/redirect) e os artefatos do T8.
 **Não substituem o teste no console**: o que foi comprovado no PS4 está em `docs/TESTE_*.md`.
 
