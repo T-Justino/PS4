@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-22T14:45:44Z",
+  "generatedAt": "2026-11-22T14:46:17Z",
   "dryRun": false,
   "note": "Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.",
   "sources": [
@@ -13,7 +13,7 @@
       "source": "own-contents",
       "repo": "T-Justino/PS4",
       "status": "ok",
-      "discovered": 1
+      "discovered": 2
     },
     {
       "source": "apollo-releases",
@@ -29,19 +29,20 @@
     }
   ],
   "counts": {
-    "descobertos": 192,
-    "acessiveis": 185,
-    "pkgVerificados": 181,
-    "compativeisSspi": 20,
+    "descobertos": 193,
+    "acessiveis": 186,
+    "pkgVerificados": 182,
+    "compativeisSspi": 21,
     "publicados": 1,
     "fases": {
       "DESCOBERTO": 11,
-      "VERIFICADO": 180,
+      "VERIFICADO": 181,
       "PUBLICAVEL": 1
     },
     "novos": 1,
-    "rejeitados": 191,
+    "rejeitados": 192,
     "motivos": {
+      "SUPERSEDED": 1,
       "PREFIX_UNPROVEN": 153,
       "NOT_PS4": 7,
       "SFO_OUTSIDE_WINDOW": 4,
@@ -56,11 +57,35 @@
   "entries": [
     {
       "key": "own-contents#fedfa6645b2994d6aa90f9fd375c3da62713c9ee",
-      "fase": "PUBLICAVEL",
+      "fase": "VERIFICADO",
       "source": "own-contents",
       "release": "fedfa66",
       "asset": "PS4StoreBRTest_CUSA95417_v1.00.pkg",
       "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/pkgs/PS4StoreBRTest_CUSA95417_v1.00.pkg",
+      "sizeFeed": 6619136,
+      "stage": "compativel_sspi",
+      "rejected": true,
+      "reason": "SUPERSEDED",
+      "detail": "CUSA95417: versão 1.01 (PS4StoreBRTest_CUSA95417_v1.01.pkg) é mais nova; só uma versão por ID entra no catálogo",
+      "titleId": "CUSA95417",
+      "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
+      "name": "PS4 Store BR Test",
+      "kind": "base",
+      "version": "1.00",
+      "sizeVerified": 6619136,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": "raw.githubusercontent.com",
+      "isNew": false,
+      "meta": {},
+      "warnings": []
+    },
+    {
+      "key": "own-contents#cac7d81c05d22f17d7419743dfb36634cf693282",
+      "fase": "PUBLICAVEL",
+      "source": "own-contents",
+      "release": "cac7d81",
+      "asset": "PS4StoreBRTest_CUSA95417_v1.01.pkg",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/pkgs/PS4StoreBRTest_CUSA95417_v1.01.pkg",
       "sizeFeed": 6619136,
       "stage": "publicado",
       "rejected": false,
@@ -70,7 +95,7 @@
       "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
       "name": "PS4 Store BR Test",
       "kind": "base",
-      "version": "1.00",
+      "version": "1.01",
       "sizeVerified": 6619136,
       "downloadHost": "raw.githubusercontent.com",
       "finalHost": "raw.githubusercontent.com",
@@ -6377,9 +6402,9 @@
   ],
   "artifact": {
     "path": "dist/auto/ps4storebr-auto.gssource",
-    "version": "1.0.2",
-    "sha256": "a702ad2acc4020418174c4b6e562a8499e6c6821b296a60279ce27c344f6d67f",
-    "contentSha256": "a24abda25f781e0aef310efc10d041785ddc64d30cacd666512d5a9793f31da0",
+    "version": "1.0.3",
+    "sha256": "8f4fdfe574d66a60d5322fa0cff83517fd48e81294c2a2a9bc4960368c033e8e",
+    "contentSha256": "2cdc820daf4d509bd87dbb4f4cebce10a01c3103a797702ac2281014517151ac",
     "titles": [
       "CUSA95417"
     ]

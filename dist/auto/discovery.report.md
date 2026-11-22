@@ -1,25 +1,26 @@
-# Relatório de descoberta — 2026-11-22T14:45:44Z
+# Relatório de descoberta — 2026-11-22T14:46:17Z
 
 > Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.
 
 | Descobertos | Acessíveis | PKG verificado | Compatíveis (regras) | Publicados | Novos | Rejeitados |
 |---|---|---|---|---|---|---|
-| 192 | 185 | 181 | 20 | 1 | 1 | 191 |
+| 193 | 186 | 182 | 21 | 1 | 1 | 192 |
 
 ## Fontes
 - `own-releases` (T-Justino/PS4): ok, 0 .pkg
-- `own-contents` (T-Justino/PS4): ok, 1 .pkg
+- `own-contents` (T-Justino/PS4): ok, 2 .pkg
 - `apollo-releases` (bucanero/apollo-ps4): erro — HTTP 403 em api.github.com
 - `pkg-zone` (): ok, 191 .pkg
 
 Catálogo atualizado: **sim**
-Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.2 · títulos: CUSA95417 · contentSha256 `a24abda25f781e0a…`
+Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.3 · títulos: CUSA95417 · contentSha256 `2cdc820daf4d509b…`
 
 ## Entradas
 
 | Novo | Fase | Estágio | Resultado | Título | Arquivo | Detalhe |
 |---|---|---|---|---|---|---|
-| sim | PUBLICAVEL | publicado | **publicado** | CUSA95417 | PS4StoreBRTest_CUSA95417_v1.00.pkg (fedfa66) |  |
+|  | VERIFICADO | compativel_sspi | rejeitado: `SUPERSEDED` | CUSA95417 | PS4StoreBRTest_CUSA95417_v1.00.pkg (fedfa66) | CUSA95417: versão 1.01 (PS4StoreBRTest_CUSA95417_v1.01.pkg) é mais nova; só uma versão por ID entra no catálogo |
+| sim | PUBLICAVEL | publicado | **publicado** | CUSA95417 | PS4StoreBRTest_CUSA95417_v1.01.pkg (cac7d81) |  |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | MOZI00001 | MOZI00001_ps4_v1.0.0.pkg (1.0.0) | prefixo MOZI não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | PLTB00000 | PLTB00000_ps4_v1.2.0.pkg (1.2.0) | prefixo PLTB não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | AMIN00048 | AMIN00048_ps4_v1.00.pkg (1.00) | prefixo AMIN não comprovado no console |

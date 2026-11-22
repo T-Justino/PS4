@@ -4,16 +4,16 @@
     "id": "ps4storebr.auto",
     "name": "PS4 Store BR (automático)",
     "description": "Catalogo gerado automaticamente a partir de fontes autorizadas. Cada pacote foi verificado (identidade lida do proprio PKG) antes de entrar.",
-    "version": "1.0.2"
+    "version": "1.0.3"
   },
   "titles": [
     {
       "titleId": "CUSA95417",
-      "identityEvidence": "Lido do proprio PKG (https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/pkgs/PS4StoreBRTest_CUSA95417_v1.00.pkg): Content ID IV0000-CUSA95417_00-PS4STOREBRTEST00, param.sfo TITLE_ID CUSA95417.",
+      "identityEvidence": "Lido do proprio PKG (https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/pkgs/PS4StoreBRTest_CUSA95417_v1.01.pkg): Content ID IV0000-CUSA95417_00-PS4STOREBRTEST00, param.sfo TITLE_ID CUSA95417.",
       "name": "PS4 Store BR Test",
       "region": null,
       "aliases": [
-        "PS4StoreBRTest_CUSA95417_v1.00"
+        "PS4StoreBRTest_CUSA95417_v1.01"
       ],
       "languages": {
         "audioPtBr": "unknown",
@@ -22,14 +22,14 @@
       },
       "packages": [
         {
-          "id": "own-contents-fedfa66-PS4StoreBRTest_CUSA95417_v1.00.pkg",
+          "id": "own-contents-cac7d81-PS4StoreBRTest_CUSA95417_v1.01.pkg",
           "kind": "base",
           "accessType": "Direct",
-          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/pkgs/PS4StoreBRTest_CUSA95417_v1.00.pkg",
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/pkgs/PS4StoreBRTest_CUSA95417_v1.01.pkg",
           "hoster": "raw.githubusercontent.com",
-          "label": "own-contents fedfa66",
-          "sourcePageUrl": "https://github.com/T-Justino/PS4/blob/ccr-8aace08a-bzwy8i/pkgs/PS4StoreBRTest_CUSA95417_v1.00.pkg",
-          "version": "1.00",
+          "label": "own-contents cac7d81",
+          "sourcePageUrl": "https://github.com/T-Justino/PS4/blob/ccr-8aace08a-bzwy8i/pkgs/PS4StoreBRTest_CUSA95417_v1.01.pkg",
+          "version": "1.01",
           "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
           "size": 6619136,
           "authorization": {

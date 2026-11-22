@@ -113,3 +113,27 @@ def test_one_version_per_id_latest_wins_and_catalog_updates_without_url_registra
     assert len(rows) == 1 and rows[0]["url"].endswith("app-v1.01.pkg") and rows[0]["version"] == "1.01"
     assert json.loads(z.read("index/titles.json"))["titles"][0]["releaseCount"] == 1
     assert json.loads((tmp_path / "o/c.json").read_text())["source"]["version"] != v1      # versão do catálogo sobe
+
+
+def test_critical_source_failure_keeps_previous_catalog_noncritical_does_not_block(tmp_path):
+    from ps4store.net import NetError
+    net = Repo()
+    net.put("a.pkg", make_pkg("CUSA95901"), "a" * 40)
+    good = {"id": "own", "type": "github-contents", "repo": "acme/app", "path": "pkgs",
+            "authorization": {"basis": "license", "evidence": "próprio"}}
+    flaky = {"id": "flaky", "type": "github-contents", "repo": "x/y", "path": "pkgs",
+             "authorization": {"basis": "license", "evidence": "e"}}
+    def mk(critical):
+        p = tmp_path / "s.json"
+        p.write_text(json.dumps({"schema": "ps4storebr.sources/v1", "catalog": {"id": "t", "name": "T"}, "tls": {"enforce": True},
+                                 "sources": [good, dict(flaky, critical=critical)]}))
+        return p
+    orig = net.get_json
+    net.get_json = lambda url: orig(url) if "acme/app" in url else (_ for _ in ()).throw(NetError("HTTP 403"))
+    r = go(tmp_path, net, mk(False))                        # não crítica: o catálogo é gerado
+    assert r.wrote_catalog and not r.critical_down
+    before = (tmp_path / "o/a.gssource").read_bytes()
+    net.put("b.pkg", make_pkg("CUSA95902"), "b" * 40)
+    r = go(tmp_path, net, mk(True))                         # crítica fora do ar: mantém o anterior
+    assert not r.wrote_catalog and r.critical_down == ["flaky"] and (tmp_path / "o/a.gssource").read_bytes() == before
+    assert "fonte crítica" in r.report["catalogError"]

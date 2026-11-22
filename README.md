@@ -9,7 +9,7 @@ Catálogo pesquisável para o SSPI (PS4), com prioridade para PT-BR. Gera arquiv
 ```bash
 PYTHONPATH=src python3 -m ps4store run     # descobre → verifica links (Range) → gera dist/auto/ps4storebr-auto.gssource + relatório
 ```
-Fontes reais: PKG-Zone (prova de descoberta; 0 publicáveis sem autorização) e pasta autorizada do próprio repositório (ciclo descoberta → catálogo gerado; instalação pendente do T8/T9). Ver `docs/GATE3.md`.
+**Estado do MVP:** descoberta→catálogo comprovada; o T8 original instalou mas **não abriu** (PKG sem `sce_module`, corrigido; `docs/TESTE_T8B.md` pendente no console). Fontes reais: PKG-Zone (prova de descoberta; 0 publicáveis sem autorização) e pasta autorizada do próprio repositório (ciclo descoberta → catálogo gerado; instalação pendente do T8/T9). Ver `docs/GATE3.md`.
 
 ## Uso
 

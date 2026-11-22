@@ -98,7 +98,7 @@ def cmd_run(a, net=None) -> int:
         print(f"catálogo atualizado: {res.report['artifact']['path']} v{res.report['artifact']['version']}" + (" [dry-run: nada foi gravado]" if a.dry_run else ""))
     else:
         print("catálogo NÃO atualizado" + (f": {res.report['catalogError']}" if res.report["catalogError"] else ": nenhuma entrada publicável (artefato anterior mantido)"))
-    return 0
+    return 3 if res.critical_down else 0     # 3 = fonte crítica fora do ar (o workflow fica vermelho, o catálogo anterior fica)
 
 
 def main(argv: list[str] | None = None, *, net=None) -> int:

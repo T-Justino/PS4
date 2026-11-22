@@ -52,6 +52,7 @@ class Source:
     max_probes: int = 250          # teto de sondagens por execução (o resto fica para a próxima)
     recheck_hours: float = 0.0     # 0 = sem cache; reaproveita a verificação por este tempo (evita repetir downloads parciais)
 
+    critical: bool = True          # fonte com erro bloqueia a atualização do .gssource (mantém o último válido)
     authorized_titles: dict = field(default_factory=dict)   # titleId -> {basis, evidence}: autorização POR ITEM
     path: str = ""                 # github-contents: pasta do repositório com os .pkg
     ref: str = ""                  # github-contents: branch/tag (vazio = padrão do repositório)
@@ -127,7 +128,7 @@ def load_config(path: str | Path) -> Config:
                            s.get("include_prereleases") is True, int(s.get("max_releases", 20)),
                            a.get("basis", ""), a.get("evidence", ""), s.get("api_base", "https://api.github.com"),
                            base, float(s.get("delay_seconds", 0)), int(s.get("max_probes", 250)),
-                           float(s.get("recheck_hours", 0)), at, s.get("path", ""), s.get("ref", "")))
+                           float(s.get("recheck_hours", 0)), s.get("critical", True) is True, at, s.get("path", ""), s.get("ref", "")))
     if not srcs:
         errs.append("nenhuma fonte configurada")
     if errs:
@@ -424,6 +425,7 @@ class RunResult:
     report: dict
     published: int
     wrote_catalog: bool
+    critical_down: list = field(default_factory=list)
 
 
 def _now() -> str:
@@ -461,7 +463,7 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
         try:
             found = CONNECTORS[src.type](src, net)
         except Exception as ex:                      # uma fonte fora do ar não derruba as demais
-            source_status.append({"source": src.id, "repo": src.repo, "status": "erro", "error": str(ex)})
+            source_status.append({"source": src.id, "repo": src.repo, "status": "erro", "error": str(ex), "critical": src.critical})
             continue
         source_status.append({"source": src.id, "repo": src.repo, "status": "ok", "discovered": len(found)})
         probes = 0
@@ -490,7 +492,10 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
     canonical = None
     wrote = False
     compile_error = None
-    if published:
+    critical_down = [x["source"] for x in source_status if x["status"] == "erro" and x.get("critical")]
+    if published and critical_down:
+        compile_error = f"fonte crítica com erro ({', '.join(critical_down)}): .gssource anterior mantido para não perder entradas"
+    if published and not critical_down:
         cur = {"titles": build_canonical(cfg, published, "0.0.0")["titles"]}
         chash = hashlib.sha256(json.dumps(cur, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
         counter = state["versionCounter"] + (0 if chash == state["catalogHash"] else 1)
@@ -523,7 +528,9 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
         write_atomic(state_path, (json.dumps(state, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode())
         write_atomic(out_report, (json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode())
         write_atomic(out_report.with_suffix(".md"), render_markdown(report).encode())
-    return RunResult(report, len(published), wrote)
+    res = RunResult(report, len(published), wrote)
+    res.critical_down = critical_down
+    return res
 
 
 def build_report(cfg, now, source_status, entries, wrote, compile_error, canonical, dry_run) -> dict:

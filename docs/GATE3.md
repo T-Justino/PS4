@@ -4,7 +4,22 @@
 > **Não é o MVP concluído.** O critério do MVP é: *um pacote autorizado, descoberto automaticamente, publicado no catálogo e instalado no PS4, sem cadastrar o link*.
 > Os resultados do PKG-Zone ficam preservados (`docs/evidencia/`, estado e cache em `data/state/`); nada foi publicado sem autorização.
 
-## Ciclo real: descoberta → validação → catálogo (feito) → instalação (pendente de T8/T9)
+## MVP: o que está comprovado, e onde
+
+| Critério | Em código/testes | Em rede real | No PS4 real |
+|---|---|---|---|
+| Arquivo autorizado descoberto em fonte real, sem cadastrar a URL | sim (113 testes) | **sim**: API de Contents do GitHub achou `pkgs/*.pkg`; antes/depois abaixo | — |
+| Link verificado, identidade do PKG validada | sim | **sim**: `Range` 64 KiB no `raw`; Content ID = `TITLE_ID` = `CUSA95417`; tamanho confere | — |
+| `.gssource` gerado sem cadastrar a URL; sem duplicar o ID | sim | **sim**: v1.0.2 (só v1.00) e v1.0.3 (só v1.01; v1.00 `SUPERSEDED`) | — |
+| Importar, achar, baixar | — | — | **T8 (22/11): sim** (importou, achou, 6,6/6,6 MB, "Installed") |
+| **Abrir o app** | — | — | **T8: NÃO** (defeito corrigido; **T8b pendente**) |
+| Atualização da fonte | regras do SSPI lidas no código público | — | **pendente** (T8b, Parte 2) |
+| Automação agendada | workflow escrito; mesmo comando testado | — | **não executado no GitHub ainda** |
+
+**O MVP técnico NÃO está concluído** até o T8b abrir o app. Evidência antes/depois: `docs/evidencia/gate3-antes.report.md` e `gate3-depois.report.md`. Diagnóstico: `docs/DIAGNOSTICO_T8.md`.
+Automação e atualização: `docs/AUTOMACAO_E_ATUALIZACAO.md`. Procedimento: `docs/TESTE_T8B.md`.
+
+## Ciclo real anterior: descoberta → validação → catálogo (T8 original, defeituoso)
 
 | Etapa | Estado |
 |---|---|

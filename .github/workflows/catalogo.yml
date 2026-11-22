@@ -1,0 +1,47 @@
+# Atualiza o catálogo .gssource automaticamente (descoberta -> verificação -> catálogo). Sem servidor, sem banco, sem VPS.
+# Roda a cada 6 h e sob demanda (Actions > catalogo > Run workflow). Se uma fonte crítica falhar, o último .gssource válido é mantido.
+name: catalogo
+on:
+  schedule:
+    - cron: "23 */6 * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: catalogo
+  cancel-in-progress: false
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Testes (não publica nada se falharem)
+        run: |
+          python -m pip install pytest
+          PYTHONPATH=src python -m pytest -q
+      - name: Descobrir, verificar e gerar o catálogo
+        id: run
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # só lê a API do GitHub (limite maior); nunca vai a hosts de download
+        run: PYTHONPATH=src python -m ps4store run
+      - name: Resumo
+        if: always()
+        run: cat dist/auto/discovery.report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Gravar mudanças (só se o catálogo/estado mudou)
+        if: always()
+        run: |
+          git config user.name "ps4store-bot"
+          git config user.email "ps4store-bot@users.noreply.github.com"
+          git add dist/auto/ps4storebr-auto.gssource data/generated data/state   # o relatório vai só no resumo do job (evita commit a cada execução)
+          if git diff --cached --quiet; then echo "sem mudanças"; else
+            git commit -m "catalogo: atualizacao automatica"
+            git push
+          fi
+      - name: Falhar se uma fonte crítica caiu
+        if: steps.run.outcome == 'failure'
+        run: exit 1
