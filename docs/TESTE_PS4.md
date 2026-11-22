@@ -10,23 +10,23 @@ Conclusão: o binário é mais restrito que o código público (que aceitaria os
 
 ## Resultado do Gate 2b (22/11/2026, relato do usuário)
 
-**T4 foi instalado** pelo SSPI 5.11.7. O que isso comprova, e só isso: **aquele PKG** (PKG-Zone Store-R2, ID real `NPXS39041`),
-listado sob a chave `CUSA99999`, foi importado e instalado **nesta versão do SSPI**. **Não** comprova o mesmo para outros
-PKGs, jogos, atualizações, DLCs, nem para outras chaves.
-Não foram relatados separadamente busca por nome/ID e detalhes (implícitos, pois a instalação parte deles).
+**CORREÇÃO (22/11/2026).** O botão "Install" da tela *Install source from USB* instala a **fonte** (`.gssource`), não o PKG.
+Quando o usuário disse "T4 foi instalado", o que ficou comprovado é: **a fonte T4 foi aceita e adicionada** no SSPI 5.11.7.
+O registro anterior de que o PKG foi baixado/instalado estava **errado e foi removido**. **Instalação de PKG sob chave sintética: NÃO provada.**
+(O Store-R2 chegou a baixar no console em 21/11, mas isso foi pela origem direta, não por uma chave sintética.)
 
-**Observação:** o código público do SSPI (`main`) prevê rejeitar um PKG cujo content ID não bate com a chave
-(`Package does not belong to …`). O T4 não foi rejeitado, então o binário se comporta diferente do código público
-nesse ponto, ou aquele PKG segue outro caminho. **Causa desconhecida; não generalizar.** Detalhes: `docs/CHAVES_SINTETICAS.md`.
+**Observação:** o código público do SSPI prevê rejeitar, **na hora de instalar o PKG**, um content ID que não bate com a chave
+(`Package does not belong to …`). Como a instalação do PKG não foi testada, **não há contradição**: a previsão segue em aberto
+(e é o maior risco da estratégia de chaves sintéticas). Detalhes: `docs/CHAVES_SINTETICAS.md`.
 
 `NPXS` e `APOL` como chave: recusados na importação.
 
 ## Resultado de T5 e T6 (22/11/2026, relato do usuário)
 
-O usuário relatou que **T5 e T6 funcionaram e foram instalados** (SSPI 5.11.7). Não foi detalhado: o botão do Store no T5
-(`Install`/`Open`), qual item do T6 foi instalado (o download do Apollo falhava por TLS), nem o teste opcional de duplicação.
-Comprovado, no relato: chaves `CUSA90001`, `CUSA90002` (e `CUSA90003`) importam e instalam. Continua valendo: vale só para
-esses PKGs e essa versão do SSPI; updates, DLC, biblioteca e duplicação seguem **não testados**.
+O usuário relatou que T5 e T6 foram "instalados" e enviou foto da tela *Install source from USB*: ou seja, **as fontes T5 e T6 foram
+adicionadas** (importação aceita; chaves `CUSA90001`, `CUSA90002`, `CUSA90003` não foram recusadas). Segundo o usuário, o botão do
+item Store (T5) na lista de resultados mostrou **`Install`** (a foto enviada é da lista de arquivos USB, não da lista de resultados;
+tratar como relato). Não testados: instalação de qualquer PKG, duplicação, atualizações, DLC, biblioteca.
 
 ## Arquivos (pasta `dist/`)
 
@@ -75,4 +75,4 @@ Extra (opcional): store com T5+T6 → [N] entradas
 | T5 erro de ID | Só `CUSA99999` passa, ou há lista de chaves | Testar outra faixa (ex.: `CUSA0xxxx`) |
 | T6 mistura/duplica itens | Conflito de chaves/shard | Investigar `packages/items.json` |
 | Botão `Open` no T5 | SSPI associa o item ao instalado de algum modo | Registrar; impacta biblioteca/atualização |
-| Botão `Install` no T5 | Chave sintética não associa ao NPXS instalado (esperado pelo código público) | Registrar; atualizações de homebrew não serão detectadas |
+| Botão `Install` no T5 (relatado) | Chave sintética não associa ao NPXS instalado (esperado pelo código público) | Registrar; atualizações de homebrew não serão detectadas |

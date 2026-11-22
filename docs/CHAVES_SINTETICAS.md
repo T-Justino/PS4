@@ -1,11 +1,11 @@
 # Chaves sintéticas de catálogo — investigação (Gate 2, antes do Gate 3)
 
-**Escopo da evidência.** T4 (`CUSA99999` + Store-R2.pkg, real `NPXS39041`) importou e instalou no SSPI 5.11.7.
-Isso vale **só para aquele PKG e aquela versão**. Nenhuma generalização para outros PKGs, jogos, updates ou DLCs.
+**Escopo da evidência.** T4 (`CUSA99999` + Store-R2.pkg, real `NPXS39041`) teve a **fonte importada** no SSPI 5.11.7; T5 e T6 (chaves `CUSA9xxxx`) também.
+**A instalação do PKG sob chave sintética nunca foi testada.** Vale só para a importação e essa versão. Nenhuma generalização para outros PKGs, jogos, updates ou DLCs.
 
 **Fonte desta análise.** Código público `xyhlo/SSPI` (`main`): `PkgValidator.cs`, `PkgInstaller.cs`, `InstalledTitleScan.cs`.
 O commit do binário (`0eb783eca1f3`) não está acessível, então o `main` pode divergir. É **leitura de código, não teste**.
-O T4 já contradiz uma previsão do código (item 1), então tudo abaixo é hipótese a confirmar no console.
+Tudo abaixo é hipótese a confirmar no console.
 
 ## Regra de projeto
 
@@ -19,7 +19,7 @@ O T4 já contradiz uma previsão do código (item 1), então tudo abaixo é hip�
 
 | Área | O que o código público indica | Risco | Como verificar |
 |---|---|---|---|
-| Instalação (base) | `CheckRequestedIdentity` compara a chave com o content ID do PKG (`Package does not belong to …`). T4 passou, contrariando isso | Outro PKG pode ser recusado | Só testando cada PKG; T4 não basta |
+| Instalação (base) | `CheckRequestedIdentity` compara a chave com o content ID do PKG (`Package does not belong to …`). Ainda não testado com PKG; maior risco | Outro PKG pode ser recusado | Teste de instalação (T7) por PKG |
 | Biblioteca / botão Open | Homebrew é identificado pelo próprio ID instalado (`IsHomebrew`: não-CUSA). Uma chave `CUSA` não casa com `NPXS39041` instalado | Item pode aparecer como `Install` mesmo instalado | T5, passo 4 |
 | Atualizações | Update exige base instalada sob a chave (`sceAppInstUtilAppExists(titleId)`) e compara content ID com o `param.sfo` instalado | Update de homebrew sob chave sintética tende a falhar (`requires installed base game`) | Fora do escopo do T5/T6; testar antes de prometer updates |
 | DLC | `GameAcceptsAddon` lê `appmeta/<CUSA>/param.sfo` do jogo instalado | Chave sintética nunca tem `param.sfo`: DLC não associa | Testar com DLC autorizado antes de suportar |

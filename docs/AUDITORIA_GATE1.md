@@ -64,4 +64,4 @@ Os hashes de conteúdo de T2/T3 acima valem só como histórico.
 
 ## Gate 2b: T4 instalado (22/11/2026)
 
-Relato do usuário: T4 (`CUSA99999` + Store-R2.pkg) foi instalado. Fluxo importar → instalar comprovado no console com chave sintética `CUSA`.
+Relato do usuário: T4 foi "instalado". **Correção:** era a instalação da *fonte* (botão Install da lista USB). Comprovado: importação aceita com chave `CUSA`. Instalação do PKG: não provada.

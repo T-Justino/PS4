@@ -2,7 +2,7 @@
 
 Catálogo pesquisável para o SSPI (PS4), com prioridade para PT-BR. Gera arquivos `.gssource` a partir de um catálogo canônico versionado. **Não hospeda nem baixa jogos.**
 
-**Status:** Gate 1 auditado (`docs/AUDITORIA_GATE1.md`). Gate 2 concluído no console (SSPI 5.11.7 Final): `NPXS`/`APOL` recusados como chave; `CUSA99999` + link real importa e instala (T4, só aquele PKG). T5/T6 (chaves `CUSA9xxxx` distintas) instalaram no console (relato); riscos das chaves sintéticas em `docs/CHAVES_SINTETICAS.md`.
+**Status:** Gate 1 auditado (`docs/AUDITORIA_GATE1.md`). Gate 2 concluído no console (SSPI 5.11.7 Final): `NPXS`/`APOL` recusados como chave; chaves `CUSA` sintéticas (T4, T5, T6): **fontes importadas** no console; instalação de PKG sob chave sintética **não provada** (`docs/TESTE_PS4.md`, `docs/CHAVES_SINTETICAS.md`).
 
 ## Uso
 
