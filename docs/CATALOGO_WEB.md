@@ -2,6 +2,8 @@
 
 Página estática única (`site/index.html`, sem backend, banco ou usuários), gerada por `ps4store web` a partir dos registros que o robô já valida (`local/research.json`). O workflow `catalogo` gera e publica no GitHub Pages. `.gssource` e CLI seguem funcionando.
 
+**Publicado:** https://t-justino.github.io/PS4/ (deploy confirmado pelo workflow `catalogo` #9, job `publicar-site`: "Reported success!", 22/11/2026; modo `publico`). Não foi preciso `actions/configure-pages`: o 404 do run #8 ocorreu porque o Pages ainda não estava configurado como *GitHub Actions* naquele momento; depois de configurado (Source = GitHub Actions + branch autorizada no ambiente `github-pages`), o mesmo workflow publicou sem alteração.
+
 ## O que a página mostra
 - Busca por nome ou ID, sem acentos/maiúsculas; ordem: exato → começa com → palavra do nome → contém.
 - Título, versão, tipo, tamanho, ID, Content ID, **de onde veio a identidade** ("lida do PKG" ou "informada pela fonte") e o estado:
