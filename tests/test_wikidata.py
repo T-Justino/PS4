@@ -88,7 +88,7 @@ def test_consulta_usa_ps4_e_jogo_e_so_inteiros_no_limite():
 
 
 def paginas(total, tamanho):
-    """fetch falso: devolve `total` itens distintos fatiados pelo OFFSET pedido (1 linha por item)."""
+    """fetch falso (modo DISTINCT): devolve `total` jogos distintos fatiados pelo OFFSET pedido (1 linha por jogo)."""
     def f(url):
         q = urllib.parse.unquote(urllib.parse.urlsplit(url).query.split("query=", 1)[1])
         off = int(q.split("OFFSET ")[1].split(")")[0].split()[0])
@@ -98,17 +98,31 @@ def paginas(total, tamanho):
     return f
 
 
-def test_paginacao_ate_pagina_incompleta_e_com_pausa_entre_paginas():
+def test_paginacao_termina_em_pagina_vazia_sem_contagem_e_pausa_entre_paginas():
     esperas, prog = [], []
-    bind, avisos = baixar_tudo(paginas(2500, 1000), 1000, 40, 1.5, dormir=esperas.append, progresso=lambda p, n: prog.append((p, n)))
-    assert len(bind) == 2500 and avisos == [] and esperas == [1.5, 1.5] and prog == [(1, 1000), (2, 2000), (3, 2500)]
-    itens, _ = para_itens(bind)
+    c = baixar_tudo(paginas(2500, 1000), 1000, 40, 1.5, dormir=esperas.append, progresso=lambda p, n: prog.append((p, n)))
+    assert len(c.linhas) == 2500 and len(c.qids) == 2500 and esperas == [1.5, 1.5, 1.5] and prog == [(1, 1000), (2, 2000), (3, 2500), (4, 2500)]
+    assert c.completa and not c.validada and any("NÃO pôde ser conferida" in a for a in c.avisos)
+    itens, _ = para_itens(c.linhas)
     assert len(itens) == 2500
 
 
-def test_teto_de_paginas_avisa_que_pode_haver_mais():
-    bind, avisos = baixar_tudo(paginas(10_000, 1000), 1000, 3, 0, dormir=lambda s: None)
-    assert len(bind) == 3000 and avisos and "teto de 3" in avisos[0]
+def test_com_contagem_para_ao_atingi_la_sem_pedir_pagina_extra_e_valida():
+    pedidos = []
+
+    def f(url):
+        pedidos.append(url)
+        return paginas(2500, 1000)(url)
+
+    c = baixar_tudo(f, 1000, 40, 0, dormir=lambda s: None, esperado=2500)
+    assert len(pedidos) == 3 and c.completa and c.validada and c.motivo == "" and c.avisos == []
+
+
+def test_teto_de_paginas_marca_incompleta():
+    c = baixar_tudo(paginas(10_000, 1000), 1000, 3, 0, dormir=lambda s: None)
+    assert len(c.qids) == 3000 and any("teto de 3" in a for a in c.avisos) and not c.completa
+    c2 = baixar_tudo(paginas(10_000, 1000), 1000, 3, 0, dormir=lambda s: None, esperado=10_000)
+    assert not c2.completa and "3000 de 10000" in c2.motivo and "30.0%" in c2.motivo
 
 
 def test_fetch_http_so_fala_com_o_host_do_servico_e_usa_user_agent_do_usuario(monkeypatch):
@@ -158,7 +172,10 @@ def test_user_agent_padrao_nao_expoe_dados_do_usuario_ou_do_projeto():
 
 # ---------- ponta a ponta: importar -> índice offline -> busca ----------
 def fetch_sim(url):
-    return json.dumps({"results": {"bindings": SIM if "OFFSET 0" in urllib.parse.unquote(url) else []}}).encode()
+    q = urllib.parse.unquote(url)
+    if "COUNT(DISTINCT" in q:
+        return json.dumps({"results": {"bindings": [{"n": {"type": "literal", "value": "6"}}]}}).encode()
+    return json.dumps({"results": {"bindings": SIM if "OFFSET 0" in q else []}}).encode()
 
 
 def test_atualizar_gera_cache_e_indice_e_a_busca_acha_batman_e_lego_batman(tmp_path, capsys):
@@ -166,6 +183,7 @@ def test_atualizar_gera_cache_e_indice_e_a_busca_acha_batman_e_lego_batman(tmp_p
     rc = main(["--atualizar", "--cache", cache, "--indice", idx, "--fontes", FONTES, "--pausa", "0", "--user-agent", "T/1 (x)"], fetch=fetch_sim)
     out = capsys.readouterr().out
     assert rc == 0 and "5 importado(s)" in out and "6 jogo(s) de PS4" in out and "1 sem rótulo" in out and "não indicam que exista PKG" in out
+    assert "conferido: 6 de 6 da contagem do serviço" in out and "PARCIAL" not in out
     doc = busca.carregar_indice(idx)
     f = doc["fontes"]["wikidata"]
     assert f["licenca"] == "CC0-1.0" and f["origem"] == "https://www.wikidata.org/" and f["obtidoEm"] and f["itens"] == 5
@@ -254,3 +272,158 @@ def test_testar_erro_de_rede_e_claro(capsys):
         raise urllib.error.URLError("sem rede")
 
     assert main(["--testar"], fetch=quebra) == 1 and "URLError" in capsys.readouterr().err
+
+
+# ---------- REGRESSÃO (relato real no Termux): total 6.628, 1ª página com 988 linhas / 947 jogos e coleta encerrada cedo ----------
+TOTAL = 6628
+LEGO3 = 5200                                   # o LEGO Batman 3 só aparece bem depois da 1ª página
+NOMES = {10: "Batman: Arkham Knight", 2000: "Batman: Arkham VR", 3500: "Batman: The Telltale Series", LEGO3: "LEGO Batman 3: Beyond Gotham",
+         6000: "LEGO Batman: The Videogame"}
+
+
+def _bag():
+    out = []
+    for i in range(TOTAL):
+        out.append(i)
+        if i % 18 == 0:
+            out.append(i)                      # o mesmo jogo por 2 caminhos de classe: duplicata que o antigo `SELECT ?g` contava no LIMIT
+    return out
+
+
+def _rows(ids):
+    linhas = []
+    for i in ids:
+        linhas.append(row(990200000 + i, NOMES.get(i, f"Jogo {i}")))
+        if i % 23 == 5:                                                  # 2ª linha do mesmo jogo (outra Wikipedia)
+            linhas.append(row(990200000 + i, NOMES.get(i, f"Jogo {i}"), None, None, f"https://pt.wikipedia.org/wiki/J{i}"))
+    return linhas
+
+
+def servidor(modo="distinct", conta=TOTAL, corta_em=None, perde=0, log=None):
+    """Simula o serviço. modo 'bag' = o comportamento do `SELECT ?g` sem DISTINCT (LIMIT conta linhas repetidas)."""
+    bag = _bag()
+
+    def f(url):
+        q = urllib.parse.unquote(urllib.parse.urlsplit(url).query.split("query=", 1)[1])
+        if log is not None:
+            log.append(q)
+        if "COUNT(DISTINCT" in q:
+            if conta is None:
+                raise urllib.error.URLError("sem contagem")
+            return json.dumps({"results": {"bindings": [{"n": {"type": "literal", "value": str(conta)}}]}}).encode()
+        off = int(q.split("OFFSET ")[1].split(")")[0].split()[0])
+        lim = int(q.split("LIMIT ")[1].split()[0])
+        if corta_em is not None and off >= corta_em:
+            return json.dumps({"results": {"bindings": []}}).encode()
+        if modo == "bag":
+            ids = sorted(set(bag[off:off + lim]))
+        else:
+            ids = list(range(off, min(off + lim, TOTAL)))
+        ids = [i for i in ids if i >= perde] if perde else ids
+        return json.dumps({"results": {"bindings": _rows(ids)}}).encode()
+    return f
+
+
+def test_cenario_do_relato_primeira_pagina_988_linhas_947_jogos():
+    p1 = json.loads(servidor("bag")(url_pagina(1000, 0)))["results"]["bindings"]
+    assert len(p1) == 988 and len({b["g"]["value"] for b in p1}) == 947          # exatamente o que o Termux mostrou
+    assert 947 < 1000                                                               # a regra antiga ("página curta = fim") encerraria aqui
+
+
+def test_consulta_de_pagina_usa_subconsulta_distinct():
+    assert "SELECT DISTINCT ?g WHERE" in consulta(1000, 0)
+
+
+def test_pagina_curta_nao_encerra_e_coleta_os_6628_jogos(tmp_path, capsys):
+    log = []
+    c = baixar_tudo(servidor("bag", log=log), 1000, 40, 0, dormir=lambda s: None, esperado=TOTAL)
+    assert len(c.qids) == TOTAL and c.completa and c.validada and c.paginas > 1
+    idx, cache = str(tmp_path / "i.json"), str(tmp_path / "c.json")
+    assert main(["--atualizar", "--cache", cache, "--indice", idx, "--fontes", FONTES, "--pausa", "0", "--user-agent", "T/1 (x)"], fetch=servidor("bag")) == 0
+    out = capsys.readouterr().out
+    assert f"conferido: {TOTAL} de {TOTAL} da contagem do serviço" in out and f"{TOTAL} importado(s)" in out
+    doc = busca.carregar_indice(idx)
+    assert len(doc["titulos"]) == TOTAL
+    assert "LEGO Batman 3: Beyond Gotham" in [r["nome"] for r in busca.buscar(doc, "lego batman")]                   # só existe depois da 1ª página
+    assert {r["nome"] for r in busca.buscar(doc, "Batman")} == set(NOMES.values())                                     # os 5 Batman, não 4
+
+
+def test_modo_distinct_pagina_exata_e_para_ao_atingir_a_contagem():
+    log = []
+    c = baixar_tudo(servidor("distinct", log=log), 1000, 40, 0, dormir=lambda s: None, esperado=TOTAL)
+    assert c.paginas == 7 and len(c.qids) == TOTAL and c.completa and sum("OFFSET" in q for q in log) == 7
+
+
+def test_coleta_encerrada_cedo_e_incompleta_nao_substitui_o_indice_valido(tmp_path, capsys):
+    idx, cache = tmp_path / "i.json", tmp_path / "c.json"
+    d = busca.indice_vazio()
+    busca.importar(d, busca.carregar_fontes(FONTES), "wikidata", [{"nome": "Antigo Válido", "url": "https://www.wikidata.org/wiki/Q1", "idFonte": "wikidata:Q1"}])
+    busca.salvar_indice(d, str(idx))
+    wikidata.salvar_cache(SIM, str(cache))
+    antes_i, antes_c = idx.read_bytes(), cache.read_bytes()
+    rc = main(["--atualizar", "--cache", str(cache), "--indice", str(idx), "--fontes", FONTES, "--pausa", "0"], fetch=servidor("bag", corta_em=1000))
+    err = capsys.readouterr().err
+    assert rc == 1 and "INCOMPLETA" in err and "coletados 947 de 6628" in err and "14.3%" in err
+    assert idx.read_bytes() == antes_i and cache.read_bytes() == antes_c                                 # nada foi substituído
+    parcial = json.loads((tmp_path / "c.parcial.json").read_text(encoding="utf-8"))
+    assert parcial["completa"] is False and parcial["coletados"] == 947 and parcial["esperados"] == TOTAL
+
+
+def test_aceitar_parcial_importa_mas_marca_o_indice_e_a_busca_avisa(tmp_path, capsys):
+    idx, cache = str(tmp_path / "i.json"), str(tmp_path / "c.json")
+    rc = main(["--atualizar", "--aceitar-parcial", "--cache", cache, "--indice", idx, "--fontes", FONTES, "--pausa", "0"], fetch=servidor("bag", corta_em=1000))
+    out = capsys.readouterr().out
+    assert rc == 0 and "PARCIAL" in out and "947 de 6628" in out
+    f = busca.carregar_indice(idx)["fontes"]["wikidata"]
+    assert f["parcial"] is True and f["coletados"] == 947 and f["esperados"] == TOTAL
+    assert busca.main(["--indice", idx, "Jogo 10"]) == 0
+    assert "é PARCIAL (947 de 6628 jogos)" in capsys.readouterr().out
+
+
+def test_sem_contagem_termina_em_pagina_vazia_mas_avisa_que_nao_foi_conferida(tmp_path, capsys):
+    idx, cache = str(tmp_path / "i.json"), str(tmp_path / "c.json")
+    rc = main(["--atualizar", "--cache", cache, "--indice", idx, "--fontes", FONTES, "--pausa", "0"], fetch=servidor("distinct", conta=None))
+    cap = capsys.readouterr()
+    assert rc == 0 and "NÃO conferido contra a contagem" in cap.out and "indisponível" in cap.err and len(busca.carregar_indice(idx)["titulos"]) == TOTAL
+
+
+def test_sem_contagem_e_teto_atingido_e_incompleto():
+    c = baixar_tudo(servidor("distinct", conta=None), 1000, 3, 0, dormir=lambda s: None, esperado=None)
+    assert not c.completa and not c.validada and "sem contagem" in c.motivo
+
+
+def test_pagina_repetida_nao_prende_o_importador():
+    pg = json.dumps({"results": {"bindings": [row(990300001, "A"), row(990300002, "B")]}}).encode()
+    n = {"c": 0}
+
+    def f(url):
+        n["c"] += 1
+        return pg
+
+    c = baixar_tudo(f, 1000, 40, 0, dormir=lambda s: None, esperado=5000)
+    assert n["c"] == 2 and not c.completa and any("nenhum jogo novo" in a for a in c.avisos)
+
+
+def test_tolerancia_pequena_aceita_e_grande_rejeita():
+    ok = baixar_tudo(servidor("distinct", perde=28), 1000, 40, 0, dormir=lambda s: None, esperado=TOTAL)       # 6600 de 6628 (99,6%)
+    assert ok.completa and ok.validada and len(ok.qids) == TOTAL - 28 and any("28 jogo(s) a menos" in a for a in ok.avisos)
+    ruim = baixar_tudo(servidor("distinct", perde=200), 1000, 40, 0, dormir=lambda s: None, esperado=TOTAL)   # 6428 de 6628 (97%)
+    assert not ruim.completa and "coletados 6428 de 6628" in ruim.motivo
+
+
+def test_offline_recusa_cache_incompleto_sem_aceitar_parcial(tmp_path, capsys):
+    cache = str(tmp_path / "c.json")
+    col = baixar_tudo(servidor("bag", corta_em=1000), 1000, 40, 0, dormir=lambda s: None, esperado=TOTAL)
+    wikidata.salvar_cache(col.linhas, cache, col)
+    idx = str(tmp_path / "i.json")
+    assert main(["--offline", "--cache", cache, "--indice", idx, "--fontes", FONTES]) == 1 and not Path(idx).exists()
+    assert "INCOMPLETO" in capsys.readouterr().err
+    assert main(["--offline", "--aceitar-parcial", "--cache", cache, "--indice", idx, "--fontes", FONTES]) == 0
+    assert busca.carregar_indice(idx)["fontes"]["wikidata"]["parcial"] is True
+
+
+def test_cache_antigo_sem_informacao_de_completude_gera_aviso(tmp_path, capsys):
+    cache = str(tmp_path / "c.json")
+    wikidata.salvar_cache(SIM, cache)                                     # sem Coleta: como o cache da versão anterior
+    assert main(["--offline", "--cache", cache, "--indice", str(tmp_path / "i.json"), "--fontes", FONTES]) == 0
+    assert "versão antiga" in capsys.readouterr().err

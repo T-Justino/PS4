@@ -19,6 +19,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -35,9 +36,10 @@ _WIKI = re.compile(r"^https://(en|pt)\.wikipedia\.org/wiki/\S+$")
 
 
 def consulta(limite: int, deslocamento: int) -> str:
-    """Uma página de jogos de PS4 (subconsulta ordenada por ?g), com rótulos en/pt, páginas da Wikipedia en/pt e o ano de lançamento."""
+    """Uma página de jogos de PS4: a subconsulta é DISTINCT e ordenada por ?g, então LIMIT/OFFSET contam JOGOS (Q-ids), não linhas repetidas.
+    (Sem DISTINCT, o mesmo jogo aparece por mais de um caminho de classe e a página traz menos de LIMIT jogos distintos.)"""
     return f"""SELECT ?g ?label_en ?label_pt ?enwiki ?ptwiki (MIN(?d) AS ?data) WHERE {{
-  {{ SELECT ?g WHERE {{ ?g wdt:P31/wdt:P279* wd:{Q_VIDEO_GAME} ; wdt:P400 wd:{Q_PLAYSTATION_4} . }} ORDER BY ?g LIMIT {int(limite)} OFFSET {int(deslocamento)} }}
+  {{ SELECT DISTINCT ?g WHERE {{ ?g wdt:P31/wdt:P279* wd:{Q_VIDEO_GAME} ; wdt:P400 wd:{Q_PLAYSTATION_4} . }} ORDER BY ?g LIMIT {int(limite)} OFFSET {int(deslocamento)} }}
   OPTIONAL {{ ?g rdfs:label ?label_en . FILTER(LANG(?label_en) = "en") }}
   OPTIONAL {{ ?g rdfs:label ?label_pt . FILTER(LANG(?label_pt) = "pt") }}
   OPTIONAL {{ ?enwiki schema:about ?g ; schema:isPartOf <https://en.wikipedia.org/> . }}
@@ -76,12 +78,7 @@ def url_consulta(q: str) -> str:
 
 def testar(fetch, termo: str = "batman") -> dict:
     """Teste de conexão SEM gravar nada: conta os jogos de PS4 e lista os que contêm o termo. Devolve só o que o serviço respondeu."""
-    n = None
-    try:
-        c = json.loads(fetch(url_consulta(consulta_contagem())))["results"]["bindings"]
-        n = int(c[0]["n"]["value"]) if c else None
-    except (KeyError, IndexError, ValueError, TypeError):
-        n = None
+    n = contar(fetch)
     bind = json.loads(fetch(url_consulta(consulta_nome(termo))))["results"]["bindings"]
     itens, est = para_itens(bind)
     return {"total": n, "termo": termo, "itens": itens, "estatisticas": est}
@@ -118,24 +115,82 @@ def fetch_http(url: str, user_agent: str, timeout: int = 90, tentativas: int = 3
     raise RuntimeError("inalcançável")
 
 
-def baixar_tudo(fetch, tamanho: int = 1000, max_paginas: int = 40, pausa: float = 1.0, dormir=time.sleep, progresso=None) -> tuple[list[dict], list[str]]:
-    """Páginas até vir uma página incompleta (ou o teto). Devolve (bindings, avisos). `fetch(url)->bytes` é injetável para teste."""
-    todos: list[dict] = []
-    avisos: list[str] = []
+@dataclass
+class Coleta:
+    linhas: list = field(default_factory=list)
+    qids: set = field(default_factory=set)
+    paginas: int = 0
+    esperado: int | None = None        # contagem de jogos de PS4 informada pelo serviço (None = não obtida)
+    completa: bool = False
+    validada: bool = False             # True = conferida contra a contagem do serviço
+    avisos: list = field(default_factory=list)
+    motivo: str = ""                   # por que NÃO é completa
+
+
+TOLERANCIA = 0.995                     # diferença aceita entre a contagem e o coletado (edições do Wikidata entre as consultas)
+
+
+def contar(fetch) -> int | None:
+    """Contagem de jogos de PS4 segundo o serviço (None se a consulta falhar ou vier em formato inesperado)."""
+    try:
+        c = json.loads(fetch(url_consulta(consulta_contagem())))["results"]["bindings"]
+        return int(c[0]["n"]["value"]) if c else None
+    except (KeyError, IndexError, ValueError, TypeError, OSError, urllib.error.URLError):
+        return None
+
+
+def _qids(linhas: list[dict]) -> set[str]:
+    out = set()
+    for b in linhas:
+        m = _ENT.match(_val(b, "g"))
+        if m:
+            out.add(m.group(1))
+    return out
+
+
+def baixar_tudo(fetch, tamanho: int = 1000, max_paginas: int = 40, pausa: float = 1.0, dormir=time.sleep, progresso=None,
+                esperado: int | None = None) -> Coleta:
+    """Coleta por páginas de JOGOS DISTINTOS. Uma página curta NÃO encerra a coleta: só terminam (a) página vazia, (b) Q-ids coletados >= contagem
+    do serviço, (c) página sem nenhum Q-id novo (travada) ou (d) teto de páginas. Depois confere o total contra a contagem (`esperado`)."""
+    c = Coleta(esperado=esperado)
+    fim_natural = False
     for pag in range(max_paginas):
-        corpo = fetch(url_pagina(tamanho, pag * tamanho))
-        doc = json.loads(corpo)
-        linhas = doc["results"]["bindings"]
-        todos += linhas
+        linhas = json.loads(fetch(url_pagina(tamanho, pag * tamanho)))["results"]["bindings"]
+        c.paginas += 1
+        qs = _qids(linhas)
+        novos = qs - c.qids
+        c.linhas += linhas
+        c.qids |= qs
         if progresso:
-            progresso(pag + 1, len(todos))
-        # uma página pode ter mais linhas que itens (rótulos/páginas múltiplas): usa os itens distintos da página para decidir o fim
-        distintos = {b["g"]["value"] for b in linhas if "g" in b}
-        if len(distintos) < tamanho:
-            return todos, avisos
+            progresso(c.paginas, len(c.qids))
+        if not linhas:
+            fim_natural = True
+            break
+        if esperado is not None and len(c.qids) >= esperado:
+            fim_natural = True
+            break
+        if not novos:
+            c.avisos.append(f"a página {c.paginas} não trouxe nenhum jogo novo: coleta interrompida")
+            break
         dormir(pausa)
-    avisos.append(f"parou no teto de {max_paginas} páginas ({max_paginas * tamanho} itens): pode haver mais jogos; aumente --max-paginas")
-    return todos, avisos
+    else:
+        c.avisos.append(f"parou no teto de {max_paginas} páginas: pode haver mais jogos; aumente --max-paginas")
+    coletados = len(c.qids)
+    if esperado is not None:
+        minimo = int(esperado * TOLERANCIA + 0.999999)                       # teto de esperado*0,995
+        c.validada = True
+        c.completa = coletados >= minimo
+        if not c.completa:
+            c.motivo = f"coletados {coletados} de {esperado} jogos ({100 * coletados / max(esperado, 1):.1f}%)"
+        elif coletados < esperado:
+            c.avisos.append(f"{esperado - coletados} jogo(s) a menos que a contagem do serviço (dentro da tolerância de {100 * (1 - TOLERANCIA):.1f}%)")
+    else:
+        c.completa = fim_natural
+        c.avisos.append("contagem do serviço indisponível: a coleta NÃO pôde ser conferida (só se sabe que terminou com página vazia)" if fim_natural
+                        else "contagem do serviço indisponível e a coleta não terminou normalmente")
+        if not fim_natural:
+            c.motivo = "coleta interrompida sem contagem para validar"
+    return c
 
 
 def _val(b: dict, k: str) -> str:
@@ -185,9 +240,12 @@ def para_itens(bindings: list[dict]) -> tuple[list[dict], dict]:
     return itens, est
 
 
-def salvar_cache(bindings: list[dict], caminho: str) -> None:
+def salvar_cache(bindings: list[dict], caminho: str, coleta: Coleta | None = None) -> None:
     doc = {"origem": ENDPOINT, "licenca": "CC0-1.0", "obtidoEm": datetime.now(timezone.utc).isoformat(timespec="seconds"),
            "plataforma": Q_PLAYSTATION_4, "classe": Q_VIDEO_GAME, "linhas": bindings}
+    if coleta is not None:
+        doc.update({"completa": coleta.completa, "validada": coleta.validada, "esperados": coleta.esperado, "coletados": len(coleta.qids),
+                    "motivoIncompleta": coleta.motivo})
     _gravar(doc, caminho)
 
 
@@ -209,7 +267,10 @@ def carregar_cache(caminho: str) -> dict:
 def montar_indice(cache: dict, indice_caminho: str, fontes_caminho: str = busca.FONTES_PADRAO) -> dict:
     itens, est = para_itens(cache["linhas"])
     doc = busca.carregar_indice(indice_caminho)
-    rep = busca.importar(doc, busca.carregar_fontes(fontes_caminho), "wikidata", itens, meta={"obtidoEm": cache.get("obtidoEm", ""), "consulta": f"P31/P279* {Q_VIDEO_GAME} + P400 {Q_PLAYSTATION_4}"})
+    meta = {"obtidoEm": cache.get("obtidoEm", ""), "consulta": f"P31/P279* {Q_VIDEO_GAME} + P400 {Q_PLAYSTATION_4}"}
+    if cache.get("completa") is False:
+        meta.update({"parcial": True, "coletados": cache.get("coletados"), "esperados": cache.get("esperados"), "motivoIncompleta": cache.get("motivoIncompleta", "")})
+    rep = busca.importar(doc, busca.carregar_fontes(fontes_caminho), "wikidata", itens, meta=meta)
     busca.salvar_indice(doc, indice_caminho)
     return {**est, **rep}
 
@@ -226,6 +287,7 @@ def main(argv=None, fetch=None) -> int:
     ap.add_argument("--tamanho", type=int, default=1000, help="itens por página (padrão 1000)")
     ap.add_argument("--max-paginas", type=int, default=40)
     ap.add_argument("--pausa", type=float, default=1.0, help="segundos entre páginas")
+    ap.add_argument("--aceitar-parcial", action="store_true", help="importa mesmo se a coleta estiver incompleta (o índice fica marcado como PARCIAL)")
     a = ap.parse_args(argv)
     if a.testar is not None:
         if a.atualizar or a.offline:
@@ -250,12 +312,25 @@ def main(argv=None, fetch=None) -> int:
             if a.user_agent == UA_PADRAO:
                 print("AVISO  User-Agent genérico: o Wikimedia pede um identificador com contato (--user-agent ou WIKIDATA_USER_AGENT).", file=sys.stderr)
             f = fetch or (lambda u: fetch_http(u, a.user_agent))
-            bind, avisos = baixar_tudo(f, max(1, min(a.tamanho, 5000)), max(1, a.max_paginas), max(0.0, a.pausa),
-                                       progresso=lambda p, n: print(f"  página {p}: {n} linhas até agora", file=sys.stderr))
-            for av in avisos:
+            esperado = contar(f)
+            print(f"Contagem do serviço: {esperado if esperado is not None else 'indisponível'} jogos de PS4", file=sys.stderr)
+            col = baixar_tudo(f, max(1, min(a.tamanho, 5000)), max(1, a.max_paginas), max(0.0, a.pausa),
+                              progresso=lambda p, n: print(f"  página {p}: {n} jogos distintos até agora", file=sys.stderr), esperado=esperado)
+            for av in col.avisos:
                 print(f"AVISO  {av}", file=sys.stderr)
-            salvar_cache(bind, a.cache)
+            if not col.completa and not a.aceitar_parcial:
+                parcial = str(Path(a.cache).with_suffix(".parcial.json"))
+                salvar_cache(col.linhas, parcial, col)
+                print(f"ERRO  importação INCOMPLETA ({col.motivo}). O índice e o cache atuais NÃO foram alterados; a coleta parcial ficou em {parcial}.\n"
+                      "      Tente de novo (--atualizar) ou use --aceitar-parcial para importar mesmo assim (o índice ficará marcado como PARCIAL).", file=sys.stderr)
+                return 1
+            salvar_cache(col.linhas, a.cache, col)
         cache = carregar_cache(a.cache)
+        if cache.get("completa") is False and not a.aceitar_parcial:
+            print(f"ERRO  o cache está marcado como INCOMPLETO ({cache.get('motivoIncompleta', '?')}); use --atualizar ou --aceitar-parcial.", file=sys.stderr)
+            return 1
+        if "completa" not in cache:
+            print("AVISO  este cache é de uma versão antiga e não diz se a coleta foi completa; rode --atualizar para validar contra a contagem do serviço.", file=sys.stderr)
         rep = montar_indice(cache, a.indice, a.fontes)
     except FileNotFoundError:
         print(f"ERRO  cache não encontrado ({a.cache}): rode --atualizar com internet", file=sys.stderr)
@@ -263,7 +338,11 @@ def main(argv=None, fetch=None) -> int:
     except (OSError, ValueError, KeyError, urllib.error.URLError) as e:
         print(f"ERRO  {type(e).__name__}: {str(e)[:200]}", file=sys.stderr)
         return 1
-    print(f"Wikidata (CC0-1.0), obtido em {cache.get('obtidoEm', '?')}: {rep['itensWikidata']} jogo(s) de PS4 no Wikidata · "
+    conf = (f" · conferido: {cache['coletados']} de {cache['esperados']} da contagem do serviço" if cache.get("validada") and cache.get("esperados") else
+            " · NÃO conferido contra a contagem do serviço" if cache.get("validada") is False else "")
+    if cache.get("completa") is False:
+        conf += " · PARCIAL"
+    print(f"Wikidata (CC0-1.0), obtido em {cache.get('obtidoEm', '?')}: {rep['itensWikidata']} jogo(s) de PS4 no Wikidata{conf} · "
           f"{rep['importados']} importado(s) no índice · {rep['semRotulo']} sem rótulo en/pt (descartados) · "
           f"{rep['comWikipedia']} com página da Wikipedia · {rep['comAno']} com ano de lançamento · {len(rep['rejeitados'])} rejeitado(s)")
     print("São metadados de jogos: não indicam que exista PKG ou download disponível.")

@@ -13,6 +13,13 @@ Wikidata: dados estruturados em **CC0 1.0** (registrado em `config/busca-fontes.
 - Nomes, Q-ids (`idFonte`) e URLs vêm da fonte sem alteração. URL do resultado = página da Wikipedia (en, senão pt) se existir; senão a página do próprio Wikidata. Todas ficam em `referencias`.
 - **Campo ausente fica ausente:** item sem rótulo en/pt é descartado e contado; sem data não há ano; sem Wikipedia não há link da Wikipedia; sem rótulo pt não há alias. URL fora de `https://{en,pt}.wikipedia.org` é ignorada.
 
+## Paginação e validação (correção 22/11/2026)
+Relato real no Termux: o serviço contava **6.628** jogos de PS4, mas `--atualizar` parou na página 1 (988 linhas, **947 jogos distintos**) e só 947 foram importados (a busca por "lego batman" não achou nada e "Batman" só 4).
+- **Causa:** a subconsulta de página era `SELECT ?g` sem `DISTINCT`: o mesmo jogo aparece por mais de um caminho de classe e o `LIMIT 1000` contava linhas repetidas, trazendo menos de 1000 jogos distintos; a regra antiga "página curta = fim" encerrava a coleta.
+- **Correção:** `SELECT DISTINCT ?g … ORDER BY ?g LIMIT/OFFSET` (a página passa a contar jogos); página curta **não** encerra. A coleta só termina com página vazia, ao atingir a contagem do serviço, sem Q-ids novos (página repetida) ou no teto de páginas. Depois confere os Q-ids coletados contra a contagem do serviço (tolerância de 0,5%).
+- **Incompleta:** o índice e o cache atuais **não são substituídos**; a coleta parcial fica em `local/wikidata-ps4.parcial.json` e o comando termina com erro. `--aceitar-parcial` importa mesmo assim e marca a fonte como PARCIAL (a busca avisa). `--offline` também recusa cache marcado incompleto. Sem a contagem (consulta falhou), a coleta só vale se terminar em página vazia e o relatório diz "NÃO conferido".
+- Regressão testada com um serviço simulado: 6.628 jogos, 1ª página com 988 linhas/947 jogos (os números exatos do relato). **Não verificado contra o serviço real** daqui (rede bloqueada).
+
 ## Comandos (Termux)
 **Passo 0, teste rápido (2 consultas pequenas, não grava nada):** confirma que a API responde e que os identificadores estão certos antes da importação completa.
 ```sh

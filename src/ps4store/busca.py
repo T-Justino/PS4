@@ -228,6 +228,8 @@ def main(argv=None) -> int:
         print(f"{i}. {t['nome']}{ano}{teste}\n   {t['url']}   [fonte: {t.get('fonte', '?')}" + (f" {t['idFonte']}" if t.get("idFonte") else "") + "]")
     for fid in sorted({t.get("fonte") for t in res}):
         f = doc.get("fontes", {}).get(fid, {})
+        if f.get("parcial"):
+            print(f"AVISO  o índice da fonte '{fid}' é PARCIAL ({f.get('coletados')} de {f.get('esperados')} jogos): podem faltar títulos. Rode a atualização de novo.")
         if f.get("licenca"):
             print(f"Metadados de '{fid}': licença {f['licenca']}" + (f" · origem {f['origem']}" if f.get("origem") else "") + (f" · obtido em {f['obtidoEm'][:10]}" if f.get("obtidoEm") else ""))
     print("(metadados de jogos: não indicam que exista PKG/download disponível)")
