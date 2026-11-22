@@ -1,4 +1,4 @@
-# Relatório de descoberta: 2026-11-22T15:55:43Z
+# Relatório de descoberta: 2026-11-22T15:59:28Z
 
 > Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.
 
@@ -9,23 +9,23 @@ A **descoberta registra tudo o que a fonte expõe** (sem filtrar por licença, a
 | Pergunta | Sim | Não | Não avaliado |
 |---|---|---|---|
 | **Encontrado** (descoberta) | 342 | 0 | — |
-| **Link acessível** (validação) | 42 | 15 | 285 |
+| **Link acessível** (validação) | 52 | 15 | 275 |
 | **Arquivo identificado** (ID lido do PKG) | 185 | 0 | 157 |
 | **Compatível com o SSPI** (regras técnicas) | 22 | 163 | 157 |
 | **Disponível em catálogo publicável** (política) | 1 | 184 | 157 |
-| **Disponível por link direto** (lista pessoal) | 23 | 162 | 157 |
+| **Disponível por link direto** (lista pessoal) | 29 | 156 | 157 |
 
 Licença: **0 conhecida(s)**, **342 `LICENSE_UNKNOWN`** (informativo: não elimina o resultado; também não autoriza).
 
 | Descobertos | Acessíveis | PKG verificado | Compatíveis (regras) | Publicáveis | Novos | Com motivo de bloqueio |
 |---|---|---|---|---|---|---|
-| 342 | 198 | 185 | 22 | 1 | 137 | 341 |
+| 342 | 198 | 185 | 22 | 1 | 0 | 341 |
 
 ## Fontes
 - `own-releases` (github-releases T-Justino/PS4): ok, 0 arquivos
 - `own-contents` (github-contents T-Justino/PS4): ok, 3 arquivos · link validado em 3
 - `apollo-releases` ( bucanero/apollo-ps4): erro — HTTP 403 em api.github.com
-- `pkg-zone` (pkg-zone-catalog ): ok, 328 arquivos · link validado em 28
+- `pkg-zone` (pkg-zone-catalog ): ok, 328 arquivos · link validado em 38
 - `lightningmods-ps4-store` ( LightningMods/PS4-Store): erro — HTTP 403 em api.github.com
 - `own-rar` (github-contents T-Justino/PS4): ok, 11 arquivos · link validado em 11
 - `gh-search` (github-search ): ok, 0 arquivos
@@ -65,22 +65,22 @@ Legenda: ✓ sim · ✗ não · — não avaliado. Colunas: Link acessível · A
 |  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | SMSR00001 | SMSR00001_ps4_v1.9.2-ps4.pkg (1.9.2-ps4) | `PREFIX_UNPROVEN` prefixo SMSR não comprovado no console |
 |  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | MAND00001 | MAND00001_ps4_v1.00.pkg (1.00) | `PREFIX_UNPROVEN` prefixo MAND não comprovado no console |
 |  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | NTXS10053 | NTXS10053_ps4_v1.30.pkg (1.30) | `PREFIX_UNPROVEN` prefixo NTXS não comprovado no console |
-|  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | WILI00000 | WILI00000_ps4_v1.6.0.pkg (1.6.0) | `PREFIX_UNPROVEN` prefixo WILI não comprovado no console |
-|  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | SKID02048 | SKID02048_ps4_v1.01.pkg (1.01) | `PREFIX_UNPROVEN` prefixo SKID não comprovado no console |
+|  | ✓ | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | WILI00000 | WILI00000_ps4_v1.6.0.pkg (1.6.0) | `PREFIX_UNPROVEN` prefixo WILI não comprovado no console |
+|  | ✓ | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | SKID02048 | SKID02048_ps4_v1.01.pkg (1.01) | `PREFIX_UNPROVEN` prefixo SKID não comprovado no console |
 |  | — | — | — | — | — | LICENSE_UNKNOWN |  | PPSA01650_ps5_v1.03.pkg (1.03) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
 |  | — | — | — | — | — | LICENSE_UNKNOWN |  | PPSA01615_ps5_v6.00.pkg (6.00) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-|  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | YTSB42069 | YTSB42069_ps4_v1.0.1.pkg (1.0.1) | `PREFIX_UNPROVEN` prefixo YTSB não comprovado no console |
+|  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | YTSB42069 | YTSB42069_ps4_v1.0.1.pkg (1.0.1) | `PREFIX_UNPROVEN` prefixo YTSB não comprovado no console |
 |  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.14.pkg (1.14) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-|  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | ITEM00001 | ITEM00001_ps4_v1.08.pkg (1.08) | `PREFIX_UNPROVEN` prefixo ITEM não comprovado no console |
-|  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | PKGI13337 | PKGI13337_ps4_v1.10.0.pkg (1.10.0) | `PREFIX_UNPROVEN` prefixo PKGI não comprovado no console |
+|  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | ITEM00001 | ITEM00001_ps4_v1.08.pkg (1.08) | `PREFIX_UNPROVEN` prefixo ITEM não comprovado no console |
+|  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | PKGI13337 | PKGI13337_ps4_v1.10.0.pkg (1.10.0) | `PREFIX_UNPROVEN` prefixo PKGI não comprovado no console |
 |  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps5_v1.10.0.pkg (1.10.0) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
 |  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20016_ps5_v1.00.pkg (1.00) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-|  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | LAPY20015 | LAPY20015_ps4_v1.02.pkg (1.02) | `PREFIX_UNPROVEN` prefixo LAPY não comprovado no console |
-|  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | AZIF00001 | AZIF00001_ps4_v1.02.pkg (1.02) | `PREFIX_UNPROVEN` prefixo AZIF não comprovado no console |
-|  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | UDAT99998 | UDAT99998_ps4_v2.04.pkg (2.04) | `PREFIX_UNPROVEN` prefixo UDAT não comprovado no console |
-|  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | LAPY10025 | LAPY10025_ps4_v1.04.pkg (1.04) | `PREFIX_UNPROVEN` prefixo LAPY não comprovado no console |
+|  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | LAPY20015 | LAPY20015_ps4_v1.02.pkg (1.02) | `PREFIX_UNPROVEN` prefixo LAPY não comprovado no console |
+|  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | AZIF00001 | AZIF00001_ps4_v1.02.pkg (1.02) | `PREFIX_UNPROVEN` prefixo AZIF não comprovado no console |
+|  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | UDAT99998 | UDAT99998_ps4_v2.04.pkg (2.04) | `PREFIX_UNPROVEN` prefixo UDAT não comprovado no console |
+|  | ✓ | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | LAPY10025 | LAPY10025_ps4_v1.04.pkg (1.04) | `PREFIX_UNPROVEN` prefixo LAPY não comprovado no console |
 |  | ✓ | ✓ | ✗ | ✗ | ✓ | LICENSE_UNKNOWN | LAPY10024 | LAPY10024_ps4_v1.01.pkg (1.01) | `PREFIX_UNPROVEN` prefixo LAPY não comprovado no console |
-|  | — | ✓ | ✓ | ✗ | ✗ | LICENSE_UNKNOWN | CUSA01015 | CUSA01116_ps4_v2.32.pkg (2.32) | `RETAIL_STYLE_ID` Content ID UP4381-CUSA01015_00-YOUTUBESCEA00000 / categoria 'media' tem aparência de conteúdo comercial: fica só na pesquisa; só entra em catálogo com autorização POR ITEM |
+|  | ✓ | ✓ | ✓ | ✗ | ✗ | LICENSE_UNKNOWN | CUSA01015 | CUSA01116_ps4_v2.32.pkg (2.32) | `RETAIL_STYLE_ID` Content ID UP4381-CUSA01015_00-YOUTUBESCEA00000 / categoria 'media' tem aparência de conteúdo comercial: fica só na pesquisa; só entra em catálogo com autorização POR ITEM |
 |  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | LAPY20001 | LAPY20001_ps4_v1.34.pkg (1.34) | `PREFIX_UNPROVEN` prefixo LAPY não comprovado no console |
 |  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | SAAT29385 | SAAT29385_ps4_v2.20.pkg (2.20) | `PREFIX_UNPROVEN` prefixo SAAT não comprovado no console |
 |  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | NPXX51362 | NPXX51364_ps4_v1.00.pkg (1.00) | `PREFIX_UNPROVEN` prefixo NPXX não comprovado no console |
@@ -233,143 +233,143 @@ Legenda: ✓ sim · ✗ não · — não avaliado. Colunas: Link acessível · A
 |  | — | ✓ | ✓ | ✗ | ✗ | LICENSE_UNKNOWN | CUSA02644 | CUSA02644_ps4_v1.34.pkg (1.34) | `RETAIL_STYLE_ID` Content ID EP8805-CUSA02644_00-20150410XCRUNCHY / categoria 'media' tem aparência de conteúdo comercial: fica só na pesquisa; só entra em catálogo com autorização POR ITEM |
 |  | — | ✓ | ✓ | ✗ | ✗ | LICENSE_UNKNOWN | CUSA01850 | CUSA01850_ps4_v2.03.pkg (2.03) | `RETAIL_STYLE_ID` Content ID UP4544-CUSA01850_00-PLEX000000000000 / categoria 'media' tem aparência de conteúdo comercial: fica só na pesquisa; só entra em catálogo com autorização POR ITEM |
 |  | — | ✓ | ✗ | ✗ | ✗ | LICENSE_UNKNOWN | BBAR00505 | BBAR00505_ps4_v1.00.pkg (1.00) | `PREFIX_UNPROVEN` prefixo BBAR não comprovado no console |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | NUEX00001_ps4_v2.0.0.pkg (2.0.0) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.5.pkg (0.9.5) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.4.pkg (0.9.4) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.3.pkg (0.9.3) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.2.pkg (0.9.2) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.1.pkg (0.9.1) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.0.pkg (0.9.0) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.8.3.pkg (0.8.3) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.8.2.pkg (0.8.2) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.8.1.pkg (0.8.1) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.8.0.pkg (0.8.0) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.7.pkg (0.7.7) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.6.pkg (0.7.6) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.5.pkg (0.7.5) | `UNREACHABLE` HTTP 403 |
-| sim | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.4.pkg (0.7.4) | `UNREACHABLE` HTTP 403 |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.3.pkg (0.7.3) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.2.pkg (0.7.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.1.pkg (0.7.1) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20011_ps5_v1.05.pkg (1.05) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20011_ps5_v1.04.pkg (1.04) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20011_ps5_v1.02.pkg (1.02) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.07.pkg (2.07) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.06.pkg (2.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.05.pkg (2.05) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.04.pkg (2.04) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.03.pkg (2.03) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.02.pkg (2.02) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | MARC00001_ps4_v4.00.pkg (4.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | MARC00001_ps4_v3.90.pkg (3.90) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | MARC00001_ps4_v3.72.pkg (3.72) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | FPKP00001_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LIBR00001_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.10.pkg (2.10) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.09.pkg (2.09) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.08.pkg (2.08) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.07.pkg (2.07) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.06.pkg (2.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.05.pkg (2.05) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.04.pkg (2.04) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.03.pkg (2.03) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.02.pkg (2.02) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.01.pkg (2.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.00.pkg (2.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.39.pkg (1.39) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.38.pkg (1.38) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.37.pkg (1.37) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.36.pkg (1.36) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.35.pkg (1.35) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.34.pkg (1.34) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.33.pkg (1.33) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.32.pkg (1.32) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.31.pkg (1.31) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.30.pkg (1.30) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.29.pkg (1.29) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.28.pkg (1.28) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.27.pkg (1.27) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.25.pkg (1.25) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.24.pkg (1.24) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | KRGR00001_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | BREW69420_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | SMSR00002_ps4_v2.9.2.pkg (2.9.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | SMSR00001_ps4_v1.9.2.pkg (1.9.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.37.pkg (0.37) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.35.pkg (0.35) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.34.pkg (0.34) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.33.pkg (0.33) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.32.pkg (0.32) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.31.pkg (0.31) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.30.pkg (0.30) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.29.pkg (0.29) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.28.pkg (0.28) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.27.pkg (0.27) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.5.3.pkg (1.5.3) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.5.2.pkg (1.5.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.5.1.pkg (1.5.1) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.5.0.pkg (1.5.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.4.1.pkg (1.4.1) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.4.0.pkg (1.4.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | SKID02048_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.13.pkg (1.13) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.12.pkg (1.12) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.11.pkg (1.11) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.10.pkg (1.10) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.09.pkg (1.09) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.08.pkg (1.08) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps4_v1.07.pkg (1.07) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.07.pkg (1.07) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps4_v1.06.pkg (1.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.06.pkg (1.06) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps4_v1.05.pkg (1.05) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps4_v1.04.pkg (1.04) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v1.01.1.pkg (1.01.1) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps5_v1.01.1.pkg (1.01.1) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v1.01.0.pkg (1.01.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps5_v1.01.0.pkg (1.01.0) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v1.00.0.pkg (1.00.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps5_v1.00.0.pkg (1.00.0) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.87.7.pkg (0.87.7) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.87.3.pkg (0.87.3) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.87.pkg (0.87) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.86.pkg (0.86) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.81.pkg (0.81) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.80.pkg (0.80) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.75.pkg (0.75) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20015_ps4_v1.01.pkg (1.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20015_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | UDAT99998_ps4_v2.03.pkg (2.03) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | UDAT99998_ps4_v2.02.pkg (2.02) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | UDAT99998_ps4_v2.01.pkg (2.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10025_ps4_v1.03.pkg (1.03) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10025_ps4_v1.02.pkg (1.02) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10025_ps4_v1.01.pkg (1.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10025_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10024_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | CUSA01116_ps4_v2.23.pkg (2.23) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | SAAT29385_ps4_v2.10.pkg (2.10) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | SAAT29385_ps4_v2.0.0.pkg (2.0.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.3.2.pkg (2.3.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.3.0.pkg (2.3.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.2.4.pkg (2.2.4) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.2.0.pkg (2.2.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.0.0.pkg (2.0.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.7.0.pkg (1.7.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.6.0.pkg (1.6.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.4.5.pkg (1.4.5) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.4.4.pkg (1.4.4) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.4.2.pkg (1.4.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | CHTM00777_ps4_v1.2.0.pkg (1.2.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20014_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20004_ps4_v1.06.pkg (1.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20006_ps4_v1.06.pkg (1.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | CUSA00127_ps4_v1.46.pkg (1.46) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20007_ps4_v1.15.pkg (1.15) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20007_ps4_v1.14.pkg (1.14) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20007_ps4_v1.12 (Christmas Edition Qz).pkg (1.12 (Christmas Edition Qz)) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20002_ps4_v1.07.pkg (1.07) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
-| sim | — | — | — | — | — | LICENSE_UNKNOWN |  | CUSA01850_ps4_v2.01.pkg (2.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | NUEX00001_ps4_v2.0.0.pkg (2.0.0) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.5.pkg (0.9.5) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.4.pkg (0.9.4) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.3.pkg (0.9.3) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.2.pkg (0.9.2) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.1.pkg (0.9.1) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.9.0.pkg (0.9.0) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.8.3.pkg (0.8.3) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.8.2.pkg (0.8.2) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.8.1.pkg (0.8.1) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.8.0.pkg (0.8.0) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.7.pkg (0.7.7) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.6.pkg (0.7.6) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.5.pkg (0.7.5) | `UNREACHABLE` HTTP 403 |
+|  | ✗ | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.4.pkg (0.7.4) | `UNREACHABLE` HTTP 403 |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.3.pkg (0.7.3) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.2.pkg (0.7.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | SFIN00000_ps4_v0.7.1.pkg (0.7.1) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20011_ps5_v1.05.pkg (1.05) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20011_ps5_v1.04.pkg (1.04) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20011_ps5_v1.02.pkg (1.02) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.07.pkg (2.07) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.06.pkg (2.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.05.pkg (2.05) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.04.pkg (2.04) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.03.pkg (2.03) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20009_ps4_v2.02.pkg (2.02) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | MARC00001_ps4_v4.00.pkg (4.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | MARC00001_ps4_v3.90.pkg (3.90) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | MARC00001_ps4_v3.72.pkg (3.72) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | FPKP00001_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LIBR00001_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.10.pkg (2.10) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.09.pkg (2.09) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.08.pkg (2.08) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.07.pkg (2.07) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.06.pkg (2.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.05.pkg (2.05) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.04.pkg (2.04) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.03.pkg (2.03) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.02.pkg (2.02) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.01.pkg (2.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v2.00.pkg (2.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.39.pkg (1.39) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.38.pkg (1.38) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.37.pkg (1.37) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.36.pkg (1.36) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.35.pkg (1.35) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.34.pkg (1.34) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.33.pkg (1.33) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.32.pkg (1.32) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.31.pkg (1.31) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.30.pkg (1.30) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.29.pkg (1.29) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.28.pkg (1.28) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.27.pkg (1.27) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.25.pkg (1.25) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | RMTC00001_ps4_v1.24.pkg (1.24) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | KRGR00001_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | BREW69420_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | SMSR00002_ps4_v2.9.2.pkg (2.9.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | SMSR00001_ps4_v1.9.2.pkg (1.9.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.37.pkg (0.37) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.35.pkg (0.35) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.34.pkg (0.34) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.33.pkg (0.33) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.32.pkg (0.32) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.31.pkg (0.31) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.30.pkg (0.30) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.29.pkg (0.29) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.28.pkg (0.28) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | NTXS10053_ps4_v0.27.pkg (0.27) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.5.3.pkg (1.5.3) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.5.2.pkg (1.5.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.5.1.pkg (1.5.1) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.5.0.pkg (1.5.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.4.1.pkg (1.4.1) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | WILI00000_ps4_v1.4.0.pkg (1.4.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | SKID02048_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.13.pkg (1.13) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.12.pkg (1.12) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.11.pkg (1.11) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.10.pkg (1.10) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.09.pkg (1.09) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.08.pkg (1.08) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps4_v1.07.pkg (1.07) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.07.pkg (1.07) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps4_v1.06.pkg (1.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps5_v1.06.pkg (1.06) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps4_v1.05.pkg (1.05) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | ITEM00001_ps4_v1.04.pkg (1.04) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v1.01.1.pkg (1.01.1) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps5_v1.01.1.pkg (1.01.1) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v1.01.0.pkg (1.01.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps5_v1.01.0.pkg (1.01.0) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v1.00.0.pkg (1.00.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps5_v1.00.0.pkg (1.00.0) | `NOT_PS4` ps5: fora do alvo (PS4); não sondado |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.87.7.pkg (0.87.7) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.87.3.pkg (0.87.3) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.87.pkg (0.87) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.86.pkg (0.86) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.81.pkg (0.81) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.80.pkg (0.80) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | PKGI13337_ps4_v0.75.pkg (0.75) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20015_ps4_v1.01.pkg (1.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20015_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | UDAT99998_ps4_v2.03.pkg (2.03) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | UDAT99998_ps4_v2.02.pkg (2.02) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | UDAT99998_ps4_v2.01.pkg (2.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10025_ps4_v1.03.pkg (1.03) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10025_ps4_v1.02.pkg (1.02) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10025_ps4_v1.01.pkg (1.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10025_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY10024_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | CUSA01116_ps4_v2.23.pkg (2.23) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | SAAT29385_ps4_v2.10.pkg (2.10) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | SAAT29385_ps4_v2.0.0.pkg (2.0.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.3.2.pkg (2.3.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.3.0.pkg (2.3.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.2.4.pkg (2.2.4) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.2.0.pkg (2.2.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v2.0.0.pkg (2.0.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.7.0.pkg (1.7.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.6.0.pkg (1.6.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.4.5.pkg (1.4.5) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.4.4.pkg (1.4.4) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | APOL00004_ps4_v1.4.2.pkg (1.4.2) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | CHTM00777_ps4_v1.2.0.pkg (1.2.0) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20014_ps4_v1.00.pkg (1.00) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20004_ps4_v1.06.pkg (1.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20006_ps4_v1.06.pkg (1.06) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | CUSA00127_ps4_v1.46.pkg (1.46) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20007_ps4_v1.15.pkg (1.15) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20007_ps4_v1.14.pkg (1.14) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20007_ps4_v1.12 (Christmas Edition Qz).pkg (1.12 (Christmas Edition Qz)) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | LAPY20002_ps4_v1.07.pkg (1.07) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
+|  | — | — | — | — | — | LICENSE_UNKNOWN |  | CUSA01850_ps4_v2.01.pkg (2.01) | `PROBE_BUDGET` release inativa/antiga: registrada; o link é validado aos poucos (orçamento incremental) |
 |  | ✓ | — | — | — | — | LICENSE_UNKNOWN |  | PS4StoreBRTest_v1.02_rar.part01.rar (567c27c) | `ARCHIVE_MULTIPART` RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 1): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
 |  | ✓ | — | — | — | — | LICENSE_UNKNOWN |  | PS4StoreBRTest_v1.02_rar.part02.rar (b8c009a) | `ARCHIVE_MULTIPART` RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 2): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |
 |  | ✓ | — | — | — | — | LICENSE_UNKNOWN |  | PS4StoreBRTest_v1.02_rar.part03.rar (eb4523e) | `ARCHIVE_MULTIPART` RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 3): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto |

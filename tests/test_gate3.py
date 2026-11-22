@@ -295,7 +295,8 @@ def test_cli_run_single_command(tmp_path, capsys):
     net.release("acme/app", 1, "v1", [("a.pkg", u, len(BASE_PKG))])
     cfgp = write_cfg(tmp_path)
     argv = ["run", "--config", str(cfgp), "--out-dir", str(tmp_path / "o"), "--canonical", str(tmp_path / "c.json"),
-            "--state", str(tmp_path / "s.json")]
+            "--state", str(tmp_path / "s.json"),
+            "--research-dir", str(tmp_path / "loc")]            # nunca gravar no local/ real
     assert main(argv, net=net) == 0
     out = capsys.readouterr().out
     assert "publicados=1" in out and "NOVO" in out and "catálogo atualizado" in out
