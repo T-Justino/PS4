@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-22T15:28:40Z",
+  "generatedAt": "2026-11-22T15:30:54Z",
   "dryRun": false,
   "note": "Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.",
   "sources": [
@@ -49,18 +49,18 @@
     },
     "novos": 0,
     "links": {
-      "classificados": 15,
-      "sspiBaixaveis": 15,
-      "redirectTemporario": 12,
+      "classificados": 25,
+      "sspiBaixaveis": 25,
+      "redirectTemporario": 22,
       "semRange": 0,
       "tipos": {
         "direto": 3,
-        "redirect": 12
+        "redirect": 22
       }
     },
     "restritos": 102,
     "duplicados": 2,
-    "listaPessoal": 9,
+    "listaPessoal": 16,
     "rejeitados": 193,
     "motivos": {
       "SUPERSEDED": 2,
@@ -892,7 +892,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": true,
       "duplicateOf": null,
       "isNew": false,
@@ -929,7 +945,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -966,7 +998,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": true,
       "duplicateOf": null,
       "isNew": false,
@@ -1003,7 +1051,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -1040,7 +1104,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": true,
       "duplicateOf": null,
       "isNew": false,
@@ -1077,7 +1157,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -1114,7 +1210,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -1151,7 +1263,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -1188,7 +1316,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -1225,7 +1369,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,

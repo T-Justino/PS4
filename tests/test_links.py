@@ -171,3 +171,17 @@ def test_refresh_links_enriches_cached_entries_incrementally_without_mass_probe(
     assert z.probes - p0 == 2 and r.report["counts"]["links"]["classificados"] == 2
     r = go(tmp_path, z, cfgp, now="2026-11-22T14:00:00Z", refresh_links=2)
     assert z.probes - p0 == 4 and r.report["counts"]["links"]["classificados"] == 4   # avança de 2 em 2
+
+
+def test_personal_list_excludes_hosts_with_known_tls_failure_even_if_rejected_earlier(tmp_path):
+    net = Repo()
+    net.put("a.pkg", make_pkg("NPXS39041"), "a" * 40)               # ID recusado pelo catálogo → rejeitado antes da checagem de TLS
+    net.files["https://github.com/acme/app/releases/download/v1/b.pkg"] = make_pkg("APOL00004")
+    net.dir.append({"name": "b.pkg", "path": "pkgs/b.pkg", "sha": "b" * 40, "size": len(BASE_PKG), "type": "file",
+                    "html_url": "x", "download_url": "https://github.com/acme/app/releases/download/v1/b.pkg"})
+    cfgp = contents_cfg(tmp_path)
+    cfgd = json.loads(cfgp.read_text()); cfgd["tls"]["known_bad_hosts"] = {"github.com": "TLS 0x8095F00C"}
+    cfgp.write_text(json.dumps(cfgd))
+    go(tmp_path, net, cfgp)
+    txt = (tmp_path / "loc/links-sspi.txt").read_text()
+    assert "raw.githubusercontent.com" in txt and "github.com/acme/app/releases" not in txt

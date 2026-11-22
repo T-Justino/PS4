@@ -561,7 +561,7 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
                         "contentSha256": sspi.content_sha256(data), "titles": rep.published_titles}
     report = build_report(cfg, now, source_status, entries, wrote, compile_error, canonical, dry_run)
     if out_research is not None and not dry_run:
-        write_research(out_research, entries, now)
+        write_research(out_research, entries, now, cfg)
     if wrote:
         report["artifact"] = artifact
     if not dry_run:
@@ -590,24 +590,25 @@ def research_row(e: Entry) -> dict:
             "firmware": f.meta.get("firmware"), "linkNotes": e.link.get("notes") or []}
 
 
-def personal_links(entries: list[Entry]) -> list[Entry]:
+def personal_links(entries: list[Entry], cfg: Config | None = None) -> list[Entry]:
     """Lista PESSOAL para colar no SSPI (Downloads → colar link): identidade verificada, link utilizável, tipo base,
     sem aparência comercial, host sem falha de TLS conhecida. Independe do prefixo do ID (o SSPI instala pelo ID do próprio PKG)
     e da autorização de publicação; **nunca** é commitada nem hospedada."""
     out = []
     for e in entries:
         if (e.phase in ("VERIFICADO", "PUBLICAVEL") and e.kind == "base" and e.link.get("sspiUsable") and not e.restricted
-                and e.reason not in ("TLS_HOST_BLOCKED", "SUPERSEDED") and not e.duplicate_of):
-            out.append(e)
+                and e.reason not in ("TLS_HOST_BLOCKED", "SUPERSEDED") and not e.duplicate_of
+                and not (cfg and cfg.tls_enforce and urlsplit(e.found.url).hostname in cfg.tls_known_bad)):
+            out.append(e)                  # (host com TLS falho no console, ex. github.com, fica de fora mesmo se rejeitado antes)
     return out
 
 
-def write_research(path: Path, entries: list[Entry], now: str) -> None:
+def write_research(path: Path, entries: list[Entry], now: str, cfg: Config | None = None) -> None:
     rows = [research_row(e) for e in entries]
     doc = {"generatedAt": now, "aviso": "USO PESSOAL. Pesquisa de metadados e disponibilidade; não é publicação. Não commitar nem hospedar este arquivo.",
            "total": len(rows), "entries": rows}
     write_atomic(path, (json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode())
-    pl = personal_links(entries)
+    pl = personal_links(entries, cfg)
     lines = ["# USO PESSOAL: cole estes links no SSPI (Downloads → tocar no touchpad → colar link, ou a página do celular).",
              "# Cada link vai direto à origem; nada é hospedado aqui. Excluídos: IDs/categorias de aparência comercial, links sem Range/identidade.",
              "# Não redistribua esta lista."]
@@ -638,7 +639,7 @@ def build_report(cfg, now, source_status, entries, wrote, compile_error, canonic
                                  "tipos": dict(collections.Counter(e.link.get("kind") for e in entries if e.link))},
                        "restritos": sum(1 for e in entries if e.restricted),
                        "duplicados": sum(1 for e in entries if e.duplicate_of),
-                       "listaPessoal": len(personal_links(entries)),
+                       "listaPessoal": len(personal_links(entries, cfg)),
                        "rejeitados": sum(1 for e in entries if e.reason), "motivos": reasons},
             "catalogUpdated": wrote, "catalogError": compile_error,
             "entries": [e.to_dict() for e in entries]}

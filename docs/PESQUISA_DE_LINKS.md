@@ -26,31 +26,48 @@ PYTHONPATH=src python3 -m ps4store run --refresh-links 10   # descobre → valid
 - **Colar link direto (PKG/RAR)** na aba Downloads **não passa pelo importador de catálogo**: o ID do pacote (`NPXS`, `APOL`, `BREW`…) não é barrado aqui. É a rota para o homebrew que o catálogo não carrega.
 - RAR dividido: o SSPI suporta (`x.part1.rar` ou `x.rar`+`x.r00`, 2–512 volumes declarados em ordem). O robô **reconhece** esses nomes (`ARCHIVE_MULTIPART`, não sondados); **publicá-los é o Gate 5** (não feito).
 
-## Resultado real (22/11/2026)
+## Resultado real (22/11/2026; execução do GitHub Actions `45038602372` + estado acumulado)
 
-**Fontes consultadas:** (1) PKG-Zone, catálogo JSON público (191 releases ativas); (2) GitHub Contents do repositório do projeto (3 PKGs); (3) GitHub Releases: do projeto (0) e do Apollo (no Actions: 5 releases reais, `APOL00004`). `LightningMods/PS4-Store` foi adicionada só para pesquisa; **sem resultado ainda** (403 nesta sessão; roda no Actions).
+**Fontes consultadas com sucesso:**
+
+| Fonte | Tipo | Descobertos |
+|---|---|---|
+| PKG-Zone | catálogo JSON público | 191 releases ativas |
+| Pasta `pkgs/` do projeto | GitHub Contents | 3 (app próprio v1.00, v1.01, v1.02) |
+| `bucanero/apollo-ps4` | GitHub Releases (só rodou no Actions) | 5 (todos `APOL00004`) |
+| `LightningMods/PS4-Store` | GitHub Releases (só pesquisa; Actions) | 3 (`Store-R2`, `-PS5`, `-Legacy`, v4.5, `NPXS39041`) |
+
 **Não conectadas, de propósito:** qualquer fonte de jogos comerciais sem direitos.
 
-| Métrica (PKG-Zone + pasta própria) | Valor |
+| Métrica | Valor |
 |---|---|
-| Links descobertos | **194** (191 + 3) |
-| Acessíveis (o servidor entregou o arquivo) | **187** (7 são PS5: descobertos, não sondados) |
-| Com identidade PKG verificável (Content ID = `TITLE_ID`) | **183** (4 PKGs têm o `param.sfo` além dos 64 KiB) |
-| Links com classificação completa (sondados com a versão nova) | **15** (12 PKG-Zone + 3 próprios); sobem 10 por execução do workflow |
-| Dessas 15: baixáveis pelo SSPI (hipótese pelo código) | **15/15**: 3 diretos; **12 redirects para URL assinada temporária**, todos com `Range` 206 e tamanho conferido |
-| Compatíveis com o importador (ID `CUSA`, base) | 22, dos quais **1 publicável** (app próprio); 19 são `RETAIL_STYLE_ID` (aparência comercial, bloqueados) |
-| IDs que o catálogo não importa (`PREFIX_UNPROVEN` 153, recusados 2) | 155: **fora do catálogo, mas na pesquisa**; os não restritos entram na lista pessoal para colar |
-| Restritos (aparência comercial) | 102: só metadados |
-| Lista pessoal gerada | 9 itens (homebrew/utilitários/emuladores; tamanhos de 7 a 63 MB) |
+| Links descobertos | **202** |
+| Acessíveis (o servidor entregou o arquivo) | **195** (7 são PS5: descobertos, não sondados) |
+| Com identidade PKG verificável (Content ID = `TITLE_ID`, lido do PKG) | **191** (4 têm o `param.sfo` além dos 64 KiB) |
+| Links com classificação completa de rede | **33** (22 PKG-Zone, 3 próprios, 5 Apollo, 3 LightningMods); +10 por execução do workflow |
+| Dos 33: utilizáveis pelo baixador do SSPI (hipótese pelo código) | **33/33** (tudo com `Range` 206 e tamanho conferido): **3 diretos** (`raw`) e **30 redirects para URL assinada temporária** |
+| Compatíveis com o importador de catálogo (ID `CUSA`, base) | 22, dos quais **1 publicável** (app próprio); 19 são `RETAIL_STYLE_ID` (bloqueados) |
+| IDs que o catálogo não importa (`NPXS`, `APOL` recusados; demais não comprovados) | 163: fora do catálogo, **na pesquisa** |
+| Restritos (aparência comercial: Content ID `UP/EP…` ou categoria `media/game/mod/dev menu`) | 99: só metadados, em nenhuma lista de download |
+| **Lista pessoal** (para colar no SSPI) | 26 itens: homebrew/utilitários/emuladores, sem aparência comercial e sem host de TLS falho |
+
+**Comportamento medido por tipo de link:**
+
+| Origem | Link | Redirect | Temporário | `Range` | Observação |
+|---|---|---|---|---|---|
+| `raw.githubusercontent.com` | direto | não | não | 206 | **comprovado no console** (T8b/T9) |
+| PKG-Zone `/download/ps4/{id}/{versão}` | estável | 302 → `api.pkg-zone.com` (assinada) | **sim** (≈6 h) | 206 | catálogo guarda a URL estável; SSPI refaz o redirect se expirar (código); **sem prova no console** |
+| GitHub Releases | `github.com/.../releases/download/...` | 302 → `release-assets.githubusercontent.com` (assinada) | sim | 206 | **o 1º salto é `github.com`, onde o TLS do SSPI falhou**: fica fora das listas |
 
 ## Obstáculos que impedem os demais downloads
-1. **Catálogo só aceita `CUSA`:** 155 itens não podem ir por catálogo. Solução tecnicamente viável: **colar o link** (caminho B), a testar no console (T10).
-2. **Restritos (102):** excluídos por política; não vou listá-los para download.
+1. **Catálogo só aceita `CUSA`:** 163 itens não podem ir por catálogo. Solução tecnicamente viável: **colar o link** (caminho B), a testar no console (T10).
+2. **Restritos (99):** excluídos por política; não vou listá-los para download.
 3. **Redirect assinado do PKG-Zone:** previsto como compatível, **não testado no SSPI** (T10, parte B).
 4. **11 sem verificação de identidade:** 7 PS5 (fora do alvo) e 4 com `param.sfo` fora da janela; solução simples: uma 2ª requisição `Range` só do `param.sfo` (não implementada, ganho pequeno).
-5. **Cobertura de medição:** 15 de 191 links do PKG-Zone com dados completos; o resto sobe pelo `--refresh-links` (ou `--recheck`, que é sondagem em massa: evitei).
-6. **Multipartes:** nenhuma fonte atual os usa; mecanismo de detecção pronto, publicação é o Gate 5.
-7. **Sem autorização de listagem do PKG-Zone:** não afeta o caminho B (uso pessoal, link direto da própria origem), mas continua bloqueando o A.
+5. **Cobertura de medição:** 22 de 191 links do PKG-Zone com dados completos (33 de 202 no total); o resto sobe pelo `--refresh-links` (ou `--recheck`, que é sondagem em massa: evitei).
+6. **GitHub Releases de terceiros** (Apollo, Store): descobertos e verificados, mas baixam via `github.com` (TLS falho no seu console): não entram nas listas até um teste mostrar o contrário.
+7. **Multipartes:** nenhuma fonte atual os usa; mecanismo de detecção pronto, publicação é o Gate 5.
+8. **Sem autorização de listagem do PKG-Zone:** não afeta o caminho B (uso pessoal, link direto da própria origem), mas continua bloqueando o A.
 
 ## Teste no console (T10): colar link, sem catálogo
 No celular (página do SSPI) ou no PS4 (*Downloads → touchpad → Paste a download link*), um link por linha:

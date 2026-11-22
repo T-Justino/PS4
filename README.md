@@ -20,7 +20,7 @@ Robô que **descobre pacotes em fontes autorizadas, verifica os links e gera aut
 ```bash
 PYTHONPATH=src python3 -m ps4store run              # descobre → verifica → gera dist/auto/ps4storebr-auto.gssource
 PYTHONPATH=src python3 -m ps4store run --dry-run    # sem gravar nada
-PYTHONPATH=src python3 -m pytest -q                 # 130 testes (Python ≥ 3.11, sem dependências de runtime)
+PYTHONPATH=src python3 -m pytest -q                 # 131 testes (Python ≥ 3.11, sem dependências de runtime)
 ```
 No PS4 (sem PC): cole `https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/auto/ps4storebr-auto.gssource` na página do celular do SSPI (aba *Sources*). Passo a passo: `docs/USO_NO_PS4.md`.
 
@@ -40,7 +40,7 @@ data/                 canônico gerado, estado do robô, fixtures históricas
 dist/                 artefatos (ver dist/README.md)
 .github/workflows/    catalogo.yml (agendado a cada 6 h)
 docs/                 índice em docs/README.md
-tests/                130 testes
+tests/                131 testes
 ```
 
 ## Regras do catálogo instalável

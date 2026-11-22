@@ -65,7 +65,7 @@ Política de TLS: `tls.known_bad_hosts` (bloqueia a publicação, ex. `github.co
 6. **Desativar/remover:** `"enabled": false` (o item some do catálogo na próxima execução; o relatório mantém o histórico no estado).
 
 ## 3. Testes
-`PYTHONPATH=src python3 -m pytest -q` → **130 testes**, sem rede (Python 3.11, 3.12 no Actions e 3.13). Cobrem: formato `.gssource` e validador, regras do canônico, leitura de PKG, conectores
+`PYTHONPATH=src python3 -m pytest -q` → **131 testes**, sem rede (Python 3.11, 3.12 no Actions e 3.13). Cobrem: formato `.gssource` e validador, regras do canônico, leitura de PKG, conectores
 (Releases, Contents, PKG-Zone), fases e rejeições, autorização por item, cache e teto de sondagens, uma versão por ID, fonte crítica, rede segura (servidor local com Range/redirect) e os artefatos do T8.
 **Não substituem o teste no console**: o que foi comprovado no PS4 está em `docs/TESTE_*.md`.
 
