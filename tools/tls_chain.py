@@ -115,6 +115,17 @@ def main(hosts):
         if len(fps) > 1:
             for k, v in fps.items():
                 print(f"|  ↳ variante | | | | | {len(k)} | {', '.join(v)} |")
+    print("\n### Detalhe: cada certificado servido (cliente moderno, 1º IP) e se é fixado (pin) pelo SSPI\n")
+    for host in hosts:
+        ch = served_chain(host)
+        if not ch:
+            continue
+        print(f"**{host}**\n")
+        for n, c in enumerate(ch):
+            i = info(c)
+            print(f"- [{n}] `{i['subject'][:70]}` · sha256 `{i['sha256'][:16]}…` · expira {i['notAfter']} · "
+                  f"**{PINS.get(i['sha256'], 'não fixado pelo SSPI')}**")
+        print()
 
 
 if __name__ == "__main__":
