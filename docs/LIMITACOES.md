@@ -18,6 +18,9 @@ O MVP prova o **mecanismo** (descobrir → verificar → publicar → importar �
 9. **Jogos reais têm de 1 a 100 GB**, e hospedar no GitHub não é viável (limite de 100 MB por arquivo no repositório; uso como CDN de jogos viola os termos). **RAR/partes múltiplas não estão implementados** (Gate 5).
 10. **Sem VPS e sem PC** (requisito) significa depender de hosts gratuitos de terceiros com limite de banda/arquivo.
 
+## C2. Retomada de downloads grandes (achado do Teste 3, 22/11/2026)
+- Um download de ≈949 MB **falhou por certificado TLS em 915,3 MB depois de uma interrupção**; a nova tentativa manual concluiu. **A retomada não está resolvida**: não se sabe se a 2ª tentativa retomou ou recomeçou, nem a causa do erro (hipótese: cadeia de certificado do host de download, `api.pkg-zone.com`/Cloudflare, não aceita pelo PS4 em uma reconexão). Do lado do robô não há correção; o servidor oferece o que o SSPI precisa (`Range`, tamanho e ETag estáveis). Para o usuário: após uma interrupção, **refazer o download**.
+
 ## D. Verificação e operação
 11. **A verificação lê só os primeiros 64 KiB:** identidade e tamanho, **não** o conteúdo inteiro nem `sha256` (não inventamos). Não prova que o PKG instala/abre (só o T8b provou, para um pacote). 4 PKGs do PKG-Zone têm `param.sfo` além da janela e não foram lidos.
 12. **O firmware exigido pelo pacote** (`pv` do PKG-Zone, ex. "9.00", "5.05+") **não é verificado** contra o console.

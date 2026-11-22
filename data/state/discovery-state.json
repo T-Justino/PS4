@@ -2222,7 +2222,7 @@
     },
     "own-contents#9175adc36da1a81dbe354ff94b5500ed55f894b4": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "",
         "finalHost": "raw.githubusercontent.com",
@@ -2232,14 +2232,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": "PS4 Store BR Test",
         "reason": null,
@@ -2255,7 +2258,7 @@
     },
     "own-contents#cac7d81c05d22f17d7419743dfb36634cf693282": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo",
         "finalHost": "raw.githubusercontent.com",
@@ -2265,14 +2268,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": "PS4 Store BR Test",
         "reason": "SUPERSEDED",
@@ -2288,7 +2294,7 @@
     },
     "own-contents#fedfa6645b2994d6aa90f9fd375c3da62713c9ee": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo",
         "finalHost": "raw.githubusercontent.com",
@@ -2298,14 +2304,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": "PS4 Store BR Test",
         "reason": "SUPERSEDED",
@@ -2321,7 +2330,7 @@
     },
     "own-rar#224ec742f664b4ed9c5b99d252a1f95baa3b6337": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 11): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2331,14 +2340,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2354,7 +2366,7 @@
     },
     "own-rar#567c27c6ac37af86187ea37c7cc9592c13754bea": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 1): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2364,14 +2376,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2387,7 +2402,7 @@
     },
     "own-rar#67bc45dd83ba36b0d7cb5d812d27709c208572e8": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 8): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2397,14 +2412,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2420,7 +2438,7 @@
     },
     "own-rar#81e8c73f16f7568725e2b0dbb79f9442384ff8f6": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 6): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2430,14 +2448,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2453,7 +2474,7 @@
     },
     "own-rar#86ea9b57a8dd2a366f808833f9719a8e98df045f": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 4): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2463,14 +2484,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2486,7 +2510,7 @@
     },
     "own-rar#b859579907a16ddfb8cc96ac0e73c56055d1fe4d": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 9): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2496,14 +2520,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2519,7 +2546,7 @@
     },
     "own-rar#b8c009aa5610fc8ee410ea2f2cd828dc14f01497": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 2): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2529,14 +2556,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2552,7 +2582,7 @@
     },
     "own-rar#c582e22c8be6adee60c85a8ca6e684706d7fa7ee": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 7): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2562,14 +2592,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2585,7 +2618,7 @@
     },
     "own-rar#d61ea80b3221b5488fefa331750d190e4ca87005": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 10): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2595,14 +2628,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2618,7 +2654,7 @@
     },
     "own-rar#e24605b133a5df14a1c601ee5734521cd9f396b9": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 5): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2628,14 +2664,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -2651,7 +2690,7 @@
     },
     "own-rar#eb4523ea87fd2dbf782fa8a6878ba6cfad1718e5": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "RAR dividido (PS4StoreBRTest_v1.02_rar.part*.rar, volume 3): o SSPI suporta (volumes em ordem), mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto",
         "finalHost": null,
@@ -2661,14 +2700,17 @@
             "raw.githubusercontent.com"
           ],
           "etag": true,
+          "etagStrong": true,
           "kind": "direto",
+          "lastModified": false,
           "notes": [],
           "rangeOk": true,
           "redirects": 0,
           "singleLane": false,
           "sspiUsable": true,
           "status": 206,
-          "temporaryFinalUrl": false
+          "temporaryFinalUrl": false,
+          "ttlSeconds": null
         },
         "name": null,
         "reason": "ARCHIVE_MULTIPART",
@@ -6291,7 +6333,7 @@
     },
     "pkg-zone#NUEX00001#ps4#2.0.0#2026-11-17T15:22:50.564Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7188,7 +7230,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.7.4#2025-07-15T09:45:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7221,7 +7263,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.7.5#2025-09-16T16:45:11.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7254,7 +7296,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.7.6#2025-10-22T14:00:11.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7287,7 +7329,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.7.7#2025-11-17T03:15:11.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7320,7 +7362,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.8.0#2025-12-06T09:00:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7353,7 +7395,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.8.1#2025-12-09T05:00:11.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7386,7 +7428,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.8.2#2025-12-19T11:00:13.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7419,7 +7461,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.8.3#2026-02-02T11:30:33.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7452,7 +7494,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.0#2026-05-07T07:16:00.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7485,7 +7527,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.1#2026-06-18T06:45:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7518,7 +7560,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.2#2026-07-22T11:15:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7551,7 +7593,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.3#2026-07-27T03:30:12.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7584,7 +7626,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.4#2026-09-02T08:00:10.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,
@@ -7617,7 +7659,7 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.5#2026-11-13T04:45:17.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T15:59:28Z",
+        "checkedAt": "2026-11-22T17:08:16Z",
         "contentId": null,
         "detail": "HTTP 403",
         "finalHost": null,

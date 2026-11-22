@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-22T15:59:28Z",
+  "generatedAt": "2026-11-22T17:08:16Z",
   "dryRun": false,
   "note": "Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.",
   "sources": [
@@ -173,6 +173,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -236,6 +239,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -299,6 +305,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -20791,6 +20800,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -20857,6 +20869,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -20923,6 +20938,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -20989,6 +21007,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -21055,6 +21076,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -21121,6 +21145,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -21187,6 +21214,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -21253,6 +21283,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -21319,6 +21352,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -21385,6 +21421,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },
@@ -21451,6 +21490,9 @@
         "rangeOk": true,
         "singleLane": false,
         "etag": true,
+        "etagStrong": true,
+        "lastModified": false,
+        "ttlSeconds": null,
         "sspiUsable": true,
         "notes": []
       },

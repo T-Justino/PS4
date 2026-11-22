@@ -161,7 +161,7 @@ def cmd_resume_check(a, net=None) -> int:
 
     rows = [r for r in doc["entries"] if eligible(r)]
     rows.sort(key=lambda r: -r["sizeBytes"])
-    rows = rows[:max(1, min(a.limit, 10))]
+    rows = rows[:max(1, min(a.limit, 20))]
     net = net or UrllibNet()
     for r in rows:
         res = resume_check(r["url"], r["sizeBytes"], net)
@@ -248,7 +248,7 @@ def main(argv: list[str] | None = None, *, net=None) -> int:
     rc.add_argument("--title", action="append", default=[], metavar="ID", help="título (repetível); sem isto, os maiores instaláveis")
     rc.add_argument("--source", help="só esta fonte (ex.: own-rar para checar todos os volumes de um RAR dividido)")
     rc.add_argument("--min-mb", type=float, default=100)
-    rc.add_argument("--limit", type=int, default=5, help="máximo de títulos (teto 10)")
+    rc.add_argument("--limit", type=int, default=5, help="máximo de títulos (teto 20)")
     rc.add_argument("--research", default="local/research.json")
     rc.set_defaults(func=lambda a: cmd_resume_check(a, net))
     a = ap.parse_args(argv)

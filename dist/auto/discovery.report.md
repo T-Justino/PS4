@@ -1,4 +1,4 @@
-# Relatório de descoberta: 2026-11-22T15:59:28Z
+# Relatório de descoberta: 2026-11-22T17:08:16Z
 
 > Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.
 

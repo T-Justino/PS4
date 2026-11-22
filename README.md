@@ -25,7 +25,7 @@ PYTHONPATH=src python3 -m pytest -q                 # 149 testes (Python ≥ 3.1
 No PS4 (sem PC): cole `https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/auto/ps4storebr-auto.gssource` na página do celular do SSPI (aba *Sources*). Passo a passo: `docs/USO_NO_PS4.md`.
 
 ## Testes reais de jogos no PS4
-✅ **OpenTyrian** (jogo completo, 19,8 MB, link estável com redirect assinado, ID não-`CUSA`): baixado, instalado e executado pelo download direto do SSPI (22/11/2026). Próximos: arquivo grande (≈1 GB), retomada e RAR dividido.
+✅ **OpenTyrian** (jogo completo, 19,8 MB, link estável com redirect assinado, ID não-`CUSA`): baixado, instalado e executado pelo download direto do SSPI (22/11/2026). ✅ **Live Die Repeat** (≈949 MB): baixado, instalado e executado; ⚠️ a **retomada após interrupção não está resolvida** (a 1ª tentativa falhou por TLS aos 915 MB; a 2ª, manual, concluiu). Próximo: **RAR multipartes** (11 volumes preparados e validados; `docs/TESTES_DE_JOGOS.md`, Teste 5).
 `docs/TESTES_DE_JOGOS.md`: candidatos validados pelo robô (jogo completo pequeno, ≈1 GB com retomada, RAR dividido de 11 volumes), procedimento e ficha de registro.
 
 ## Descoberta × validação × publicação

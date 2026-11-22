@@ -77,5 +77,7 @@ Política de TLS: `tls.known_bad_hosts` (bloqueia a publicação, ex. `github.co
 | Fonte importada por URL e atualizada (1.0.3→1.0.4) | sim | sim (workflow) | **sim (T9)** |
 | Baixar, instalar e abrir um app do catálogo | — | — | **sim (T8b, v1.00, app próprio)** |
 | **Jogo completo por link estável com redirect assinado (OpenTyrian)** | sim | sim | **sim (22/11/2026)** |
+| **Jogo de ≈949 MB por link estável (Live Die Repeat)**: baixar, instalar, executar | sim | sim | **sim (22/11/2026)** |
+| Retomada após interrupção (erro TLS aos 915 MB) | — | `resume-check` ok | **não resolvida** |
 | Instalar a v1.02 (atualização do app) | — | — | **não testado** |
 | Agendamento por `cron` | — | **não observado** | — |
