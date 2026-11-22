@@ -4,13 +4,31 @@
   "seen": {
     "apollo-releases#213764292#250718366": {
       "check": {
-        "checkedAt": "2026-11-22T14:57:22Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "github.com",
+            "release-assets.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Apollo Save Tool",
         "reason": "PREFIX_REJECTED_BY_SSPI",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "APOL00004",
         "totalSize": 16384000,
@@ -24,13 +42,31 @@
     },
     "apollo-releases#258999632#311606567": {
       "check": {
-        "checkedAt": "2026-11-22T14:57:22Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "github.com",
+            "release-assets.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Apollo Save Tool",
         "reason": "PREFIX_REJECTED_BY_SSPI",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "APOL00004",
         "totalSize": 16842752,
@@ -44,13 +80,31 @@
     },
     "apollo-releases#287360361#360177363": {
       "check": {
-        "checkedAt": "2026-11-22T14:57:22Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "github.com",
+            "release-assets.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Apollo Save Tool",
         "reason": "PREFIX_REJECTED_BY_SSPI",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "APOL00004",
         "totalSize": 22675456,
@@ -64,13 +118,31 @@
     },
     "apollo-releases#313201081#405334055": {
       "check": {
-        "checkedAt": "2026-11-22T14:57:22Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "github.com",
+            "release-assets.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Apollo Save Tool",
         "reason": "PREFIX_REJECTED_BY_SSPI",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "APOL00004",
         "totalSize": 22675456,
@@ -84,13 +156,31 @@
     },
     "apollo-releases#410919334#648516222": {
       "check": {
-        "checkedAt": "2026-11-22T14:57:22Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
         "detail": "prefixo APOL recusado na importação (Gate 2)",
         "finalHost": "release-assets.githubusercontent.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "github.com",
+            "release-assets.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Apollo Save Tool",
         "reason": "PREFIX_REJECTED_BY_SSPI",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "APOL00004",
         "totalSize": 22806528,
@@ -100,6 +190,120 @@
         ]
       },
       "firstSeen": "2026-11-22T14:56:22Z",
+      "lastStage": "pkg_verificado"
+    },
+    "lightningmods-ps4-store#103659769#167233612": {
+      "check": {
+        "checkedAt": "2026-11-22T15:29:50Z",
+        "contentId": "IV0002-NPXS39041_00-STOREUPD00000000",
+        "detail": "prefixo NPXS recusado na importação (Gate 2)",
+        "finalHost": "release-assets.githubusercontent.com",
+        "kind": "base",
+        "link": {
+          "chain": [
+            "github.com",
+            "release-assets.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
+        "name": "Store (PS5)",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "restricted": false,
+        "stage": "pkg_verificado",
+        "titleId": "NPXS39041",
+        "totalSize": 43450368,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para release-assets.githubusercontent.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T15:29:50Z",
+      "lastStage": "pkg_verificado"
+    },
+    "lightningmods-ps4-store#103659769#268177439": {
+      "check": {
+        "checkedAt": "2026-11-22T15:29:50Z",
+        "contentId": "IV0002-NPXS39041_00-STOREUPD00000000",
+        "detail": "prefixo NPXS recusado na importação (Gate 2)",
+        "finalHost": "release-assets.githubusercontent.com",
+        "kind": "base",
+        "link": {
+          "chain": [
+            "github.com",
+            "release-assets.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
+        "name": "Store",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "restricted": false,
+        "stage": "pkg_verificado",
+        "titleId": "NPXS39041",
+        "totalSize": 24772608,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para release-assets.githubusercontent.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T15:29:50Z",
+      "lastStage": "pkg_verificado"
+    },
+    "lightningmods-ps4-store#103659769#268177642": {
+      "check": {
+        "checkedAt": "2026-11-22T15:29:50Z",
+        "contentId": "IV0002-NPXS39041_00-STOREUPD00000000",
+        "detail": "prefixo NPXS recusado na importação (Gate 2)",
+        "finalHost": "release-assets.githubusercontent.com",
+        "kind": "base",
+        "link": {
+          "chain": [
+            "github.com",
+            "release-assets.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
+        "name": "Store",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "restricted": false,
+        "stage": "pkg_verificado",
+        "titleId": "NPXS39041",
+        "totalSize": 24772608,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para release-assets.githubusercontent.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T15:29:50Z",
       "lastStage": "pkg_verificado"
     },
     "own-contents#47211795f25e46073e255b846e446d43ff761970": {
@@ -124,7 +328,7 @@
     },
     "own-contents#9175adc36da1a81dbe354ff94b5500ed55f894b4": {
       "check": {
-        "checkedAt": "2026-11-22T15:28:40Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "",
         "finalHost": "raw.githubusercontent.com",
@@ -157,7 +361,7 @@
     },
     "own-contents#cac7d81c05d22f17d7419743dfb36634cf693282": {
       "check": {
-        "checkedAt": "2026-11-22T15:28:40Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo",
         "finalHost": "raw.githubusercontent.com",
@@ -190,7 +394,7 @@
     },
     "own-contents#fedfa6645b2994d6aa90f9fd375c3da62713c9ee": {
       "check": {
-        "checkedAt": "2026-11-22T15:28:40Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo",
         "finalHost": "raw.githubusercontent.com",
@@ -261,13 +465,31 @@
     },
     "pkg-zone#AONI00001#ps4#1.0.0#2026-11-16T17:36:27.868Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-AONI00001_00-AOONIPS4PORT0000",
         "detail": "prefixo AONI não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Ao Oni",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "AONI00001",
         "totalSize": 76480512,
@@ -701,13 +923,31 @@
     },
     "pkg-zone#BREW00089#ps4#1.3.2.5#2026-11-14T00:52:42.633Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-BREW00089_00-PS4HDDTOOLS00000",
         "detail": "prefixo BREW não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "PS4 HDD Tools",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "BREW00089",
         "totalSize": 6619136,
@@ -781,13 +1021,31 @@
     },
     "pkg-zone#BREW69420#ps4#initial#2026-11-14T00:23:44.215Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "TX0000-BREW69420_00-BREWSTORE0000000",
         "detail": "prefixo BREW não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Brew",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "BREW69420",
         "totalSize": 2752512,
@@ -821,13 +1079,31 @@
     },
     "pkg-zone#CBFD00064#ps4#00.13#2026-11-14T01:19:14.015Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-CBFD00064_00-CONKERRECOMPPS40",
         "detail": "prefixo CBFD não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Conker's Bad Fur Day: Recompiled",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "CBFD00064",
         "totalSize": 124059648,
@@ -1815,13 +2091,31 @@
     },
     "pkg-zone#KRGR00001#ps4#release-1.0#2026-11-14T00:24:10.425Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "KG1633-KRGR00001_00-HAMER00000000000",
         "detail": "prefixo KRGR não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Hamer!! (PORT)",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "KRGR00001",
         "totalSize": 235667456,
@@ -2485,13 +2779,31 @@
     },
     "pkg-zone#MAND00001#ps4#1.00#2026-08-16T18:53:06.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-MAND00001_00-MANDELZOOM000000",
         "detail": "prefixo MAND não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Mandelbrot Zoom",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "MAND00001",
         "totalSize": 7143424,
@@ -3081,13 +3393,31 @@
     },
     "pkg-zone#NTXS10053#ps4#1.30#2026-11-01T17:14:52.000Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0001-NTXS10053_00-SCRATCHPS4000000",
         "detail": "prefixo NTXS não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Scratch Everywhere!",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "NTXS10053",
         "totalSize": 71696384,
@@ -3415,13 +3745,31 @@
     },
     "pkg-zone#PPLA00008#ps4#1.01#2026-11-14T01:37:20.053Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-PPLA00008_00-PICOPLAYPS400000",
         "detail": "prefixo PPLA não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "PicoPlay",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "PPLA00008",
         "totalSize": 6619136,
@@ -3787,13 +4135,31 @@
     },
     "pkg-zone#SMSR00001#ps4#1.9.2-ps4#2026-11-14T00:23:36.255Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-SMSR00001_00-SONIC1SMSREMAKE0",
         "detail": "prefixo SMSR não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Sonic SMS Remake",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "SMSR00001",
         "totalSize": 47972352,
@@ -3807,13 +4173,31 @@
     },
     "pkg-zone#SMSR00002#ps4#2.9.2-ps4#2026-11-14T00:23:43.173Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:29:50Z",
         "contentId": "IV0000-SMSR00002_00-SONIC2SMSREMAKE0",
         "detail": "prefixo SMSR não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Sonic SMS Remake 2",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "SMSR00002",
         "totalSize": 65863680,
