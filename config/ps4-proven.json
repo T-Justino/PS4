@@ -1,0 +1,7 @@
+{
+  "_nota": "Só o que o usuário RELATOU ter baixado/instalado/executado no PS4 Pro 9.00 (GoldHEN, SSPI 5.11.7). Casa pela URL exata testada. Validação automática do robô NÃO entra aqui.",
+  "proven": [
+    {"url": "https://pkg-zone.com/download/ps4/OPEN00001/1.01", "date": "2026-11-22", "note": "OpenTyrian: download, instalação e execução (relato do usuário)"},
+    {"url": "https://pkg-zone.com/download/ps4/LAPY10024/1.01", "date": "2026-11-22", "note": "Live Die Repeat: download, instalação e execução (relato do usuário); retomada não resolvida"}
+  ]
+}

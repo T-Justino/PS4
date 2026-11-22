@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS4 Store BR</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--tx:#14171c;--mut:#5b6573;--bd:#dde1e7;--ok:#0a7d33;--okbg:#e3f6ea;--ps4:#0b4fd1;--ps4bg:#e4ecff;--warn:#8a5a00;--warnbg:#fff2d6;--bad:#a32121;--badbg:#fde5e5;--gr:#4b5563;--grbg:#eceff3;--ac:#0b4fd1}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1318;--card:#181e26;--tx:#eef1f5;--mut:#98a3b3;--bd:#2a323d;--ok:#5fd68a;--okbg:#12301f;--ps4:#8db0ff;--ps4bg:#16284f;--warn:#f0c26a;--warnbg:#3a2d10;--bad:#ff8f8f;--badbg:#3d1717;--gr:#b7c0cd;--grbg:#222a35;--ac:#8db0ff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,sans-serif}
+header,main,footer{max-width:760px;margin:0 auto;padding:12px 16px}
+h1{font-size:1.3rem;margin:8px 0 2px}.sub{color:var(--mut);font-size:.85rem}
+input[type=search]{width:100%;font-size:1.05rem;padding:12px 14px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);margin:10px 0 6px}
+label.chk{display:inline-flex;gap:8px;align-items:center;font-size:.9rem;color:var(--mut);margin-right:14px;min-height:32px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin:10px 0}
+.top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.name{font-weight:650;font-size:1.05rem;overflow-wrap:anywhere}
+.ver{color:var(--mut);white-space:nowrap}.meta{color:var(--mut);font-size:.82rem;margin:4px 0;overflow-wrap:anywhere}
+.b{display:inline-block;font-size:.78rem;padding:3px 8px;border-radius:999px;margin:2px 4px 2px 0}
+.b.ok{background:var(--okbg);color:var(--ok)}.b.ps4{background:var(--ps4bg);color:var(--ps4)}.b.nt{background:var(--grbg);color:var(--gr)}.b.warn{background:var(--warnbg);color:var(--warn)}.b.bad{background:var(--badbg);color:var(--bad)}
+button.cp{margin-top:8px;font-size:1rem;padding:12px 16px;border:0;border-radius:10px;background:var(--ac);color:#fff;width:100%;min-height:44px}
+button.cp.done{background:var(--ok)}details{margin:12px 0;color:var(--mut);font-size:.9rem}summary{cursor:pointer;color:var(--tx);font-weight:600}
+ol{padding-left:20px}code{background:var(--grbg);padding:1px 5px;border-radius:5px;font-size:.85em}
+#n{color:var(--mut);font-size:.85rem;margin:4px 0}footer{color:var(--mut);font-size:.78rem}
+</style>
+</head>
+<body>
+<header>
+<h1>PS4 Store BR</h1>
+<div class="sub" id="gen"></div>
+<input id="q" type="search" placeholder="Buscar: nome ou ID" autocomplete="off" autocapitalize="off" enterkeyhint="search">
+<label class="chk"><input id="only" type="checkbox" checked> Só com link validado</label>
+<div id="n"></div>
+<details><summary>Como enviar ao PS4 (sem terminal)</summary>
+<ol>
+<li>No PS4, abra o SSPI e mostre o <b>QR code</b> do Phone Companion; escaneie com o celular (mesma rede Wi-Fi).</li>
+<li>Aqui, toque em <b>Copiar link</b> no item desejado.</li>
+<li>Na página do SSPI no celular, aba <b>Downloads</b> → cole no campo <b>Paste a download link</b> → enviar.</li>
+<li>No PS4, o item aparece na fila do SSPI; acompanhe e instale por lá.</li>
+</ol>
+<p><b>Validado automaticamente</b> = o robô testou o link (responde, aceita Range) e leu a identidade do PKG. Não garante instalação.
+<b>Instalação comprovada no PS4</b> = você relatou ter instalado e aberto aquele link exato.</p>
+</details>
+</header>
+<main id="list"></main>
+<footer id="foot"></footer>
+<script>
+const DATA = /*__DATA__*/null;
+const norm = s => (s||"").normalize("NFKD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+function rank(it,q){ if(!q) return 4; const n=norm(it.name);
+  if(q===n||q===norm(it.titleId)||q===norm(it.contentId)) return 0;
+  if(n.startsWith(q)) return 1; if((" "+n).includes(" "+q)) return 2; return n.includes(q)?3:4; }
+function hay(it){ return norm([it.name,it.titleId,it.contentId,it.version,it.source,it.kind].join(" ")); }
+function el(t,c,x){const e=document.createElement(t); if(c)e.className=c; if(x!=null)e.textContent=x; return e;}
+async function copy(url,btn){
+  let ok=false;
+  try{ await navigator.clipboard.writeText(url); ok=true; }catch(e){
+    const ta=document.createElement("textarea"); ta.value=url; ta.setAttribute("readonly",""); ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select(); try{ ok=document.execCommand("copy"); }catch(_){} ta.remove(); }
+  if(!ok){ prompt("Copie o link:",url); return; }
+  const old=btn.textContent; btn.textContent="Copiado ✓"; btn.classList.add("done");
+  setTimeout(()=>{btn.textContent=old;btn.classList.remove("done");},1800);
+}
+function card(it){
+  const c=el("div","card"); const t=el("div","top"); t.append(el("div","name",it.name), el("div","ver","v"+(it.version||"?"))); c.append(t);
+  const b=el("div"); const cls={validado:"ok","nao-testado":"nt",inacessivel:"bad",indisponivel:"warn"}[it.state]||"nt";
+  b.append(el("span","b "+cls,it.text)); if(it.ps4) b.append(el("span","b ps4","Instalação comprovada no PS4 · "+it.ps4.date)); c.append(b);
+  const m=[it.kind,it.fileType,it.sizeMB?it.sizeMB+" MB":"", it.titleId?("ID "+it.titleId):"", "identidade "+it.identity,"fonte "+it.source].filter(Boolean).join(" · ");
+  c.append(el("div","meta",m)); if(it.contentId) c.append(el("div","meta","Content ID "+it.contentId));
+  if(it.ps4&&it.ps4.note) c.append(el("div","meta",it.ps4.note));
+  if(it.url){ const bt=el("button","cp","Copiar link"); bt.type="button"; bt.addEventListener("click",()=>copy(it.url,bt)); c.append(bt); }
+  return c;
+}
+function render(){
+  const q=norm(document.getElementById("q").value), only=document.getElementById("only").checked;
+  const terms=q?q.split(" "):[]; let rows=DATA.items.filter(i=>(!only||i.state==="validado")&&terms.every(t=>hay(i).includes(t)));
+  rows=rows.map(i=>[rank(i,q),i]).sort((a,b)=>a[0]-b[0]||(a[1].state==="validado"?0:1)-(b[1].state==="validado"?0:1)||a[1].name.localeCompare(b[1].name)).map(x=>x[1]);
+  const L=document.getElementById("list"); L.replaceChildren(); rows.slice(0,60).forEach(i=>L.append(card(i)));
+  document.getElementById("n").textContent=rows.length+" resultado(s)"+(rows.length>60?" (mostrando 60)":"")+(only?" · só com link validado":"");
+}
+document.getElementById("gen").textContent="Atualizado em "+DATA.generatedAt.replace("T"," ").slice(0,16)+" UTC · modo "+DATA.mode;
+document.getElementById("foot").textContent="Catálogo de pesquisa pessoal. Os links apontam para a fonte original; nada é hospedado aqui. Validação automática ≠ instalação comprovada.";
+document.getElementById("q").addEventListener("input",render); document.getElementById("only").addEventListener("change",render); render();
+</script>
+</body>
+</html>

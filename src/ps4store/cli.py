@@ -213,6 +213,19 @@ def cmd_find(a) -> int:
     return 0
 
 
+def cmd_web(a) -> int:
+    from .web import build_site
+    try:
+        doc = json.loads(Path(a.research).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        print(f"ERRO  catálogo de pesquisa não encontrado em {a.research}: rode `ps4store run` primeiro", file=sys.stderr)
+        return 1
+    rep = build_site(doc, Path(a.out), a.modo, Path(a.proven) if a.proven else None)
+    print(f"site em {a.out}/: {rep['items']} itens · {rep['validated']} com link validado · {rep['withUrl']} com URL copiável · "
+          f"{rep['ps4Proven']} com instalação comprovada no PS4 (modo {a.modo})")
+    return 0
+
+
 def cmd_resume_check(a, net=None) -> int:
     """Checagem leve de prontidão para retomada/arquivos grandes (até 3 requisições de 64 KiB por título; limite de títulos)."""
     from .net import UrllibNet
@@ -329,6 +342,13 @@ def main(argv: list[str] | None = None, *, net=None) -> int:
     f.add_argument("--limit", type=int, default=20)
     f.add_argument("--urls", action="store_true", help="mostra a URL (só de itens com link validado)")
     f.set_defaults(func=cmd_find)
+    w = sub.add_parser("web", help="gera o catálogo web estático (HTML único) a partir de local/research.json")
+    w.add_argument("--research", default="local/research.json")
+    w.add_argument("--out", default="site")
+    w.add_argument("--modo", choices=["publico", "pessoal"], default="publico",
+                   help="publico: só embute URL de item autorizado para listagem; pessoal: também os de link direto validado")
+    w.add_argument("--proven", default="config/ps4-proven.json", help="instalações comprovadas no PS4 (relato do usuário)")
+    w.set_defaults(func=cmd_web)
     rc = sub.add_parser("resume-check", help="prontidão para retomada/arquivos grandes: Range em offsets, tamanho e ETag estáveis (≤3 requisições de 64 KiB por título)")
     rc.add_argument("--title", action="append", default=[], metavar="ID", help="título (repetível); sem isto, os maiores instaláveis")
     rc.add_argument("--source", help="só esta fonte (ex.: own-rar para checar todos os volumes de um RAR dividido)")

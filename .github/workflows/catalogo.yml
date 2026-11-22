@@ -9,6 +9,9 @@ on:
       refresh_links:
         description: "Quantos links pendentes sondar nesta execução (padrão 10; sob demanda use 40-60; o agendado usa 10)"
         default: "10"
+      web_links:
+        description: "Site: 'publico' = URL só de item autorizado para listagem; 'pessoal' = também os de link direto validado (a página é pública no GitHub Pages)"
+        default: "publico"
 permissions:
   contents: write
 concurrency:
@@ -33,6 +36,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # só lê a API do GitHub (limite maior); nunca vai a hosts de download
         run: PYTHONPATH=src python -m ps4store run --refresh-links "${{ github.event.inputs.refresh_links || '10' }}"
+      - name: Gerar o catálogo web (HTML estático, sem backend)
+        if: steps.run.outcome == 'success'
+        run: PYTHONPATH=src python -m ps4store web --out site --modo "${{ github.event.inputs.web_links || 'publico' }}"
+      - name: Empacotar o site para o GitHub Pages
+        if: steps.run.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
       - name: Resumo
         if: always()
         run: cat dist/auto/discovery.report.md >> "$GITHUB_STEP_SUMMARY" || true
@@ -49,3 +60,17 @@ jobs:
       - name: Falhar se uma fonte crítica caiu
         if: steps.run.outcome == 'failure'
         run: exit 1
+  publicar-site:
+    # Exige Settings > Pages > Source = "GitHub Actions". Se não estiver ativo, só este job falha; o catálogo .gssource não é afetado.
+    needs: atualizar
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
