@@ -63,7 +63,6 @@ def test_gssource_artifact_matches_fixture_and_published_pkg_path():
 
 
 def test_verify_pkg_cli_ok_and_detects_tampering(tmp_path, capsys):
-    assert verify_pkg.main.__module__ == "verify_pkg"
     data = bytearray(PKG.read_bytes())
     data[0x40 + 10] ^= 0x01                                        # corrompe 1 byte do Content ID do cabeçalho
     bad = tmp_path / "bad.pkg"

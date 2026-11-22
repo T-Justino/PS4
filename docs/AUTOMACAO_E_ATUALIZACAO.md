@@ -24,7 +24,7 @@
 | Diretório de fontes da comunidade | o SSPI acompanha sozinho pelo ID permanente: **não é o nosso caso** |
 | Engine `embedded-catalog-refresh-v1` | buscaria conteúdo novo sozinho, mas o engine estático proíbe origem de rede; **não usado nem testado** |
 
-**Alternativa mais simples (a recomendada):** o robô mantém o link estável acima; quando houver versão nova, abra a página do celular e cole o **mesmo link** de novo (ou use USB). Um toque, sem PC ligado.
+**Comprovado no PS4 (T9):** fonte importada e atualizada por URL (1.0.3 → 1.0.4) sem pendrive. **Alternativa mais simples (a recomendada, agora validada):** o robô mantém o link estável acima; quando houver versão nova, abra a página do celular e cole o **mesmo link** de novo (ou use USB). Um toque, sem PC ligado.
 O T8b, Parte 2, testa exatamente isso.
 
 **Limite do ID `CUSA`:** o SSPI só substitui apps antigos automaticamente para homebrew (ID **não** `CUSA`); para IDs `CUSA` (como o nosso) é preciso usar *Reinstall* ou excluir o app antes. Isso vem do código público; não testado.

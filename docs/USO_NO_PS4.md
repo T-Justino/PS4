@@ -18,7 +18,7 @@
 
 Como saber que há versão nova: o commit `catalogo: atualizacao automatica` no repositório, ou o resumo do job em *Actions*.
 
-## 3) Testes que faltam no console (T9)
+## 3) T9 (APROVADO em 22/11/2026: etapas A e B; C não executada — ver `docs/TESTE_T9.md`)
 Use dois links, para provar importação **por URL** e **atualização**:
 
 | Etapa | Link | Esperado |

@@ -43,7 +43,7 @@ class Zone(FakeNet):
     def probe(self, url, nbytes=65536):
         pr = super().probe(url, nbytes)
         if pr.ok:
-            _, tid, v = url.rsplit("/download/", 1)[1].split("/")[0], url.split("/")[-2], url.split("/")[-1]
+            tid, v = url.split("/")[-2], url.split("/")[-1]
             pr.final_url = SIGNED.format(t=tid, v=v)       # o servidor real responde 302 → URL assinada
         return pr
 
@@ -98,7 +98,7 @@ def test_phases_npxs_apol_stay_in_report_but_never_in_gssource(tmp_path):
     assert by["PPSA01650_ps5_v1.0.0.pkg"]["fase"] == "DESCOBERTO"
     assert r.report["counts"]["fases"] == {"DESCOBERTO": 1, "VERIFICADO": 5, "PUBLICAVEL": 0}
     assert not r.wrote_catalog and not (tmp_path / "o/a.gssource").exists()
-    assert not any("PPSA" in k for k in z.files) or z.probes == 5             # PS5 não foi sondado
+    assert z.probes == 5                                                       # PS5 não foi sondado (só os 5 PS4)
 
 
 def test_authorization_is_per_title_and_only_publishable_enters_gssource(tmp_path):

@@ -155,3 +155,9 @@ homebrew com ID que o parser recusa (NPXS, APOL…) ─► fora do catálogo ─
 
 **Gate 2 (reaberto/encerrado):** importação e pesquisa comprovadas; instalação **só** comprovada para pacote com identidade compatível,
 e esse caso ainda **não foi testado** (ver `docs/VALIDACAO_E2E.md`, pré-requisito do Gate 3).
+
+## 13. Estado consolidado do MVP (22/11/2026)
+
+Provas no console (PS4 Pro 9.00, GoldHEN, SSPI 5.11.7 Final): T8b (instalação e execução do app próprio v1.00) e T9 (importação e atualização da fonte por URL, 1.0.3 → 1.0.4).
+Automação: GitHub Actions (`catalogo.yml`), 2 execuções manuais com sucesso; `cron` ainda não observado. Operação e cadastro de fontes: `docs/OPERACAO.md`. Variedade de jogos: **não existe**; limites em `docs/LIMITACOES.md`.
+O MVP técnico (mecanismo) está provado para 1 pacote próprio; **não** é prova de cobertura de jogos.
