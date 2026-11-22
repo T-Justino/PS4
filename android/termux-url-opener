@@ -1,0 +1,18 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# PS4 Store BR: recebe o link do botão "Compartilhar" do Android (Termux chama este script com o texto compartilhado em $1),
+# resolve e copia as URLs prontas para colar no painel do SSPI.
+# Segurança: o texto recebido NUNCA é interpretado pelo shell: vai entre aspas, depois de "--", direto para o Python, que só extrai
+# URLs http(s) por regex. Nada é executado nem baixado por inteiro.
+DIR="${PS4STORE_DIR:-$HOME/PS4}"
+PY="${PS4STORE_PYTHON:-python}"
+pausa() { [ -n "$PS4STORE_SEM_PAUSA" ] || { printf '\nPressione Enter para fechar... '; read _enter; }; }
+if [ ! -d "$DIR/src/ps4store" ]; then
+  echo "Projeto não encontrado em $DIR (defina PS4STORE_DIR)." >&2
+  pausa
+  exit 1
+fi
+cd "$DIR" || exit 1
+PYTHONPATH="$DIR/src" "$PY" -m ps4store.colar --extrair -- "$1"
+rc=$?
+pausa
+exit $rc
