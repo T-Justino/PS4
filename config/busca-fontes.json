@@ -1,15 +1,32 @@
 {
-  "_nota": "Fontes que podem alimentar o índice de busca (src/ps4store/busca.py). Uma fonte SÓ pode ser importada se tiver 'authorization' com basis e evidence (mesma regra de config/sources.json). Sem autorização registrada: nada é importado. Nenhuma fonte de jogos comerciais está registrada.",
+  "_nota": "Fontes que podem alimentar o índice de busca (src/ps4store/busca.py). Uma fonte SÓ pode ser importada se tiver 'authorization' com basis e evidence (mesma regra de config/sources.json). Sem autorização registrada: nada é importado. A fonte 'wikidata' traz só metadados (CC0); nenhuma fonte de download está registrada.",
   "fontes": [
     {
       "id": "teste",
       "nome": "Índice de teste (fictício)",
-      "authorization": {"basis": "test-fixture", "evidence": "Dados inventados para testar a busca (data/fixtures/busca-teste.json); as URLs usam o domínio reservado .invalid e não apontam para lugar nenhum."}
+      "authorization": {
+        "basis": "test-fixture",
+        "evidence": "Dados inventados para testar a busca (data/fixtures/busca-teste.json); as URLs usam o domínio reservado .invalid e não apontam para lugar nenhum."
+      }
     },
     {
       "id": "teste-b",
       "nome": "Segundo índice de teste (fictício)",
-      "authorization": {"basis": "test-fixture", "evidence": "Idem: serve para testar nomes repetidos entre fontes."}
+      "authorization": {
+        "basis": "test-fixture",
+        "evidence": "Idem: serve para testar nomes repetidos entre fontes."
+      }
+    },
+    {
+      "id": "wikidata",
+      "nome": "Wikidata (jogos de PlayStation 4)",
+      "origem": "https://www.wikidata.org/",
+      "licenca": "CC0-1.0",
+      "licenca_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "authorization": {
+        "basis": "license",
+        "evidence": "Os dados estruturados do Wikidata são CC0 1.0 (domínio público): https://www.wikidata.org/wiki/Wikidata:Licensing. Só METADADOS (nome, identificador, páginas de referência); nenhum link de download."
+      }
     }
   ]
 }

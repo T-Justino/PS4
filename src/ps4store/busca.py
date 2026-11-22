@@ -110,13 +110,18 @@ def _valido(item: dict) -> tuple[dict | None, str]:
     rec = {"nome": nome, "url": url}
     if isinstance(item.get("aliases"), list):
         rec["aliases"] = [str(a)[:MAX_NOME] for a in item["aliases"] if str(a).strip()][:10]
-    for k in ("titleId", "regiao", "idiomas"):          # opcionais: base para filtros futuros (nenhum é exigido)
+    for k in ("titleId", "regiao", "idiomas", "idFonte", "lancamento"):   # opcionais: filtros futuros e proveniência (nenhum é exigido)
         if item.get(k) not in (None, "", []):
             rec[k] = item[k]
+    refs = item.get("referencias")
+    if isinstance(refs, dict):                                              # páginas de referência reais da fonte (ex.: Wikipedia, Wikidata)
+        ok = {str(k)[:40]: str(v) for k, v in refs.items() if urlsplit(str(v)).scheme == "https" and len(str(v)) <= MAX_URL and not re.search(r"\s", str(v))}
+        if ok:
+            rec["referencias"] = ok
     return rec, ""
 
 
-def importar(doc: dict, fontes: dict[str, dict], fonte_id: str, itens: list[dict]) -> dict:
+def importar(doc: dict, fontes: dict[str, dict], fonte_id: str, itens: list[dict], meta: dict | None = None) -> dict:
     """Troca TODOS os títulos da fonte pelos itens dados (atualização controlada). Recusa fonte desconhecida ou sem autorização registrada."""
     f = fontes.get(fonte_id)
     if f is None:
@@ -140,7 +145,8 @@ def importar(doc: dict, fontes: dict[str, dict], fonte_id: str, itens: list[dict
         novos.append(rec)
     antes = sum(1 for t in doc["titulos"] if t.get("fonte") == fonte_id)
     doc["titulos"] = [t for t in doc["titulos"] if t.get("fonte") != fonte_id] + novos
-    doc["fontes"][fonte_id] = {"nome": f.get("nome", fonte_id), "itens": len(novos)}
+    doc["fontes"][fonte_id] = {"nome": f.get("nome", fonte_id), "itens": len(novos),
+                               **{k: f[k] for k in ("licenca", "licenca_url", "origem") if f.get(k)}, **(meta or {})}
     from datetime import datetime, timezone
     doc["geradoEm"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     return {"importados": len(novos), "substituidos": antes, "rejeitados": rejeitados}
@@ -218,7 +224,13 @@ def main(argv=None) -> int:
     print(f'{total} resultado(s) para "{termo}"' + (f" (mostrando {len(res)})" if total > len(res) else "") + ":")
     for i, t in enumerate(res, 1):
         teste = " [TESTE]" if t.get("fonte", "").startswith("teste") else ""
-        print(f"{i}. {t['nome']}{teste}\n   {t['url']}   [fonte: {t.get('fonte', '?')}]")
+        ano = f" ({t['lancamento']})" if t.get("lancamento") else ""
+        print(f"{i}. {t['nome']}{ano}{teste}\n   {t['url']}   [fonte: {t.get('fonte', '?')}" + (f" {t['idFonte']}" if t.get("idFonte") else "") + "]")
+    for fid in sorted({t.get("fonte") for t in res}):
+        f = doc.get("fontes", {}).get(fid, {})
+        if f.get("licenca"):
+            print(f"Metadados de '{fid}': licença {f['licenca']}" + (f" · origem {f['origem']}" if f.get("origem") else "") + (f" · obtido em {f['obtidoEm'][:10]}" if f.get("obtidoEm") else ""))
+    print("(metadados de jogos: não indicam que exista PKG/download disponível)")
     return 0
 
 

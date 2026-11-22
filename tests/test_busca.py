@@ -81,9 +81,11 @@ def test_importar_exige_fonte_registrada_e_autorizada():
     assert not fonte_autorizada({"authorization": {"basis": "license", "evidence": ""}})
 
 
-def test_registro_de_fontes_do_repositorio_so_tem_fontes_de_teste_autorizadas():
+def test_registro_de_fontes_do_repositorio_tem_so_teste_e_wikidata_cc0_autorizadas():
     f = carregar_fontes(str(ROOT / FONTES_PADRAO))
-    assert set(f) == {"teste", "teste-b"} and all(fonte_autorizada(x) and x["authorization"]["basis"] == "test-fixture" for x in f.values())
+    assert set(f) == {"teste", "teste-b", "wikidata"} and all(fonte_autorizada(x) for x in f.values())
+    assert f["wikidata"]["licenca"] == "CC0-1.0" and f["wikidata"]["authorization"]["basis"] == "license"
+    assert all(f[k]["authorization"]["basis"] == "test-fixture" for k in ("teste", "teste-b"))
 
 
 def test_importar_valida_itens_e_atualizacao_substitui_a_fonte():
