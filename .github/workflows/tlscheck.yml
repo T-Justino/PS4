@@ -19,5 +19,18 @@ jobs:
                    "https://raw.githubusercontent.com/T-Justino/PS4/${SHA}/rartest/PS4StoreBRTest_v1.02_rar.part01.rar"; do
             echo "== $u"; curl -sS -r 0-1023 -D - -o /dev/null "$u" | grep -i -E "^HTTP|content-range|content-type|etag|cache-control|accept-ranges|server|x-served-by|via" || true
           done
+      - name: Integridade dos 11 volumes servidos pelo jsDelivr (comparação byte a byte com o repositório)
+        run: |
+          n=0; ok=0
+          while read -r u; do
+            f="$(basename "$u")"; n=$((n+1))
+            curl -sS -f -o "/tmp/$f" -D "/tmp/$f.h" "$u" || { echo "FALHA $f"; continue; }
+            if cmp -s "/tmp/$f" "rartest/$f"; then ok=$((ok+1)); else echo "DIFERENTE $f"; fi
+            echo "$f $(stat -c%s /tmp/$f) B $(grep -i -E '^(last-modified|etag|accept-ranges)' /tmp/$f.h | tr -d '\r' | tr '\n' ' ')"
+          done < rartest/links-jsdelivr-ordem.txt
+          echo "volumes idênticos: $ok/$n"
+          echo "== Range no meio do volume 5 (offset 300000, 4 KiB):"
+          u="$(sed -n 5p rartest/links-jsdelivr-ordem.txt)"
+          curl -sS -r 300000-304095 -D - -o /dev/null "$u" | grep -i -E "^HTTP|content-range|content-length|etag|last-modified|accept-ranges" | tr -d '\r'
       - name: Resumo
         run: cat chains.md >> "$GITHUB_STEP_SUMMARY"
