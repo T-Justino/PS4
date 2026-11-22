@@ -1,0 +1,38 @@
+{
+  "sourceId": "ps4storebr.gate2.t7.cusa90004",
+  "version": "0.1.0",
+  "publishedTitles": [
+    "CUSA90004"
+  ],
+  "excluded": [],
+  "files": {
+    "source.json": {
+      "size": 796,
+      "sha256": "52c24cbee26789a10c509cab80fca3ced33c53e1f2e8bae1c8b72c46afce3d5f"
+    },
+    "catalog.json": {
+      "size": 261,
+      "sha256": "4338580f8bece80abce076cf07048199e428d098cb89c29169b498b6f13bd287"
+    },
+    "index/titles.json": {
+      "size": 197,
+      "sha256": "95157befc77628b38dac637d2932d6f8155b2bfd904ca671ee20b5ed0666b7a0"
+    },
+    "packages/items.json": {
+      "size": 267,
+      "sha256": "6376afa3ae0b3a0e086840d0ab011bc9e8e723b3c5489da7a9892318e5add671"
+    }
+  },
+  "artifactSha256": "db74adb3583158d1538332f0639fe8156ae8fdbe8643c5d742bda8c62685660f",
+  "contentSha256": "52c24cbee26789a10c509cab80fca3ced33c53e1f2e8bae1c8b72c46afce3d5f",
+  "warnings": [],
+  "identityMap": [
+    {
+      "catalogKey": "CUSA90004",
+      "realTitleId": "NPXS39041",
+      "realContentId": null,
+      "probe": false
+    }
+  ],
+  "consoleCompatibility": "NAO_TESTADO — requer teste manual no PS4 (Gate 2)"
+}

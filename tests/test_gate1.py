@@ -341,7 +341,7 @@ def test_t6_two_titles_distinct_keys_no_conflict():
     assert [m["realTitleId"] for m in rep.to_dict()["identityMap"]] == ["NPXS39041", "APOL00004"]
 
 
-@pytest.mark.parametrize("fx", ["t5-cusa90001-store-r2.json", "t6-two-titles.json"])
+@pytest.mark.parametrize("fx", ["t5-cusa90001-store-r2.json", "t6-two-titles.json", "t7-cusa90004-store-r2.json"])
 def test_real_identity_never_leaks_into_gssource(fx):
     _, f, _, data = _gss(fx)
     blob = b"".join(_zf.ZipFile(_io.BytesIO(data)).read(n) for n in _zf.ZipFile(_io.BytesIO(data)).namelist())
@@ -352,7 +352,7 @@ def test_real_identity_never_leaks_into_gssource(fx):
 
 
 def test_production_fixtures_do_not_use_99999():
-    for p in DATA.glob("t[56]*.json"):
+    for p in DATA.glob("t[567]*.json"):
         assert "CUSA99999" not in p.read_text(encoding="utf-8").replace("CUSA99999 não", "")
 
 
@@ -380,3 +380,19 @@ def test_real_identity_requires_catalog_key_and_is_unique():
 
 def test_probe_allows_99999_only_for_probe():
     parse(_key_doc(titleId="CUSA99999", probe=True))
+
+
+def test_t7_store_pkg_unmodified_under_distinct_synthetic_key():
+    doc, f, rep, data = _gss("t7-cusa90004-store-r2.json")
+    [row] = f["index/titles.json"]["titles"]
+    assert row["titleId"] == "CUSA90004"
+    used = {json.loads(p.read_text(encoding="utf-8"))["titles"][i]["titleId"]
+            for p in DATA.glob("t[56]*.json") for i in range(len(json.loads(p.read_text(encoding="utf-8"))["titles"]))}
+    assert "CUSA90004" not in used                      # chave inédita: sem confundir com T5/T6
+    [pkg] = f["packages/items.json"]["titles"]["CUSA90004"]
+    assert pkg["url"] == "https://pkg-zone.com/update/Store-R2.pkg"   # URL oficial, sem espelho/alteração
+    assert pkg["kind"] == "base" and pkg["accessType"] == "Direct"
+    assert doc["titles"][0]["realIdentity"]["titleId"] == "NPXS39041"
+    assert rep.to_dict()["identityMap"][0] == {"catalogKey": "CUSA90004", "realTitleId": "NPXS39041",
+                                               "realContentId": None, "probe": False}
+    assert sspi.check_archive(data).ok
