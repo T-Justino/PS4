@@ -45,6 +45,7 @@ class Zone(FakeNet):
         if pr.ok:
             tid, v = url.split("/")[-2], url.split("/")[-1]
             pr.final_url = SIGNED.format(t=tid, v=v)       # o servidor real responde 302 → URL assinada
+            pr.redirects, pr.signed, pr.chain = 1, True, ["pkg-zone.com", "api.pkg-zone.com"]
         return pr
 
 

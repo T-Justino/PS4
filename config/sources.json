@@ -61,6 +61,16 @@
       "authorization": null,
       "_nota": "Sem autorizacao registrada: itens sao descobertos e verificados, mas NAO publicados. Os Termos do PKG-Zone nao concedem permissao de listagem a terceiros (docs/GATE3.md). Para publicar, preencha authorization com basis=written-permission e a evidencia.",
       "critical": false
+    },
+    {
+      "id": "lightningmods-ps4-store",
+      "type": "github-releases",
+      "repo": "LightningMods/PS4-Store",
+      "enabled": true,
+      "max_releases": 5,
+      "critical": false,
+      "authorization": null,
+      "_nota": "Pesquisa apenas (sem autorizacao registrada): repositorio indicado pelo proprio catalogo publico do PKG-Zone."
     }
   ]
 }

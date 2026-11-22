@@ -7,6 +7,7 @@
 | `../README.md` | estado do MVP e comandos |
 | `OPERACAO.md` | operar a automação e **cadastrar novas fontes autorizadas** |
 | `USO_NO_PS4.md` | instalar a fonte por URL e atualizar no console |
+| `PESQUISA_DE_LINKS.md` | descoberta ampliada, classificação de links, lista pessoal, resultados reais e teste T10 |
 | `LIMITACOES.md` | por que o catálogo ainda não oferece variedade real de jogos |
 | `GATE3.md` | descoberta automática: fontes, resultados reais, PKG-Zone |
 | `SDD_REVISADO.md` | arquitetura e regras (v1.2) |

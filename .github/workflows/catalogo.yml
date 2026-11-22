@@ -28,7 +28,7 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # só lê a API do GitHub (limite maior); nunca vai a hosts de download
-        run: PYTHONPATH=src python -m ps4store run
+        run: PYTHONPATH=src python -m ps4store run --refresh-links 10
       - name: Resumo
         if: always()
         run: cat dist/auto/discovery.report.md >> "$GITHUB_STEP_SUMMARY" || true

@@ -20,9 +20,12 @@ Robô que **descobre pacotes em fontes autorizadas, verifica os links e gera aut
 ```bash
 PYTHONPATH=src python3 -m ps4store run              # descobre → verifica → gera dist/auto/ps4storebr-auto.gssource
 PYTHONPATH=src python3 -m ps4store run --dry-run    # sem gravar nada
-PYTHONPATH=src python3 -m pytest -q                 # 113 testes (Python ≥ 3.11, sem dependências de runtime)
+PYTHONPATH=src python3 -m pytest -q                 # 130 testes (Python ≥ 3.11, sem dependências de runtime)
 ```
 No PS4 (sem PC): cole `https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/auto/ps4storebr-auto.gssource` na página do celular do SSPI (aba *Sources*). Passo a passo: `docs/USO_NO_PS4.md`.
+
+## Pesquisa de links e download direto (modo pessoal)
+`ps4store run` também grava `local/research.json` (tudo o que foi achado, com status do link e motivo) e `local/links-sspi.txt` (links para **colar** no SSPI, sem passar pelo importador de IDs). `local/` **nunca** é commitado; itens de aparência comercial ficam só na pesquisa. Detalhes, números reais e obstáculos: `docs/PESQUISA_DE_LINKS.md`.
 
 ## Operar e cadastrar fontes
 `docs/OPERACAO.md` (workflow, regras de segurança, como cadastrar uma fonte autorizada, checklist). **Cadastra-se a fonte e a autorização, nunca a URL do arquivo.**
@@ -37,7 +40,7 @@ data/                 canônico gerado, estado do robô, fixtures históricas
 dist/                 artefatos (ver dist/README.md)
 .github/workflows/    catalogo.yml (agendado a cada 6 h)
 docs/                 índice em docs/README.md
-tests/                113 testes
+tests/                130 testes
 ```
 
 ## Regras do catálogo instalável

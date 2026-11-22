@@ -1,26 +1,28 @@
-# Relatório de descoberta — 2026-11-22T14:46:17Z
+# Relatório de descoberta — 2026-11-22T15:28:40Z
 
 > Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.
 
 | Descobertos | Acessíveis | PKG verificado | Compatíveis (regras) | Publicados | Novos | Rejeitados |
 |---|---|---|---|---|---|---|
-| 193 | 186 | 182 | 21 | 1 | 1 | 192 |
+| 194 | 187 | 183 | 22 | 1 | 0 | 193 |
 
 ## Fontes
 - `own-releases` (T-Justino/PS4): ok, 0 .pkg
-- `own-contents` (T-Justino/PS4): ok, 2 .pkg
+- `own-contents` (T-Justino/PS4): ok, 3 .pkg
 - `apollo-releases` (bucanero/apollo-ps4): erro — HTTP 403 em api.github.com
 - `pkg-zone` (): ok, 191 .pkg
+- `lightningmods-ps4-store` (LightningMods/PS4-Store): erro — HTTP 403 em api.github.com
 
 Catálogo atualizado: **sim**
-Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.3 · títulos: CUSA95417 · contentSha256 `2cdc820daf4d509b…`
+Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.4 · títulos: CUSA95417 · contentSha256 `cd66d10a51c72e7b…`
 
 ## Entradas
 
 | Novo | Fase | Estágio | Resultado | Título | Arquivo | Detalhe |
 |---|---|---|---|---|---|---|
-|  | VERIFICADO | compativel_sspi | rejeitado: `SUPERSEDED` | CUSA95417 | PS4StoreBRTest_CUSA95417_v1.00.pkg (fedfa66) | CUSA95417: versão 1.01 (PS4StoreBRTest_CUSA95417_v1.01.pkg) é mais nova; só uma versão por ID entra no catálogo |
-| sim | PUBLICAVEL | publicado | **publicado** | CUSA95417 | PS4StoreBRTest_CUSA95417_v1.01.pkg (cac7d81) |  |
+|  | VERIFICADO | compativel_sspi | rejeitado: `SUPERSEDED` | CUSA95417 | PS4StoreBRTest_CUSA95417_v1.00.pkg (fedfa66) | CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo |
+|  | VERIFICADO | compativel_sspi | rejeitado: `SUPERSEDED` | CUSA95417 | PS4StoreBRTest_CUSA95417_v1.01.pkg (cac7d81) | CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo |
+|  | PUBLICAVEL | publicado | **publicado** | CUSA95417 | PS4StoreBRTest_CUSA95417_v1.02.pkg (9175adc) |  |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | MOZI00001 | MOZI00001_ps4_v1.0.0.pkg (1.0.0) | prefixo MOZI não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | PLTB00000 | PLTB00000_ps4_v1.2.0.pkg (1.2.0) | prefixo PLTB não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | AMIN00048 | AMIN00048_ps4_v1.00.pkg (1.00) | prefixo AMIN não comprovado no console |
@@ -59,7 +61,7 @@ Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.3 · títulos: CUSA95417 · 
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | UDAT99998 | UDAT99998_ps4_v2.04.pkg (2.04) | prefixo UDAT não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | LAPY10025 | LAPY10025_ps4_v1.04.pkg (1.04) | prefixo LAPY não comprovado no console |
 |  | DESCOBERTO | acessivel | rejeitado: `SFO_OUTSIDE_WINDOW` |  | LAPY10024_ps4_v1.01.pkg (1.01) | param.sfo fora da janela baixada |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA01015 | CUSA01116_ps4_v2.32.pkg (2.32) | nem a fonte 'pkg-zone' nem o título CUSA01015 têm autorização de listagem registrada (config/sources.json) |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA01015 | CUSA01116_ps4_v2.32.pkg (2.32) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | LAPY20001 | LAPY20001_ps4_v1.34.pkg (1.34) | prefixo LAPY não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | SAAT29385 | SAAT29385_ps4_v2.20.pkg (2.20) | prefixo SAAT não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | NPXX51362 | NPXX51364_ps4_v1.00.pkg (1.00) | prefixo NPXX não comprovado no console |
@@ -86,7 +88,7 @@ Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.3 · títulos: CUSA95417 · 
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | NPXX51351 | NPXX51351_ps4_v1.00.pkg (1.00) | prefixo NPXX não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PLACEHOLDER_ID` | CUSA00000 | CUSA00000_ps4_v1.00.pkg (1.00) | CUSA00000 é ID fictício |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | MRPH00001 | MRPH00001_ps4_v1.00.pkg (1.00) | prefixo MRPH não comprovado no console |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA33666 | CUSA33666_ps4_v2.pkg (2) | nem a fonte 'pkg-zone' nem o título CUSA33666 têm autorização de listagem registrada (config/sources.json) |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA33666 | CUSA33666_ps4_v2.pkg (2) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | FMSX00000 | FMSX00000_ps4_v1.00.pkg (1.00) | prefixo FMSX não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | ZZZZ00002 | ZZZZ00002_ps4_v1.00.pkg (1.00) | prefixo ZZZZ não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | PPPP00002 | PPPP00002_ps4_v1.00.pkg (1.00) | prefixo PPPP não comprovado no console |
@@ -124,32 +126,32 @@ Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.3 · títulos: CUSA95417 · 
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | XDPX20004 | XDPX20004_ps4_v1.33.pkg (1.33) | prefixo XDPX não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | BREW00009 | BREW00009_ps4_v0.0.1.pkg (0.0.1) | prefixo BREW não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | XDPX20006 | XDPX20006_ps4_v1.00.pkg (1.00) | prefixo XDPX não comprovado no console |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA00127 | CUSA00127_ps4_v1.53.pkg (1.53) | nem a fonte 'pkg-zone' nem o título CUSA00127 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA00131 | CUSA00131_ps4_v2.33.pkg (2.33) | nem a fonte 'pkg-zone' nem o título CUSA00131 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA05365 | CUSA05365_ps4_v2.00.pkg (2.00) | nem a fonte 'pkg-zone' nem o título CUSA05365 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA02012 | CUSA02012_ps4_v4.01.pkg (4.01) | nem a fonte 'pkg-zone' nem o título CUSA02012 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA05214 | CUSA05214_ps4_v4.00.pkg (4.00) | nem a fonte 'pkg-zone' nem o título CUSA05214 têm autorização de listagem registrada (config/sources.json) |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA00127 | CUSA00127_ps4_v1.53.pkg (1.53) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA00131 | CUSA00131_ps4_v2.33.pkg (2.33) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA05365 | CUSA05365_ps4_v2.00.pkg (2.00) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA02012 | CUSA02012_ps4_v4.01.pkg (4.01) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA05214 | CUSA05214_ps4_v4.00.pkg (4.00) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | OPEN00001 | OPEN00001_ps4_v1.01.pkg (1.01) | prefixo OPEN não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | BREW00009 | SILI00009_ps4_v1.00.pkg (1.00) | prefixo BREW não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | PFBN00001 | PFBN00001_ps4_v6.7.pkg (6.7) | prefixo PFBN não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | PSNE00001 | PSNE00001_ps4_v6.7.pkg (6.7) | prefixo PSNE não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | PNES00001 | PNES00001_ps4_v6.7.pkg (6.7) | prefixo PNES não comprovado no console |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA18680 | CUSA18680_ps4_v01.01.pkg (01.01) | nem a fonte 'pkg-zone' nem o título CUSA18680 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA04688 | CUSA04688_ps4_v3.43.pkg (3.43) | nem a fonte 'pkg-zone' nem o título CUSA04688 têm autorização de listagem registrada (config/sources.json) |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA18680 | CUSA18680_ps4_v01.01.pkg (01.01) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA04688 | CUSA04688_ps4_v3.43.pkg (3.43) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | LAPY20007 | LAPY20007_ps4_v1.16.pkg (1.16) | prefixo LAPY não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | VTHX21368 | VTHX21368_ps4_v1.32.pkg (1.32) | prefixo VTHX não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | BREW34965 | BREW34965_ps4_v0.10.pkg (0.10) | prefixo BREW não comprovado no console |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA08223 | CUSA08223_ps4_v1.03.pkg (1.03) | nem a fonte 'pkg-zone' nem o título CUSA08223 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA24386 | CUSA24386_ps4_v1.11.pkg (1.11) | nem a fonte 'pkg-zone' nem o título CUSA24386 têm autorização de listagem registrada (config/sources.json) |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA08223 | CUSA08223_ps4_v1.03.pkg (1.03) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA24386 | CUSA24386_ps4_v1.11.pkg (1.11) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | AZIF00003 | AZIF00003_ps4_v0.98.pkg (0.98) | prefixo AZIF não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | OVBD00001 | OVBD00001_ps4_v1.1.2.1.pkg (1.1.2.1) | prefixo OVBD não comprovado no console |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA99900 | CUSA99900_ps4_v1.00.pkg (1.00) | nem a fonte 'pkg-zone' nem o título CUSA99900 têm autorização de listagem registrada (config/sources.json) |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA99900 | CUSA99900_ps4_v1.00.pkg (1.00) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `KIND_UNTESTED` | CUSA03290 | CUSA03290_ps4_v1.03.pkg (1.03) | tipo 'update' (CATEGORY=gp): só 'base' é publicado; update/DLC não testados |
 |  | VERIFICADO | pkg_verificado | rejeitado: `KIND_UNTESTED` | CUSA03991 | CUSA03991_ps4_v1.00.pkg (1.00) | tipo 'update' (CATEGORY=gp): só 'base' é publicado; update/DLC não testados |
 |  | VERIFICADO | pkg_verificado | rejeitado: `KIND_UNTESTED` | CUSA03291 | CUSA03291_ps4_v1.00.pkg (1.00) | tipo 'update' (CATEGORY=gp): só 'base' é publicado; update/DLC não testados |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | NPXX33392 | NPXX33392_ps4_v1.00.pkg (1.00) | prefixo NPXX não comprovado no console |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA02222 | CUSA02222_ps4_v1.00.pkg (1.00) | nem a fonte 'pkg-zone' nem o título CUSA02222 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA02222 | CUSA02222_ps4_v1.00.pkg (1.00) | nem a fonte 'pkg-zone' nem o título CUSA02222 têm autorização de listagem registrada (config/sources.json) |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA02222 | CUSA02222_ps4_v1.00.pkg (1.00) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA02222 | CUSA02222_ps4_v1.00.pkg (1.00) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | BORC00018 | BORC00018_ps4_v1.00.pkg (1.00) | prefixo BORC não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | BORP09801 | BORP09801_ps4_v1.00.pkg (1.00) | prefixo BORP não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | BORC00014 | BORC00014_ps4_v1.00.pkg (1.00) | prefixo BORC não comprovado no console |
@@ -186,8 +188,8 @@ Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.3 · títulos: CUSA95417 · 
 |  | VERIFICADO | pkg_verificado | rejeitado: `PLACEHOLDER_ID` | CUSA00000 | CUSA00002_ps4_v1.00.pkg (1.00) | CUSA00000 é ID fictício |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | FLTZ00001 | FLTZ00001_ps4_v1.00.pkg (1.00) | prefixo FLTZ não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | CUSB00002 | CUSB00002_ps4_v1.00.pkg (1.00) | prefixo CUSB não comprovado no console |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA36666 | CUSA36666_ps4_v4.pkg (4) | nem a fonte 'pkg-zone' nem o título CUSA36666 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA36666 | CUSA36666_ps4_v2.5.pkg (2.5) | nem a fonte 'pkg-zone' nem o título CUSA36666 têm autorização de listagem registrada (config/sources.json) |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA36666 | CUSA36666_ps4_v4.pkg (4) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA36666 | CUSA36666_ps4_v2.5.pkg (2.5) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_REJECTED_BY_SSPI` | NPXS29129 | NPXS29129_ps4_v1.00.pkg (1.00) | prefixo NPXS recusado na importação (Gate 2) |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | SPLK00001 | SPLK00001_ps4_v1.00.pkg (1.00) | prefixo SPLK não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | MODS00001 | MODS00001_ps4_v1.02.pkg (1.02) | prefixo MODS não comprovado no console |
@@ -208,7 +210,7 @@ Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.3 · títulos: CUSA95417 · 
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | NPXX51522 | NPXX51522_ps4_v1.00.pkg (1.00) | prefixo NPXX não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | LAPY10004 | LAPY10004_ps4_v1.03.pkg (1.03) | prefixo LAPY não comprovado no console |
 |  | DESCOBERTO | acessivel | rejeitado: `SFO_OUTSIDE_WINDOW` |  | BBFF12362_ps4_v1.00.pkg (1.00) | param.sfo fora da janela baixada |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA03398 | CUSA03285_ps4_v1.46.pkg (1.46) | nem a fonte 'pkg-zone' nem o título CUSA03398 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA02644 | CUSA02644_ps4_v1.34.pkg (1.34) | nem a fonte 'pkg-zone' nem o título CUSA02644 têm autorização de listagem registrada (config/sources.json) |
-|  | VERIFICADO | compativel_sspi | rejeitado: `NO_AUTHORIZATION` | CUSA01850 | CUSA01850_ps4_v2.03.pkg (2.03) | nem a fonte 'pkg-zone' nem o título CUSA01850 têm autorização de listagem registrada (config/sources.json) |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA03398 | CUSA03285_ps4_v1.46.pkg (1.46) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA02644 | CUSA02644_ps4_v1.34.pkg (1.34) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
+|  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA01850 | CUSA01850_ps4_v2.03.pkg (2.03) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | BBAR00505 | BBAR00505_ps4_v1.00.pkg (1.00) | prefixo BBAR não comprovado no console |

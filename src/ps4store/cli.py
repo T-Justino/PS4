@@ -84,12 +84,16 @@ def cmd_run(a, net=None) -> int:
     out_dir = Path(a.out_dir)
     res = run(cfg, net, out_gssource=out_dir / "ps4storebr-auto.gssource",
               out_canonical=Path(a.canonical), out_report=out_dir / "discovery.report.json",
-              state_path=Path(a.state), dry_run=a.dry_run, recheck=a.recheck)
+              state_path=Path(a.state), dry_run=a.dry_run, recheck=a.recheck,
+              refresh_links=a.refresh_links, out_research=Path(a.research_dir) / "research.json")
     c = res.report["counts"]
     for s in res.report["sources"]:
         print(f"fonte {s['source']} ({s['repo']}): {s['status']}" + (f" — {s['error']}" if s.get("error") else ""))
     print(f"descobertos={c['descobertos']} acessíveis={c['acessiveis']} pkg_verificados={c['pkgVerificados']} "
           f"compatíveis={c['compativeisSspi']} publicados={c['publicados']} novos={c['novos']} rejeitados={c['rejeitados']}")
+    L = c["links"]
+    print(f"links: sspi_baixáveis={L['sspiBaixaveis']} redirect_temporário={L['redirectTemporario']} restritos={c['restritos']} "
+          f"duplicados={c['duplicados']} lista_pessoal={c['listaPessoal']}")
     print("fases: " + " · ".join(f"{k}={v}" for k, v in c["fases"].items()))
     for e in res.report["entries"]:
         print(f"  {'NOVO ' if e['isNew'] else '     '}{e['fase']:<10} {e['stage']:<16} {e['asset']} ({e['release']})"
@@ -121,6 +125,9 @@ def main(argv: list[str] | None = None, *, net=None) -> int:
     r.add_argument("--out-dir", default="dist/auto")
     r.add_argument("--canonical", default="data/generated/auto-catalog.json")
     r.add_argument("--state", default="data/state/discovery-state.json")
+    r.add_argument("--refresh-links", type=int, default=0, metavar="N",
+                   help="re-sonda até N itens em cache sem dados de link (enriquecimento incremental)")
+    r.add_argument("--research-dir", default="local", help="catálogo de pesquisa e lista pessoal (NUNCA commitar; padrão local/)")
     r.add_argument("--recheck", action="store_true", help="ignora o cache de verificação e sonda tudo de novo")
     r.add_argument("--dry-run", action="store_true", help="não grava nada (estado, catálogo, relatório)")
     r.set_defaults(func=lambda a: cmd_run(a, net))

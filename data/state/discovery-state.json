@@ -124,13 +124,28 @@
     },
     "own-contents#9175adc36da1a81dbe354ff94b5500ed55f894b4": {
       "check": {
-        "checkedAt": "2026-11-22T14:57:22Z",
+        "checkedAt": "2026-11-22T15:28:40Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "",
         "finalHost": "raw.githubusercontent.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "raw.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "direto",
+          "notes": [],
+          "rangeOk": true,
+          "redirects": 0,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": false
+        },
         "name": "PS4 Store BR Test",
         "reason": null,
+        "restricted": false,
         "stage": "publicado",
         "titleId": "CUSA95417",
         "totalSize": 6619136,
@@ -142,13 +157,28 @@
     },
     "own-contents#cac7d81c05d22f17d7419743dfb36634cf693282": {
       "check": {
-        "checkedAt": "2026-11-22T14:57:22Z",
+        "checkedAt": "2026-11-22T15:28:40Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo",
         "finalHost": "raw.githubusercontent.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "raw.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "direto",
+          "notes": [],
+          "rangeOk": true,
+          "redirects": 0,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": false
+        },
         "name": "PS4 Store BR Test",
         "reason": "SUPERSEDED",
+        "restricted": false,
         "stage": "compativel_sspi",
         "titleId": "CUSA95417",
         "totalSize": 6619136,
@@ -160,13 +190,28 @@
     },
     "own-contents#fedfa6645b2994d6aa90f9fd375c3da62713c9ee": {
       "check": {
-        "checkedAt": "2026-11-22T14:57:22Z",
+        "checkedAt": "2026-11-22T15:28:40Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo",
         "finalHost": "raw.githubusercontent.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "raw.githubusercontent.com"
+          ],
+          "etag": true,
+          "kind": "direto",
+          "notes": [],
+          "rangeOk": true,
+          "redirects": 0,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": false
+        },
         "name": "PS4 Store BR Test",
         "reason": "SUPERSEDED",
+        "restricted": false,
         "stage": "compativel_sspi",
         "titleId": "CUSA95417",
         "totalSize": 6619136,
@@ -178,13 +223,31 @@
     },
     "pkg-zone#AMIN00048#ps4#1.00#2026-11-21T17:49:50.237Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0000-AMIN00048_00-MEDIACENTER00001",
         "detail": "prefixo AMIN não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Media Center For PS4",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "AMIN00048",
         "totalSize": 46137344,
@@ -1578,13 +1641,31 @@
     },
     "pkg-zone#FPKP00001#ps4#01.00#2026-11-18T19:10:24.361Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0000-FPKP00001_00-FPKGIPLUS0000000",
         "detail": "prefixo FPKP não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "FPKGi+",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "FPKP00001",
         "totalSize": 17170432,
@@ -1696,13 +1777,31 @@
     },
     "pkg-zone#JFPS40000#ps4#1.16#2026-11-18T17:13:41.464Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0000-JFPS40000_00-JELLYFINPS400000",
         "detail": "prefixo JFPS não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "JellyFin [PS] for PS4",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "JFPS40000",
         "totalSize": 38862848,
@@ -2196,13 +2295,31 @@
     },
     "pkg-zone#LAPY20009#ps4#2.10#2026-11-20T02:21:18.422Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "ED1234-LAPY20009_00-PS4XPLORER200000",
         "detail": "prefixo LAPY não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "PS4-Xplorer 2.0",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "LAPY20009",
         "totalSize": 63832064,
@@ -2330,13 +2447,31 @@
     },
     "pkg-zone#LIBR00001#ps4#01.00#2026-11-18T18:03:37.516Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0000-LIBR00001_00-LIBRARIANPS40000",
         "detail": "prefixo LIBR não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Librarian [PS4]",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "LIBR00001",
         "totalSize": 26542080,
@@ -2370,13 +2505,31 @@
     },
     "pkg-zone#MARC00001#ps4#4.21#2026-11-19T00:55:58.570Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "UP0001-MARC00001_00-0000000000000000",
         "detail": "prefixo MARC não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Hyper Neiva",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "MARC00001",
         "totalSize": 185139200,
@@ -2450,13 +2603,31 @@
     },
     "pkg-zone#MOZI00001#ps4#1.0.0#2026-11-21T19:40:45.765Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:12:39Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0000-MOZI00001_00-ORBISMOZI0000000",
         "detail": "prefixo MOZI não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Orbis Mozi",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "MOZI00001",
         "totalSize": 13893632,
@@ -2930,13 +3101,31 @@
     },
     "pkg-zone#NUEX00001#ps4#3.0#2026-11-21T17:40:44.291Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0000-NUEX00001_00-NUEEXMTP00000000",
         "detail": "prefixo NUEX não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "PS MTP Explorer",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "NUEX00001",
         "totalSize": 7012352,
@@ -3128,13 +3317,31 @@
     },
     "pkg-zone#PLTB00000#ps4#1.2.0#2026-11-21T18:10:49.130Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0001-PLTB00000_00-PLTB000000100000",
         "detail": "prefixo PLTB não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Playtube",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "PLTB00000",
         "totalSize": 53215232,
@@ -3384,13 +3591,31 @@
     },
     "pkg-zone#RMTC00001#ps4#2.11#2026-11-14T02:36:28.619Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0001-RMTC00001_00-RMTC000010201100",
         "detail": "prefixo RMTC não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "ezRemote Client",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "RMTC00001",
         "totalSize": 54722560,
@@ -3444,13 +3669,31 @@
     },
     "pkg-zone#SFIN00000#ps4#0.9.6#2026-11-21T16:40:46.490Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0001-SFIN00000_00-SFIN000000009600",
         "detail": "prefixo SFIN não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "Switchfin",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "SFIN00000",
         "totalSize": 58654720,
@@ -3644,13 +3887,31 @@
     },
     "pkg-zone#SRCE00001#ps4#14.26#2026-11-16T17:37:07.770Z": {
       "check": {
-        "checkedAt": "2026-11-22T14:07:24Z",
+        "checkedAt": "2026-11-22T15:27:51Z",
         "contentId": "IV0000-SRCE00001_00-SOURCEENGINE0001",
         "detail": "prefixo SRCE não comprovado no console",
         "finalHost": "api.pkg-zone.com",
         "kind": "base",
+        "link": {
+          "chain": [
+            "pkg-zone.com",
+            "api.pkg-zone.com"
+          ],
+          "etag": true,
+          "kind": "redirect",
+          "notes": [
+            "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+          ],
+          "rangeOk": true,
+          "redirects": 1,
+          "singleLane": false,
+          "sspiUsable": true,
+          "status": 206,
+          "temporaryFinalUrl": true
+        },
         "name": "half-life 2",
         "reason": "PREFIX_UNPROVEN",
+        "restricted": false,
         "stage": "pkg_verificado",
         "titleId": "SRCE00001",
         "totalSize": 353370112,

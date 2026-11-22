@@ -8,6 +8,7 @@ Sem banco de dados: estado em um JSON versionável. Não baixa pacotes completos
 """
 from __future__ import annotations
 
+import collections
 import hashlib
 import json
 import re
@@ -20,6 +21,7 @@ from urllib.parse import quote, urlsplit
 from . import sspi
 from .build import compile_catalog, write_atomic, zip_files
 from .catalog import AUTH_BASES, CatalogError, parse
+from .links import classify_link, file_type, is_retail_style, multipart_info
 from .pkginfo import PkgError, parse_head
 
 SOURCES_SCHEMA = "ps4storebr.sources/v1"
@@ -203,7 +205,8 @@ def discover_contents(src: Source, net) -> list[Found]:
         if not isinstance(it, dict) or it.get("type") != "file":
             continue
         name, url, sha = it.get("name"), it.get("download_url"), it.get("sha")
-        if not (isinstance(name, str) and name.lower().endswith(".pkg") and isinstance(url, str) and isinstance(sha, str)):
+        if not (isinstance(name, str) and (name.lower().endswith(".pkg") or multipart_info(name))
+                and isinstance(url, str) and isinstance(sha, str)):
             continue
         size = it.get("size")
         found.append(Found(f"{src.id}#{sha}", src, sha[:7], str(it.get("html_url") or ""), "", name, url,
@@ -224,7 +227,7 @@ def discover_github(src: Source, net) -> list[Found]:
             continue
         for a in rel.get("assets") or []:
             name, url = a.get("name"), a.get("browser_download_url")
-            if not (isinstance(name, str) and isinstance(url, str) and name.lower().endswith(".pkg")):
+            if not (isinstance(name, str) and isinstance(url, str) and (name.lower().endswith(".pkg") or multipart_info(name))):
                 continue
             if a.get("state") not in (None, "uploaded"):
                 continue
@@ -254,6 +257,9 @@ class Entry:
     final_host: str | None = None
     is_new: bool = False
     warnings: list[str] = field(default_factory=list)
+    link: dict = field(default_factory=dict)      # classificação do link (links.classify_link)
+    restricted: bool = False                      # ID/categoria de aparência comercial: nunca vai a catálogo nem à lista pessoal
+    duplicate_of: str | None = None
 
     @property
     def phase(self) -> str:
@@ -266,12 +272,13 @@ class Entry:
         return {"checkedAt": now, "stage": self.stage, "reason": self.reason, "detail": self.detail,
                 "titleId": self.title_id, "contentId": self.content_id, "name": self.name, "kind": self.kind,
                 "version": self.version, "totalSize": self.total_size, "finalHost": self.final_host,
-                "warnings": self.warnings}
+                "warnings": self.warnings, "link": self.link, "restricted": self.restricted}
 
     def load_cache(self, c: dict) -> "Entry":
         self.stage, self.reason, self.detail = c["stage"], c["reason"], c["detail"]
         self.title_id, self.content_id, self.name, self.kind = c["titleId"], c["contentId"], c["name"], c["kind"]
         self.version, self.total_size, self.final_host = c["version"], c["totalSize"], c["finalHost"]
+        self.link, self.restricted = c.get("link") or {}, bool(c.get("restricted"))
         self.warnings = list(c["warnings"]) + ["resultado reaproveitado do cache (não sondado nesta execução)"]
         return self
 
@@ -285,8 +292,21 @@ class Entry:
                 "sizeFeed": f.size, "stage": self.stage, "rejected": self.reason is not None,
                 "reason": self.reason, "detail": self.detail, "titleId": self.title_id, "contentId": self.content_id,
                 "name": self.name, "kind": self.kind, "version": self.version, "sizeVerified": self.total_size,
-                "downloadHost": urlsplit(f.url).hostname, "finalHost": self.final_host,
+                "downloadHost": urlsplit(f.url).hostname, "finalHost": self.final_host, "fileType": file_type(f.asset_name),
+                "link": self.link, "restricted": self.restricted, "duplicateOf": self.duplicate_of,
                 "isNew": self.is_new, "meta": f.meta, "warnings": self.warnings}
+
+
+def mark_duplicates(entries: list[Entry]) -> None:
+    """Mesmo arquivo em mais de um lugar (mesmo Content ID, versão e tamanho): o primeiro vale, os demais viram `duplicateOf`."""
+    seen: dict[tuple, str] = {}
+    for e in entries:
+        if e.content_id and e.total_size:
+            k = (e.content_id, e.version, e.total_size)
+            if k in seen:
+                e.duplicate_of = seen[k]
+            else:
+                seen[k] = e.found.key
 
 
 def _vkey(v: str | None) -> tuple:
@@ -317,6 +337,8 @@ def _policy(e: Entry, cfg: Config) -> Entry:
     if e.stage not in ("compativel_sspi", "publicado"):
         return e
     e.stage, e.reason, e.detail = "compativel_sspi", None, ""
+    if e.restricted and e.found.source.authorized_titles.get(e.title_id) is None:
+        return e.reject("RETAIL_STYLE_ID", "aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM")
     host = urlsplit(e.found.url).hostname or ""
     if cfg.tls_enforce and host in cfg.tls_known_bad:
         return e.reject("TLS_HOST_BLOCKED", f"{host}: {cfg.tls_known_bad[host]}")
@@ -328,10 +350,18 @@ def _policy(e: Entry, cfg: Config) -> Entry:
 
 def verify(found: Found, net, cfg: Config) -> Entry:
     e = Entry(found)
+    mp = multipart_info(found.asset_name)
+    if mp and not found.skip_reason:
+        found.skip_reason = "ARCHIVE_MULTIPART"
+        found.meta["multipart"] = mp
+    if found.skip_reason == "ARCHIVE_MULTIPART":
+        return e.reject("ARCHIVE_MULTIPART", f"RAR dividido ({found.meta['multipart']['set']}, parte {found.meta['multipart']['index']}): "
+                        "o SSPI suporta (volumes declarados), mas a publicação multiparte é o Gate 5; descoberto, não sondado")
     if found.skip_reason:
         return e.reject(found.skip_reason, f"{found.meta.get('console')}: fora do alvo (PS4); não sondado")
     # 1) acessível? (uma requisição Range de 64 KiB; nunca o pacote inteiro)
     pr = net.probe(found.url, HEAD_BYTES)
+    e.link = classify_link(pr)
     if not pr.ok:
         return e.reject("UNREACHABLE", pr.error or f"HTTP {pr.status}")
     e.final_host = urlsplit(pr.final_url).hostname
@@ -373,6 +403,11 @@ def verify(found: Found, net, cfg: Config) -> Entry:
     if not found.url.startswith("https://"):
         return e.reject("NOT_HTTPS", "URL não é HTTPS")
     e.stage = "compativel_sspi"
+    e.restricted = is_retail_style(head.content_id, found.meta.get("category"))
+    if e.restricted and found.source.authorized_titles.get(e.title_id) is None:
+        return e.reject("RETAIL_STYLE_ID", f"Content ID {head.content_id}"
+                        + (f" / categoria '{found.meta.get('category')}'" if found.meta.get("category") else "")
+                        + " tem aparência de conteúdo comercial: fica só na pesquisa; só entra em catálogo com autorização POR ITEM")
     # 4) política de TLS do console (dados em config/sources.json; atualizar conforme os testes)
     host = urlsplit(found.url).hostname or ""
     if cfg.tls_enforce and host in cfg.tls_known_bad:
@@ -451,7 +486,8 @@ CONNECTORS = {"github-releases": discover_github, "github-contents": discover_co
 
 
 def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report: Path, state_path: Path,
-        dry_run: bool = False, now: str | None = None, recheck: bool = False, sleep=time.sleep) -> RunResult:
+        dry_run: bool = False, now: str | None = None, recheck: bool = False, sleep=time.sleep,
+        refresh_links: int = 0, out_research: Path | None = None) -> RunResult:
     now = now or _now()
     state = _load_state(state_path)
     entries: list[Entry] = []
@@ -467,14 +503,20 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
             continue
         source_status.append({"source": src.id, "repo": src.repo, "status": "ok", "discovered": len(found)})
         probes = 0
+        refresh_left = refresh_links          # enriquecimento incremental: re-sonda N itens em cache sem dados de link
         for f in found:
             seen = state["seen"].get(f.key) or {}
             cached = seen.get("check")
+            needs_link = cached and not cached.get("link") and not f.skip_reason and cached["stage"] != "descoberto"
+            if needs_link and refresh_left > 0 and probes < src.max_probes:
+                refresh_left -= 1
+                cached = None
             if (cached and not recheck and cached["reason"] != "UNREACHABLE"
                     and _age_hours(cached["checkedAt"], now) < src.recheck_hours):
                 e = Entry(f).load_cache(cached)
+                e.restricted = is_retail_style(e.content_id, f.meta.get("category"))
                 # a política (TLS/autorização) é reavaliada a cada execução, mesmo com cache
-                if e.reason in ("TLS_HOST_BLOCKED", "NO_AUTHORIZATION") or e.stage == "publicado":
+                if e.reason in ("TLS_HOST_BLOCKED", "NO_AUTHORIZATION", "RETAIL_STYLE_ID") or e.stage == "publicado":
                     e = _policy(e, cfg)
             elif f.skip_reason:
                 e = verify(f, net, cfg)                       # sem rede
@@ -488,6 +530,7 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
             e.is_new = f.key not in state["seen"]
             entries.append(e)
 
+    mark_duplicates(entries)
     published = dedupe_latest([e for e in entries if e.stage == "publicado"])
     canonical = None
     wrote = False
@@ -517,6 +560,8 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
             artifact = {"path": str(out_gssource), "version": f"1.0.{counter}", "sha256": sspi.sha256(data),
                         "contentSha256": sspi.content_sha256(data), "titles": rep.published_titles}
     report = build_report(cfg, now, source_status, entries, wrote, compile_error, canonical, dry_run)
+    if out_research is not None and not dry_run:
+        write_research(out_research, entries, now)
     if wrote:
         report["artifact"] = artifact
     if not dry_run:
@@ -533,6 +578,45 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
     return res
 
 
+def research_row(e: Entry) -> dict:
+    f = e.found
+    return {"name": e.name, "titleId": e.title_id, "contentId": e.content_id, "version": e.version, "sizeBytes": e.total_size,
+            "source": f.source.id, "url": f.url, "fileType": file_type(f.asset_name), "kind": e.kind,
+            "linkStatus": e.link.get("kind"), "rangeOk": e.link.get("rangeOk"), "temporaryRedirect": e.link.get("temporaryFinalUrl"),
+            "sspiDownloadable": bool(e.link.get("sspiUsable")),
+            "sspiCatalogCompat": e.stage in ("compativel_sspi", "publicado") or (e.reason in ("RETAIL_STYLE_ID", "NO_AUTHORIZATION", "TLS_HOST_BLOCKED")),
+            "phase": e.phase, "rejectionReason": e.reason, "detail": e.detail, "restricted": e.restricted,
+            "duplicateOf": e.duplicate_of, "category": f.meta.get("category"), "author": f.meta.get("author"),
+            "firmware": f.meta.get("firmware"), "linkNotes": e.link.get("notes") or []}
+
+
+def personal_links(entries: list[Entry]) -> list[Entry]:
+    """Lista PESSOAL para colar no SSPI (Downloads → colar link): identidade verificada, link utilizável, tipo base,
+    sem aparência comercial, host sem falha de TLS conhecida. Independe do prefixo do ID (o SSPI instala pelo ID do próprio PKG)
+    e da autorização de publicação; **nunca** é commitada nem hospedada."""
+    out = []
+    for e in entries:
+        if (e.phase in ("VERIFICADO", "PUBLICAVEL") and e.kind == "base" and e.link.get("sspiUsable") and not e.restricted
+                and e.reason not in ("TLS_HOST_BLOCKED", "SUPERSEDED") and not e.duplicate_of):
+            out.append(e)
+    return out
+
+
+def write_research(path: Path, entries: list[Entry], now: str) -> None:
+    rows = [research_row(e) for e in entries]
+    doc = {"generatedAt": now, "aviso": "USO PESSOAL. Pesquisa de metadados e disponibilidade; não é publicação. Não commitar nem hospedar este arquivo.",
+           "total": len(rows), "entries": rows}
+    write_atomic(path, (json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode())
+    pl = personal_links(entries)
+    lines = ["# USO PESSOAL: cole estes links no SSPI (Downloads → tocar no touchpad → colar link, ou a página do celular).",
+             "# Cada link vai direto à origem; nada é hospedado aqui. Excluídos: IDs/categorias de aparência comercial, links sem Range/identidade.",
+             "# Não redistribua esta lista."]
+    for e in sorted(pl, key=lambda x: (x.name or "", x.version or "")):
+        lines.append(f"# {e.name} {e.version or ''} [{e.title_id}] {e.total_size or '?'} B")
+        lines.append(e.found.url)
+    write_atomic(path.with_name("links-sspi.txt"), ("\n".join(lines) + "\n").encode())
+
+
 def build_report(cfg, now, source_status, entries, wrote, compile_error, canonical, dry_run) -> dict:
     reached = lambda stage: sum(1 for e in entries if STAGES.index(e.stage) >= STAGES.index(stage))
     reasons: dict[str, int] = {}
@@ -547,6 +631,14 @@ def build_report(cfg, now, source_status, entries, wrote, compile_error, canonic
                        "publicados": reached("publicado"),
                        "fases": {ph: sum(1 for e in entries if e.phase == ph) for ph in ("DESCOBERTO", "VERIFICADO", "PUBLICAVEL")},
                        "novos": sum(1 for e in entries if e.is_new),
+                       "links": {"classificados": sum(1 for e in entries if e.link),
+                                 "sspiBaixaveis": sum(1 for e in entries if e.link.get("sspiUsable")),
+                                 "redirectTemporario": sum(1 for e in entries if e.link.get("temporaryFinalUrl")),
+                                 "semRange": sum(1 for e in entries if e.link and e.link.get("rangeOk") is False and e.link.get("sspiUsable")),
+                                 "tipos": dict(collections.Counter(e.link.get("kind") for e in entries if e.link))},
+                       "restritos": sum(1 for e in entries if e.restricted),
+                       "duplicados": sum(1 for e in entries if e.duplicate_of),
+                       "listaPessoal": len(personal_links(entries)),
                        "rejeitados": sum(1 for e in entries if e.reason), "motivos": reasons},
             "catalogUpdated": wrote, "catalogError": compile_error,
             "entries": [e.to_dict() for e in entries]}

@@ -11,10 +11,11 @@ import re
 import socket
 import urllib.error
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
 UA = "ps4store-discovery/0.1"
+SIGNED_RE = re.compile(r"[?&](exp|expires|expiry|sig|signature|token|x-amz-signature|x-goog-signature|se)=", re.I)
 MAX_JSON = 2 * 1024 * 1024
 MAX_REDIRECTS = 5
 
@@ -33,6 +34,12 @@ class Probe:
     final_url: str = ""
     content_type: str | None = None
     redirects: int = 0
+    range_ok: bool = False              # 206 com Content-Range (o SSPI baixa em faixas paralelas)
+    content_encoding: str | None = None
+    etag: str | None = None
+    last_modified: str | None = None
+    chain: list = field(default_factory=list)   # hosts percorridos (origem → ... → final)
+    signed: bool = False                # URL final com assinatura/expiração (temporária)
 
 
 def _host_blocked(host: str) -> str | None:
@@ -55,12 +62,14 @@ class _Redirects(urllib.request.HTTPRedirectHandler):
     def __init__(self, net: "UrllibNet"):
         self.net = net
         self.count = 0
+        self.hosts: list[str] = []
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         self.count += 1
         if self.count > MAX_REDIRECTS:
             raise NetError("redirects demais")
         self.net._check_url(newurl)
+        self.hosts.append(urlsplit(newurl).hostname or "")
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
@@ -105,7 +114,9 @@ class UrllibNet:
             return Probe(False, error=str(e))
         redirects = _Redirects(self)
         opener = urllib.request.build_opener(redirects)
-        req = urllib.request.Request(url, headers={"User-Agent": UA, "Range": f"bytes=0-{nbytes - 1}"})
+        redirects.hosts.append(urlsplit(url).hostname or "")
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Range": f"bytes=0-{nbytes - 1}",
+                                                   "Accept-Encoding": "identity"})
         try:
             with opener.open(req, timeout=self.timeout) as r:
                 status = r.status
@@ -118,9 +129,13 @@ class UrllibNet:
                 elif status == 200 and (r.headers.get("Content-Length") or "").isdigit():
                     total = int(r.headers["Content-Length"])
                 return Probe(status in (200, 206), status, None if status in (200, 206) else f"HTTP {status}",
-                             total, head, r.geturl(), r.headers.get_content_type(), redirects.count)
+                             total, head, r.geturl(), r.headers.get_content_type(), redirects.count,
+                             range_ok=status == 206 and bool(m), content_encoding=r.headers.get("Content-Encoding"),
+                             etag=r.headers.get("ETag"), last_modified=r.headers.get("Last-Modified"),
+                             chain=list(redirects.hosts), signed=bool(SIGNED_RE.search(r.geturl())))
         except urllib.error.HTTPError as e:
-            return Probe(False, e.code, f"HTTP {e.code}", redirects=redirects.count)
+            return Probe(False, e.code, f"HTTP {e.code}", redirects=redirects.count, chain=list(redirects.hosts),
+                         final_url=getattr(e, "url", "") or "", signed=bool(SIGNED_RE.search(getattr(e, "url", "") or "")))
         except NetError as e:
             return Probe(False, error=str(e), redirects=redirects.count)
         except (urllib.error.URLError, OSError) as e:
