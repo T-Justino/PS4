@@ -1,0 +1,32 @@
+{
+  "sourceId": "ps4storebr.gate2.t2.npxs39041",
+  "version": "0.1.0",
+  "publishedTitles": [
+    "NPXS39041"
+  ],
+  "excluded": [],
+  "files": {
+    "source.json": {
+      "size": 800,
+      "sha256": "e574eddbc96627d1f9219487cc851bebaaae8e9a8c9f79a880d7a567521512d1"
+    },
+    "catalog.json": {
+      "size": 261,
+      "sha256": "4338580f8bece80abce076cf07048199e428d098cb89c29169b498b6f13bd287"
+    },
+    "index/titles.json": {
+      "size": 188,
+      "sha256": "e1f3c20e4ff117d20b1f9a76040e65ef642c144fff703187491d3b4b25630f3f"
+    },
+    "packages/items.json": {
+      "size": 267,
+      "sha256": "58d34862ec241255de72296a1fdf6379fd05c5db1fc9fc0053edd6fc71983e83"
+    }
+  },
+  "artifactSha256": "7d131922a347375c040809fe40f43455a9682ba26105652fe46fb9c67933bb32",
+  "contentSha256": "e574eddbc96627d1f9219487cc851bebaaae8e9a8c9f79a880d7a567521512d1",
+  "warnings": [
+    "index/titles.json[NPXS39041]: prefixo NPXS aceito pelo parser público, não comprovado no binário 5.11.7"
+  ],
+  "consoleCompatibility": "NAO_TESTADO — requer teste manual no PS4 (Gate 2)"
+}

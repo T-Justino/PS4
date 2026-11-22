@@ -1,0 +1,36 @@
+{
+  "schema": "ps4storebr.catalog/v1",
+  "source": {
+    "id": "ps4storebr.gate2.t3.apol00004",
+    "name": "PS4 Store BR - Gate 2 T3 (APOL00004)",
+    "description": "Sonda de identificador: testa se o SSPI 5.11.7 aceita APOL00004 no catalogo. O download via GitHub falha por TLS no SSPI: NAO instalar.",
+    "version": "0.1.0"
+  },
+  "titles": [
+    {
+      "titleId": "APOL00004",
+      "identityEvidence": "Content ID no nome do pacote oficial: IV0000-APOL00004_00-APOLLO0000000PS4.pkg (github.com/bucanero/apollo-ps4/releases).",
+      "name": "Apollo Save Tool",
+      "region": null,
+      "aliases": ["apollo", "save tool", "saves"],
+      "languages": {"audioPtBr": "unknown", "subtitlesPtBr": "unknown", "evidence": null},
+      "packages": [
+        {
+          "id": "apollo-github-release",
+          "kind": "base",
+          "accessType": "Direct",
+          "url": "https://github.com/bucanero/apollo-ps4/releases/latest/download/IV0000-APOL00004_00-APOLLO0000000PS4.pkg",
+          "hoster": "GitHub Releases",
+          "label": "Oficial do desenvolvedor - download falha TLS no SSPI (teste de ID)",
+          "sourcePageUrl": "https://github.com/bucanero/apollo-ps4/releases",
+          "version": null,
+          "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
+          "authorization": {
+            "basis": "official-developer-release",
+            "evidence": "Release publica do autor (bucanero/apollo-ps4, GPL-3.0) no GitHub."
+          }
+        }
+      ]
+    }
+  ]
+}

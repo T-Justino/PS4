@@ -1,0 +1,23 @@
+[project]
+name = "ps4store"
+version = "0.1.0"
+description = "PS4 Store BR — gerador determinístico de catálogos .gssource para SSPI"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[project.scripts]
+ps4store = "ps4store.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
