@@ -96,7 +96,14 @@ retomada: corte 30 s [retomou/reiniciou/falhou] · corte 4 min [retomou/renovou/
 Nada aqui garante jogos comerciais nem outros hosts. Nenhum identificador interno de PKG, firmware ou proteção é alterado.
 
 
-## Teste 5 (RAR dividido): preparação feita, aguardando o console
+## RESULTADO: Teste 5A (RAR dividido, 11 volumes): reconhecimento OK; **download falhou por TLS no volume 7/11** (22/11/2026, relato do usuário)
+
+- O SSPI **reconheceu os 11 volumes como um único RAR** (identificação e agrupamento ✅).
+- O download começou e **chegou ao volume 7/11 (≈ 3,7–4 MB; 6 volumes × 614.400 B = 3,69 MB)** e **falhou**: `Provider TLS certificate not trusted on fresh probe sessions for two minutes with no useful progress (0x8095F00C)`, no painel do celular.
+- Hospedagem: `raw.githubusercontent.com`. **Extração, instalação e execução não foram alcançadas.** 5B e 5C pendentes.
+- Mesmo código TLS do Live Die Repeat (hospedado via PKG-Zone). **Investigação do código do SSPI e teste mínimo de confirmação: `docs/INVESTIGACAO_TLS_SSPI.md`** (causa mais provável: o worker residente do SSPI, que baixa arquivos RAR, não monta de forma intermitente a cadeia de certificado em sessões novas; a pilha usada por PKGs homebrew tem mais certificados fixados). Teste 5 **reprovado por transporte, não por descoberta**.
+
+## Teste 5 (RAR dividido): preparação (resultado do 5A acima)
 
 **Conjunto de teste** (feito do PKG próprio v1.02; nada de terceiros): `PS4StoreBRTest_v1.02_rar.part01.rar … part11.rar`, RAR5, sem compressão.
 Validado pelo robô e conferido ponta a ponta (22/11/2026):

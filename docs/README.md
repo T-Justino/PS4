@@ -9,6 +9,7 @@
 | `USO_NO_PS4.md` | instalar a fonte por URL e atualizar no console |
 | `PESQUISA_DE_LINKS.md` | descoberta ampliada, classificação de links, lista pessoal, resultados reais e teste T10 |
 | `TESTES_DE_JOGOS.md` | candidatos de jogos completos, RAR dividido, retomada e espaço: procedimento de teste real |
+| `INVESTIGACAO_TLS_SSPI.md` | erro TLS `0x8095F00C` no SSPI: código lido, causa mais provável, evidências e teste mínimo |
 | `LIMITACOES.md` | por que o catálogo ainda não oferece variedade real de jogos |
 | `SEPARACAO_DESCOBERTA.md` | **descoberta × validação de link × publicação**, as cinco perguntas, busca genérica e `ps4store search` |
 | `GATE3.md` | descoberta automática: fontes, resultados reais, PKG-Zone |

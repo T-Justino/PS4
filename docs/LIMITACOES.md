@@ -21,6 +21,9 @@ O MVP prova o **mecanismo** (descobrir → verificar → publicar → importar �
 ## C2. Retomada de downloads grandes (achado do Teste 3, 22/11/2026)
 - Um download de ≈949 MB **falhou por certificado TLS em 915,3 MB depois de uma interrupção**; a nova tentativa manual concluiu. **A retomada não está resolvida**: não se sabe se a 2ª tentativa retomou ou recomeçou, nem a causa do erro (hipótese: cadeia de certificado do host de download, `api.pkg-zone.com`/Cloudflare, não aceita pelo PS4 em uma reconexão). Do lado do robô não há correção; o servidor oferece o que o SSPI precisa (`Range`, tamanho e ETag estáveis). Para o usuário: após uma interrupção, **refazer o download**.
 
+## C3. TLS no transporte do SSPI (achado do Teste 5A, 22/11/2026)
+- O erro `0x8095F00C` (certificado não confiável em **sessões novas**) derrubou o RAR no volume 7/11 em `raw.githubusercontent.com` e já havia derrubado o Live Die Repeat em `api.pkg-zone.com`. Pelo código público do SSPI, o worker que baixa RAR fixa menos certificados que a pilha dos PKGs homebrew, e a `libSceSsl` do firmware antigo falha de forma intermitente em montar cadeias. **Causa mais provável, ainda não confirmada**; investigação e teste mínimo em `docs/INVESTIGACAO_TLS_SSPI.md`. É problema de transporte do SSPI/console, não do robô.
+
 ## D. Verificação e operação
 11. **A verificação lê só os primeiros 64 KiB:** identidade e tamanho, **não** o conteúdo inteiro nem `sha256` (não inventamos). Não prova que o PKG instala/abre (só o T8b provou, para um pacote). 4 PKGs do PKG-Zone têm `param.sfo` além da janela e não foram lidos.
 12. **O firmware exigido pelo pacote** (`pv` do PKG-Zone, ex. "9.00", "5.05+") **não é verificado** contra o console.
