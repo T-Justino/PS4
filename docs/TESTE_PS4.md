@@ -21,6 +21,13 @@ nesse ponto, ou aquele PKG segue outro caminho. **Causa desconhecida; não gener
 
 `NPXS` e `APOL` como chave: recusados na importação.
 
+## Resultado de T5 e T6 (22/11/2026, relato do usuário)
+
+O usuário relatou que **T5 e T6 funcionaram e foram instalados** (SSPI 5.11.7). Não foi detalhado: o botão do Store no T5
+(`Install`/`Open`), qual item do T6 foi instalado (o download do Apollo falhava por TLS), nem o teste opcional de duplicação.
+Comprovado, no relato: chaves `CUSA90001`, `CUSA90002` (e `CUSA90003`) importam e instalam. Continua valendo: vale só para
+esses PKGs e essa versão do SSPI; updates, DLC, biblioteca e duplicação seguem **não testados**.
+
 ## Arquivos (pasta `dist/`)
 
 | Teste | Arquivo | Chaves | contentSha256 (início) |
