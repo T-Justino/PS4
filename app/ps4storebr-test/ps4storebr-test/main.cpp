@@ -10,6 +10,10 @@
 #include "log.h"
 #include "font5x7.h"
 
+#ifndef APP_VERSION
+#define APP_VERSION "1.00"
+#endif
+
 #define FRAME_WIDTH  1920
 #define FRAME_HEIGHT 1080
 #define FRAME_DEPTH  4
@@ -63,7 +67,7 @@ int main()
         scene->FrameBufferFill(bg);
         drawCentered(scene, "PS4 STORE BR TEST", 220, 14, white);
         drawCentered(scene, "INSTALACAO OK", 400, 20, green);
-        drawCentered(scene, "TITLE ID: CUSA95417", 620, 7, white);
+        drawCentered(scene, "TITLE ID: CUSA95417  VERSAO " APP_VERSION, 620, 7, white);
         drawCentered(scene, "CONTENT ID: IV0000-CUSA95417_00-PS4STOREBRTEST00", 700, 5, gray);
         drawCentered(scene, "APLICATIVO EXPERIMENTAL - ID NAO OFICIAL - SO PARA TESTE", 820, 5, gray);
         drawCentered(scene, "APERTE O BOTAO PS PARA SAIR", 940, 6, white);

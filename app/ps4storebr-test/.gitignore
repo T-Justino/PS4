@@ -1,6 +1,8 @@
-x64/
+__pycache__/
 *.pkg
+x64/
 pkg.gp4
 eboot.bin
 sce_sys/param.sfo
 sce_sys/about/right.sprx
+sce_module/

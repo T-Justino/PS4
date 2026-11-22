@@ -86,3 +86,30 @@ def test_contents_pkg_with_rejected_id_stays_verified_not_published(tmp_path):
     r = go(tmp_path, net, cfg(tmp_path))
     e = r.report["entries"][0]
     assert (e["fase"], e["reason"]) == ("VERIFICADO", "PREFIX_REJECTED_BY_SSPI") and not r.wrote_catalog
+
+
+def test_one_version_per_id_latest_wins_and_catalog_updates_without_url_registration(tmp_path):
+    """Alteração na pasta monitorada: o arquivo novo (versão maior) substitui o anterior; o ID não é duplicado."""
+    net = Repo()
+    old = make_pkg("CUSA95801", title="App Teste")
+    net.put("app-v1.00.pkg", old, "a" * 40)
+    p = cfg(tmp_path)
+    r1 = go(tmp_path, net, p)
+    assert r1.published == 1
+    v1 = json.loads((tmp_path / "o/c.json").read_text())["source"]["version"]
+
+    new = bytearray(make_pkg("CUSA95801", title="App Teste"))
+    i = new.index(b"1.00\x00")                       # param.sfo: APP_VER/VERSION 1.00 -> 1.01 (só no teste)
+    while i != -1 and i < 65536:
+        new[i:i + 4] = b"1.01"
+        i = new.find(b"1.00\x00", i + 1)
+    net.put("app-v1.01.pkg", bytes(new), "b" * 40)   # arquivo novo na pasta: ninguém cadastra a URL
+    r2 = go(tmp_path, net, p)
+    by = {e["asset"]: e for e in r2.report["entries"]}
+    assert by["app-v1.01.pkg"]["isNew"] and by["app-v1.01.pkg"]["fase"] == "PUBLICAVEL"
+    assert (by["app-v1.00.pkg"]["fase"], by["app-v1.00.pkg"]["reason"]) == ("VERIFICADO", "SUPERSEDED")
+    z = zipfile.ZipFile(tmp_path / "o/a.gssource")
+    rows = json.loads(z.read("packages/items.json"))["titles"]["CUSA95801"]
+    assert len(rows) == 1 and rows[0]["url"].endswith("app-v1.01.pkg") and rows[0]["version"] == "1.01"
+    assert json.loads(z.read("index/titles.json"))["titles"][0]["releaseCount"] == 1
+    assert json.loads((tmp_path / "o/c.json").read_text())["source"]["version"] != v1      # versão do catálogo sobe

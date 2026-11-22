@@ -10,9 +10,8 @@
     "known_bad_hosts": {
       "github.com": "download falhou com TLS 0x8095F00C no SSPI 5.11.7 (relato do usuario, 21/11/2026)"
     },
-    "untested_hosts": {
-      "raw.githubusercontent.com": "download em teste no T8 (22/11/2026); resultado pendente"
-    }
+    "untested_hosts": {},
+    "_nota": "raw.githubusercontent.com: download de 6,6 MB concluido no SSPI 5.11.7 (T8, 22/11/2026, relato do usuario). github.com continua com falha de TLS."
   },
   "sources": [
     {
@@ -31,7 +30,7 @@
       "id": "own-contents",
       "type": "github-contents",
       "repo": "T-Justino/PS4",
-      "path": "dist/t8",
+      "path": "pkgs",
       "enabled": true,
       "authorization": {
         "basis": "license",
@@ -57,7 +56,7 @@
       "enabled": true,
       "delay_seconds": 0.5,
       "max_probes": 250,
-      "recheck_hours": 168,
+      "recheck_hours": 720,
       "authorization": null,
       "_nota": "Sem autorizacao registrada: itens sao descobertos e verificados, mas NAO publicados. Os Termos do PKG-Zone nao concedem permissao de listagem a terceiros (docs/GATE3.md). Para publicar, preencha authorization com basis=written-permission e a evidencia."
     }

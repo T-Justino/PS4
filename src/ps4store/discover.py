@@ -288,6 +288,29 @@ class Entry:
                 "isNew": self.is_new, "meta": f.meta, "warnings": self.warnings}
 
 
+def _vkey(v: str | None) -> tuple:
+    return tuple(int(x) for x in re.findall(r"\d+", v or "")) or (0,)
+
+
+def dedupe_latest(published: list[Entry]) -> list[Entry]:
+    """Um pacote por (título, tipo): vence a maior versão (empate: o mais novo; depois a chave). Os demais ficam VERIFICADOS
+    com motivo SUPERSEDED, evitando duplicar o mesmo identificador no catálogo instalável."""
+    best: dict[tuple, Entry] = {}
+    for e in published:
+        k = (e.title_id, e.kind)
+        cur = best.get(k)
+        rank = lambda x: (_vkey(x.version), x.found.published_at, x.found.key)
+        if cur is None or rank(e) > rank(cur):
+            best[k] = e
+    keep = set(id(e) for e in best.values())
+    for e in published:
+        if id(e) not in keep:
+            w = best[(e.title_id, e.kind)]
+            e.stage = "compativel_sspi"
+            e.reject("SUPERSEDED", f"{e.title_id}: versão {w.version} ({w.found.asset_name}) é mais nova; só uma versão por ID entra no catálogo")
+    return [e for e in published if id(e) in keep]
+
+
 def _policy(e: Entry, cfg: Config) -> Entry:
     """Reavalia TLS e autorização sobre um resultado já verificado (cache), pois a política muda sem nova sondagem."""
     if e.stage not in ("compativel_sspi", "publicado"):
@@ -463,7 +486,7 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
             e.is_new = f.key not in state["seen"]
             entries.append(e)
 
-    published = [e for e in entries if e.stage == "publicado"]
+    published = dedupe_latest([e for e in entries if e.stage == "publicado"])
     canonical = None
     wrote = False
     compile_error = None
