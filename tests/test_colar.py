@@ -1,6 +1,7 @@
 """Formatador para o painel do SSPI + script termux-url-opener: regras de 'pronto', ordem, limite de 50, cópia e segurança dos argumentos."""
 import json
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -9,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from ps4store.colar import LIMITE_PAINEL, copiar, extrair_urls, main, montar_blocos, validar_url
+from ps4store.colar import LIMITE_PAINEL, copiar, extrair_urls, ler_lista, main, montar_blocos, ultimo_volume_aberto, validar_url
 from ps4store.resolver import Crawl, Resolved, ResolverNet
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -116,6 +117,14 @@ def test_copiar_usa_lista_de_argumentos_sem_shell_e_texto_por_stdin():
 # ---------- ponta a ponta (servidor local, sem download completo) ----------
 PKG = b"\x7fCNT" + b"\0" * 20_000
 RAR = b"Rar!\x1a\x07\x01\x00" + b"\0" * 20_000
+LAST = {"v": 11, "w": 51}        # diretório -> índice do último volume (os anteriores declaram "há mais volumes")
+
+
+def volume_rar5(diretorio: str, n: int) -> bytes:
+    aberto = n < LAST[diretorio]
+    return b"Rar!\x1a\x07\x01\x00" + b"\0" * 20_000 + b"\x11\x22\x33\x44" + b"\x03\x05\x04" + (b"\x01" if aberto else b"\x00") + (b"\0" * 4 if aberto else b"")
+
+
 PAGES = {
     "/pg": '<a href="/r/x.part03.rar">3</a><a href="/r/x.part01.rar">1</a><a href="/r/x.part02.rar">2</a><a href="/a.pkg">pkg</a>',
     "/pg-falta": '<a href="/r/x.part01.rar">1</a><a href="/r/x.part03.rar">3</a>',
@@ -136,6 +145,10 @@ class H(BaseHTTPRequestHandler):
             data, ct = PKG, "application/octet-stream"
         elif p.startswith("/r/") and p.endswith(".rar"):
             data, ct = RAR, "application/octet-stream"
+        elif re.match(r"^/(v|w)/\w+\.part\d+\.rar$", p):
+            data, ct = volume_rar5(p[1], int(re.search(r"part(\d+)", p).group(1))), "application/octet-stream"
+        elif re.match(r"^/p/\d+\.pkg$", p):
+            data, ct = PKG, "application/octet-stream"
         else:
             self.send_response(404)
             self.end_headers()
@@ -231,3 +244,88 @@ def test_opener_sem_projeto_avisa(tmp_path):
     env = dict(os.environ, PS4STORE_DIR=str(tmp_path), PS4STORE_SEM_PAUSA="1")
     r = subprocess.run(["sh", str(ROOT / "android" / "termux-url-opener"), "https://a.com/x.pkg"], capture_output=True, text=True, env=env, timeout=30)
     assert r.returncode == 1 and "Projeto não encontrado" in r.stderr
+
+
+# ---------- --arquivo (listas locais): regressão do caso real "rartest/links-ordem.txt" ----------
+def lista(tmp_path, linhas, nome="lista.txt"):
+    f = tmp_path / nome
+    f.write_text("\n".join(linhas) + "\n", encoding="utf-8")
+    return str(f)
+
+
+def vols(srv, d, ns):
+    return [f"{srv}/{d}/x.part{n:02d}.rar" for n in ns]
+
+
+def test_ler_lista_ignora_vazias_e_comentarios_sem_limite_de_10(tmp_path):
+    f = lista(tmp_path, ["# volumes", "", "  ", *[f"https://h/p{n}.pkg" for n in range(30)], "texto solto", "ftp://h/x", "# fim", "https://h/p0.pkg"])
+    urls, avisos = ler_lista(f)
+    assert len(urls) == 30 and urls[0] == "https://h/p0.pkg" and urls[-1] == "https://h/p29.pkg"
+    assert len(avisos) == 2 and "linha" in avisos[0]
+
+
+def test_arquivo_com_11_volumes_vira_um_unico_bloco_pronto_em_ordem(srv, tmp_path, capsys):
+    embaralhado = [vols(srv, "v", [n])[0] for n in (4, 11, 1, 7, 2, 10, 3, 9, 5, 8, 6)]
+    f = lista(tmp_path, ["# 11 volumes (embaralhados)", "", *embaralhado, ""])
+    copias = []
+    rc, out = rodar(["--arquivo", f], capsys, copias)
+    assert rc == 0 and "1 bloco(s) pronto(s)" in out and out.count("== BLOCO") == 1 and "RAR x.part*.rar · 11 volume(s)" in out
+    assert copias == ["\n".join(vols(srv, "v", range(1, 12))) + "\n"]
+    assert "confirmado pelo cabeçalho RAR" in out
+
+
+def test_arquivo_sem_o_ultimo_volume_e_bloqueado_pelo_cabecalho_final(srv, tmp_path, capsys):
+    copias = []
+    rc, out = rodar(["--arquivo", lista(tmp_path, vols(srv, "v", range(1, 11)))], capsys, copias)       # 1..10 de 11 (como rartest/links-sem-part11.txt)
+    assert rc == 3 and copias == [] and "BLOQUEADO" in out and "há mais volumes depois" in out and "Nada pronto" in out
+
+
+def test_arquivo_com_volume_do_meio_faltando_e_bloqueado(srv, tmp_path, capsys):
+    rc, out = rodar(["--arquivo", lista(tmp_path, vols(srv, "v", [n for n in range(1, 12) if n != 5]))], capsys, [])
+    assert rc == 3 and "[5]" in out and "NÃO ENVIAR" in out
+
+
+def test_arquivo_com_mais_de_50_volumes_e_bloqueado_e_avulsos_viram_lotes(srv, tmp_path, capsys):
+    rc, out = rodar(["--arquivo", lista(tmp_path, vols(srv, "w", range(1, 52)))], capsys, [])
+    assert rc == 3 and "no máximo 50" in out
+    copias = []
+    rc, out = rodar(["--arquivo", lista(tmp_path, [f"{srv}/p/{n}.pkg" for n in range(1, 56)])], capsys, copias)
+    assert rc == 0 and "lote 1 de 2" in out and "lote 2 de 2" in out and len(copias[0].splitlines()) == 50 and "55 URLs no total" in out
+
+
+def test_limite_de_10_continua_so_para_argumentos_com_aviso_explicito(srv, capsys):
+    rc, out = rodar([f"{srv}/p/{n}.pkg" for n in range(1, 13)] + ["--sem-copiar"], capsys)
+    assert "só as 10 primeiras" in out and "10 arquivo(s) avulso(s)" in out
+
+
+def test_arquivo_inexistente_ou_gigante_falha_claro(tmp_path, capsys):
+    assert main(BASE + ["--arquivo", str(tmp_path / "nao-existe.txt")]) == 2
+    assert main(BASE + ["--arquivo", lista(tmp_path, [f"https://h/p{n}.pkg" for n in range(501)])]) == 2
+    assert main(BASE + ["--arquivo", lista(tmp_path, ["# só comentário", ""])]) == 2
+
+
+def test_arquivo_junto_com_url_posicional_mantem_ordem_e_remove_repetidas(srv, tmp_path, capsys):
+    copias = []
+    f = lista(tmp_path, [f"{srv}/p/2.pkg", f"{srv}/p/1.pkg"])
+    rc, out = rodar([f"{srv}/p/1.pkg", "--arquivo", f], capsys, copias)
+    assert rc == 0 and copias == [f"{srv}/p/1.pkg\n{srv}/p/2.pkg\n"]
+
+
+def test_ultimo_volume_aberto_cobre_casos_sem_confirmacao():
+    class Net:
+        def __init__(self, head, status=206, ini=None):
+            self.head, self.status, self.ini = head, status, ini
+
+        def probe(self, url, nbytes, start):
+            from ps4store.net import Probe
+            return Probe(True, self.status, head=self.head, range_start=start if self.ini is None else self.ini)
+
+    fim_aberto = b"\0" * 50 + b"\x03\x05\x04\x01" + b"\0" * 10
+    fim_ultimo = b"\0" * 60 + b"\x03\x05\x04\x00"
+    assert ultimo_volume_aberto("u", 1000, Net(fim_aberto)) is True
+    assert ultimo_volume_aberto("u", 1000, Net(fim_ultimo)) is False
+    assert ultimo_volume_aberto("u", 1000, Net(b"\x03\x05\x04\x01" + b"\xff" * 60)) is None       # padrão no meio dos dados, não no fim
+    assert ultimo_volume_aberto("u", 1000, Net(b"x" * 64)) is None                                   # sem cabeçalho (ex.: RAR4)
+    assert ultimo_volume_aberto("u", 1000, Net(fim_aberto, status=200)) is None                      # servidor ignora Range
+    assert ultimo_volume_aberto("u", 1000, Net(fim_aberto, ini=0)) is None                           # offset não honrado
+    assert ultimo_volume_aberto("u", None, Net(fim_aberto)) is None

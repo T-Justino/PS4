@@ -24,6 +24,8 @@ from .net import SIGNED_RE
 from .resolver import OK, PAGINA_SEM_ARQUIVO, Resolved, ResolverNet, crawl, group_sets, load_hosts
 
 LIMITE_PAINEL = 50
+LIMITE_TEXTO = 10        # só para texto compartilhado/argumentos; listas locais (--arquivo) não têm esse limite
+LIMITE_LISTA = 500       # teto de segurança de uma lista local (acima disso: erro explícito, nunca corte silencioso)
 MAX_URL = 2048
 _URL = re.compile(r"https?://[^\s<>\"'`\\]+", re.I)
 _CTRL = re.compile(r"[\x00-\x20\x7f]")
@@ -49,6 +51,39 @@ def extrair_urls(texto: str, limite: int = 10) -> list[str]:
     return out[:limite]
 
 
+def ler_lista(caminho: str) -> tuple[list[str], list[str]]:
+    """URLs de um arquivo local, uma por linha. Ignora linhas vazias e comentários (#). Devolve (urls na ordem, avisos de linhas inválidas).
+    Repetidas são removidas mantendo a primeira posição. Não aplica o limite de texto compartilhado."""
+    urls: list[str] = []
+    avisos: list[str] = []
+    for n, linha in enumerate(Path(caminho).read_text(encoding="utf-8-sig").splitlines(), 1):
+        t = linha.strip()
+        if not t or t.startswith("#"):
+            continue
+        u = validar_url(t)
+        if not u:
+            avisos.append(f"linha {n} ignorada: não é uma URL http(s) válida")
+        elif u not in urls:
+            urls.append(u)
+    return urls, avisos
+
+
+_EOF = re.compile(rb"\x03\x05[\x00-\x0f]([\x00\x01])")
+
+
+def ultimo_volume_aberto(url: str, tamanho: int | None, net) -> bool | None:
+    """Lê só os 64 bytes finais do ÚLTIMO volume RAR5 e olha o cabeçalho de fim de arquivo: True = declara que HÁ mais volumes depois
+    (conjunto incompleto); False = é mesmo o último; None = não deu para confirmar (não é RAR5, servidor sem Range, etc.)."""
+    if not tamanho or tamanho < 64:
+        return None
+    ini = tamanho - 64
+    pr = net.probe(url, nbytes=64, start=ini)
+    if not pr.ok or pr.status != 206 or pr.range_start != ini:
+        return None
+    achados = [m for m in _EOF.finditer(pr.head) if pr.head[m.end():].strip(b"\x00") == b""]      # o cabeçalho de fim fecha o arquivo (só zeros depois)
+    return None if not achados else achados[-1].group(1) == b"\x01"
+
+
 @dataclass
 class Bloco:
     titulo: str
@@ -63,7 +98,7 @@ def _temporaria(u: str) -> bool:
     return bool(SIGNED_RE.search(u))
 
 
-def montar_blocos(crawls: list, aceitar_temporarias: bool = False) -> dict:
+def montar_blocos(crawls: list, aceitar_temporarias: bool = False, ultimo_aberto=None) -> dict:
     """Blocos prontos e a lista do que NÃO enviar. Entrada: resultados de resolver.crawl()."""
     files, terminal = [], []
     for c in crawls:
@@ -100,6 +135,14 @@ def montar_blocos(crawls: list, aceitar_temporarias: bool = False) -> dict:
         if len(b.urls) > LIMITE_PAINEL:
             b.bloqueio.append(f"{len(b.urls)} volumes: o painel do SSPI aceita no máximo {LIMITE_PAINEL} links por envio e o conjunto não pode ser dividido")
         b.bloqueio += sorted(set(bad))
+        if not b.bloqueio and g["style"] == "part-rar" and ultimo_aberto:
+            aberto = ultimo_aberto(vols[b.urls[-1]])
+            if aberto is True:
+                b.bloqueio.append(f"o último volume lido ({b.urls[-1].rsplit('/', 1)[-1]}) declara que há mais volumes depois dele: falta(m) volume(s) no fim")
+            elif aberto is None:
+                b.avisos.append("o fim do conjunto não pôde ser confirmado pelo cabeçalho do último volume: confira que não falta nenhum volume depois dele")
+            else:
+                b.avisos.append("último volume confirmado pelo cabeçalho RAR (não há volumes depois dele)")
         b.pronto = not b.bloqueio
         if b.pronto:
             b.avisos.append("cole tudo de uma vez; o SSPI agrupa os volumes pelos nomes .partNN.rar (ordem 01 → N)")
@@ -152,6 +195,7 @@ def copiar(texto: str, run=subprocess.run, which=shutil.which) -> tuple[bool, st
 def main(argv=None, net: ResolverNet | None = None, run=subprocess.run, which=shutil.which) -> int:
     ap = argparse.ArgumentParser(prog="python -m ps4store.colar", description="resolve URLs e monta blocos para colar no painel do SSPI")
     ap.add_argument("urls", nargs="*")
+    ap.add_argument("--arquivo", help="arquivo local com uma URL por linha (vazias e # ignoradas; sem o limite de texto compartilhado)")
     ap.add_argument("--extrair", action="store_true", help="extrai as URLs http(s) de um texto compartilhado (modo Termux)")
     ap.add_argument("--bloco", type=int, default=1, help="qual bloco PRONTO copiar (padrão 1)")
     ap.add_argument("--sem-copiar", action="store_true")
@@ -163,11 +207,25 @@ def main(argv=None, net: ResolverNet | None = None, run=subprocess.run, which=sh
     ap.add_argument("--max-requisicoes", type=int, default=80)
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args(argv)
-    bruto = list(a.urls)
     urls: list[str] = []
-    for x in bruto:
+    for x in a.urls:
         urls += extrair_urls(x) if a.extrair else ([x] if validar_url(x) else [])
-    urls = list(dict.fromkeys(urls))[:10]
+    urls = list(dict.fromkeys(urls))
+    avisos_entrada: list[str] = []
+    if len(urls) > LIMITE_TEXTO:
+        avisos_entrada.append(f"argumentos/texto compartilhado: só as {LIMITE_TEXTO} primeiras URLs foram usadas (use --arquivo para listas)")
+        urls = urls[:LIMITE_TEXTO]
+    if a.arquivo:
+        try:
+            lista, avisos_lista = ler_lista(a.arquivo)
+        except (OSError, UnicodeDecodeError) as e:
+            print(f"ERRO  não foi possível ler {a.arquivo}: {type(e).__name__}", file=sys.stderr)
+            return 2
+        if len(lista) > LIMITE_LISTA:
+            print(f"ERRO  {a.arquivo} tem {len(lista)} URLs (máximo {LIMITE_LISTA}); divida a lista", file=sys.stderr)
+            return 2
+        avisos_entrada += avisos_lista
+        urls = list(dict.fromkeys(urls + lista))
     if not urls:
         print("ERRO  nenhuma URL http(s) válida na entrada (nada foi executado nem acessado)", file=sys.stderr)
         return 2
@@ -175,7 +233,8 @@ def main(argv=None, net: ResolverNet | None = None, run=subprocess.run, which=sh
     hosts = load_hosts(Path(a.hosts)) | {h.lower() for h in a.permitir} | set(extra)
     net = net or ResolverNet()
     crawls = [crawl(u, net, hosts, max_depth=max(0, a.profundidade), max_pages=a.max_paginas, max_requests=a.max_requisicoes) for u in urls]
-    res = montar_blocos(crawls, a.aceitar_temporarias)
+    res = montar_blocos(crawls, a.aceitar_temporarias, lambda v: ultimo_volume_aberto(v.sspiUrl, v.sizeBytes, net))
+    res["avisos"] = avisos_entrada + res["avisos"]
     blocos: list[Bloco] = res["blocos"]
     prontos = [b for b in blocos if b.pronto]
     if a.json:

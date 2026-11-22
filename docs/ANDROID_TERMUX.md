@@ -26,6 +26,16 @@ PYTHONPATH=src python -m ps4store.colar --sem-copiar https://pkg-zone.com/downlo
 Esperado: (1) 1 bloco PRONTO, 6,6 MB; (2) 1 bloco PRONTO "RAR … 11 volume(s)", URLs `part01 … part11` em ordem; (3) 1 bloco PRONTO, 19,8 MB. Sem `--sem-copiar`, o bloco 1 vai para a área de transferência (se o Termux:API estiver instalado) ou aparece entre `----- copie daqui -----` e `----- até aqui -----` para copiar à mão.
 Para testar o bloqueio: acrescente `--max-paginas 5` ao comando (2): o conjunto vira **NÃO ENVIAR** (busca truncada).
 
+### Listas de URLs (`--arquivo`)
+Uma URL por linha; linhas vazias e `#` são ignoradas; **sem o limite de 10** (o limite de 10 vale só para URLs passadas como argumento/texto compartilhado, e agora avisa quando corta). As URLs da lista são resolvidas uma a uma e os volumes RAR são agrupados em **um único bloco**, na ordem.
+```sh
+cd ~/PS4
+PYTHONPATH=src python -m ps4store.colar --arquivo rartest/links-ordem.txt            # esperado: 1 bloco PRONTO, 11 volumes, 6,6 MB
+PYTHONPATH=src python -m ps4store.colar --arquivo rartest/links-embaralhado.txt      # esperado: igual (ordem 01 → 11)
+PYTHONPATH=src python -m ps4store.colar --arquivo rartest/links-sem-part11.txt       # esperado: NÃO ENVIAR (falta o último volume)
+```
+Faltando o **último** volume não há como notar pela contagem; por isso o formatador lê só os 64 bytes finais do último volume RAR5 e confere o cabeçalho de fim: se ele declara "há mais volumes", o conjunto é bloqueado. Se o cabeçalho não puder ser lido (RAR4, servidor sem Range), o bloco sai com o aviso "fim do conjunto não confirmado".
+
 ## Teste 2: pelo botão Compartilhar
 1. No Chrome do Android, abra uma página (ex.: `https://pkg-zone.com/download/ps4/OPEN00001/1.01`), toque em **Compartilhar → Termux**.
 2. O Termux abre, resolve e mostra o bloco; com Termux:API, o bloco já está copiado. **Enter** fecha.
