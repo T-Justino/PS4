@@ -1,0 +1,12 @@
+{
+  "_nota": "DADOS FICTÍCIOS para testar a busca. Os nomes são só texto de teste; as URLs (.invalid) não existem. Não é um índice de nenhum site.",
+  "titulos": [
+    {"nome": "Batman: Arkham Knight", "url": "https://exemplo.invalid/teste/batman-arkham-knight"},
+    {"nome": "Batman: Arkham VR", "url": "https://exemplo.invalid/teste/batman-arkham-vr"},
+    {"nome": "LEGO Batman 3: Beyond Gotham", "url": "https://exemplo.invalid/teste/lego-batman-3"},
+    {"nome": "LEGO Batman: The Videogame", "url": "https://exemplo.invalid/teste/lego-batman-the-videogame"},
+    {"nome": "The Batman Collection", "url": "https://exemplo.invalid/teste/the-batman-collection"},
+    {"nome": "Pokémon Café Mix", "url": "https://exemplo.invalid/teste/pokemon-cafe-mix"},
+    {"nome": "Spider-Man", "url": "https://exemplo.invalid/teste/spider-man"}
+  ]
+}
