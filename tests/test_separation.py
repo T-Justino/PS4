@@ -204,3 +204,48 @@ def test_search_command_by_name_id_type_and_status(tmp_path, capsys):
     out = capsys.readouterr().out
     assert "CUSA95417" in out and "LICENSE_UNKNOWN" in out and "1 resultado" in out
     assert main(["search", "x", "--research", str(tmp_path / "nao-existe.json")]) == 1
+
+
+# ---- find: busca por nome (normalização, ranking, disponibilidade em português) ----
+def _row(name, tid, **kw):
+    r = {"name": name, "titleId": tid, "contentId": None, "url": f"https://x/{tid}.pkg", "source": "s", "author": None,
+         "description": None, "repo": None, "fileType": "pkg", "version": "1.0", "sizeBytes": 1000000, "identityRead": False,
+         "linkStatus": None, "publicationAvailable": False, "directInstallAvailable": False,
+         "status": {"linkAccessible": None}, "publicationBlockers": [], "directInstallBlockers": []}
+    r.update(kw)
+    return r
+
+
+def test_find_normaliza_e_ordena_exato_inicio_parcial():
+    from ps4store.cli import match_rank, search_rows
+    rs = [_row("Super Ação Bros Deluxe", "AAAA00001"), _row("Ação", "AAAA00002"), _row("Ação Total", "AAAA00003"), _row("A Grande Acao", "AAAA00004")]
+    got = search_rows(rs, ["acao"])                      # sem acento e minúsculas acham "Ação"
+    assert len(got) == 4
+    got.sort(key=lambda r: match_rank(r, ["ACAO"]))
+    assert [r["titleId"] for r in got[:2]] == ["AAAA00002", "AAAA00003"]     # exato, depois início do nome
+    assert {r["titleId"] for r in got[2:]} == {"AAAA00001", "AAAA00004"}    # depois palavra no meio do nome
+    assert match_rank(rs[1], ["aaaa00002"]) == 0          # ID exato conta como exato
+
+
+def test_find_disponibilidade_nao_inventa_validacao():
+    from ps4store.cli import availability_pt
+    assert availability_pt(_row("X", "AAAA00001")) == ("Descoberto, link NÃO testado", False)
+    assert availability_pt(_row("X", "AAAA00001", status={"linkAccessible": False}, linkStatus="acesso-negado"))[1] is False
+    # link responde mas identidade não lida => nunca 'validado'
+    t, ok = availability_pt(_row("X", "AAAA00001", status={"linkAccessible": True}, directInstallAvailable=True))
+    assert ok is False and "não identificado" in t
+    t, ok = availability_pt(_row("X", "AAAA00001", status={"linkAccessible": True}, identityRead=True, directInstallAvailable=True))
+    assert ok is True and "link direto" in t
+    t, ok = availability_pt(_row("X", "AAAA00001", status={"linkAccessible": True}, identityRead=True, publicationBlockers=["NO_AUTHORIZATION"]))
+    assert ok is False and "sem autorização" in t
+
+
+def test_find_cli_nao_mostra_url_de_item_nao_validado(tmp_path, capsys):
+    from ps4store.cli import main
+    rs = [_row("Jogo Teste", "AAAA00001"), _row("Jogo Pronto", "AAAA00002", status={"linkAccessible": True}, identityRead=True, directInstallAvailable=True)]
+    f = tmp_path / "research.json"
+    f.write_text(json.dumps({"entries": rs}), encoding="utf-8")
+    assert main(["find", "jogo", "--urls", "--research", str(f)]) == 0
+    out = capsys.readouterr().out
+    assert "https://x/AAAA00002.pkg" in out and "https://x/AAAA00001.pkg" not in out
+    assert "região não informada" in out and "idioma não informado" in out

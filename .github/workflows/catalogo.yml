@@ -4,7 +4,11 @@ name: catalogo
 on:
   schedule:
     - cron: "23 */6 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      refresh_links:
+        description: "Quantos links pendentes sondar nesta execução (padrão 10; sob demanda use 40-60; o agendado usa 10)"
+        default: "10"
 permissions:
   contents: write
 concurrency:
@@ -28,7 +32,7 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # só lê a API do GitHub (limite maior); nunca vai a hosts de download
-        run: PYTHONPATH=src python -m ps4store run --refresh-links 10
+        run: PYTHONPATH=src python -m ps4store run --refresh-links "${{ github.event.inputs.refresh_links || '10' }}"
       - name: Resumo
         if: always()
         run: cat dist/auto/discovery.report.md >> "$GITHUB_STEP_SUMMARY" || true

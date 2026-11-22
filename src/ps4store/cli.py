@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
+import unicodedata
 from pathlib import Path
 
 from . import sspi
@@ -113,13 +115,20 @@ def cmd_run(a, net=None) -> int:
     return 3 if res.critical_down else 0     # 3 = fonte crítica fora do ar (o workflow fica vermelho, o catálogo anterior fica)
 
 
+def _norm(text) -> str:
+    """Minúsculas, sem acentos, só letras/dígitos separados por espaço (mesma ideia do índice do SSPI)."""
+    t = unicodedata.normalize("NFKD", str(text or "")).casefold()
+    t = "".join(c for c in t if not unicodedata.combining(c))
+    return re.sub(r"[^a-z0-9]+", " ", t).strip()
+
+
 def search_rows(rows: list[dict], terms: list[str], *, ftype: str | None = None, source: str | None = None,
                 only: str | None = None, known_license: bool | None = None) -> list[dict]:
     """Busca no catálogo interno de pesquisa por nome, ID (CUSA ou outro), Content ID, URL, fonte, autor, descrição e tipo de arquivo."""
     out = []
     for r in rows:
-        hay = " ".join(str(r.get(k) or "") for k in ("name", "titleId", "contentId", "url", "source", "author", "description", "repo")).casefold()
-        if not all(t.casefold() in hay for t in terms):
+        hay = _norm(" ".join(str(r.get(k) or "") for k in ("name", "titleId", "contentId", "url", "source", "author", "description", "repo")))
+        if not all(_norm(t) in hay for t in terms if _norm(t)):
             continue
         if ftype and r.get("fileType") != ftype:
             continue
@@ -135,6 +144,73 @@ def search_rows(rows: list[dict], terms: list[str], *, ftype: str | None = None,
             continue
         out.append(r)
     return out
+
+
+def match_rank(r: dict, terms: list[str]) -> int:
+    """0 = nome/ID exato · 1 = nome começa com a busca · 2 = palavra do nome começa com a busca · 3 = nome contém · 4 = só outros campos."""
+    q = _norm(" ".join(terms))
+    if not q:
+        return 4
+    name = _norm(r.get("name"))
+    if q in (name, _norm(r.get("titleId")), _norm(r.get("contentId"))):
+        return 0
+    if name.startswith(q):
+        return 1
+    if (" " + q) in (" " + name):
+        return 2
+    return 3 if q in name else 4
+
+
+_REASON_PT = {
+    "RETAIL_STYLE_ID": "ID com aparência de conteúdo comercial",
+    "NO_AUTHORIZATION": "sem autorização de listagem registrada",
+    "SUPERSEDED": "há versão mais nova",
+    "LINK_NOT_USABLE": "link não utilizável pelo SSPI",
+    "NOT_IDENTIFIED": "arquivo ainda não identificado",
+    "KIND_NOT_BASE": "não é jogo base",
+    "TLS_HOST_BLOCKED": "host com falha de TLS conhecida",
+    "DUPLICATE": "duplicado",
+}
+
+
+def availability_pt(r: dict) -> tuple[str, bool]:
+    """(texto em português, link_validado). Só marca 'validado' quando a sondagem do link deu certo E a identidade foi lida do PKG."""
+    st = r.get("status", {})
+    if st.get("linkAccessible") is False:
+        return f"Link inacessível ({r.get('linkStatus') or 'falhou'})", False
+    if st.get("linkAccessible") is None:
+        return "Descoberto, link NÃO testado", False
+    if not r.get("identityRead"):
+        return "Link responde, arquivo ainda não identificado", False
+    if r.get("publicationAvailable"):
+        return "Disponível no catálogo do SSPI (link validado)", True
+    if r.get("directInstallAvailable"):
+        return "Disponível por link direto no SSPI (link validado); fora do catálogo", True
+    blk = r.get("publicationBlockers") or r.get("directInstallBlockers") or []
+    why = ", ".join(_REASON_PT.get(b, b) for b in blk) or "sem motivo registrado"
+    return f"Link validado, mas indisponível: {why}", False
+
+
+def cmd_find(a) -> int:
+    try:
+        doc = json.loads(Path(a.research).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        print(f"ERRO  catálogo de pesquisa não encontrado em {a.research}: rode `ps4store run` primeiro", file=sys.stderr)
+        return 1
+    rows = search_rows(doc["entries"], a.nome, ftype=a.type, source=a.source)
+    if a.disponiveis:
+        rows = [r for r in rows if availability_pt(r)[1]]
+    rows.sort(key=lambda r: (match_rank(r, a.nome), _norm(r.get("name")), str(r.get("version") or "")))
+    for r in rows[:a.limit]:
+        text, ok = availability_pt(r)
+        region = r.get("region") or "região não informada"
+        lang = (r.get("languages") or {}).get("evidence") and "idioma comprovado" or "idioma não informado"
+        print(f"{r.get('name') or '?'}  [{r.get('titleId') or 'ID?'}] v{r.get('version') or '?'}  ·  {region}  ·  {lang}")
+        print(f"    {(r.get('sizeBytes') or 0) / 1e6:.1f} MB · {r.get('fileType')} · fonte {r.get('source')} · {text}")
+        if a.urls and ok:
+            print(f"    {r['url']}")
+    print(f"-- {len(rows)} resultado(s)" + (f" (mostrando {a.limit})" if len(rows) > a.limit else ""))
+    return 0
 
 
 def cmd_resume_check(a, net=None) -> int:
@@ -244,6 +320,15 @@ def main(argv: list[str] | None = None, *, net=None) -> int:
     q.add_argument("--sort", choices=["size"], help="ordena do maior para o menor")
     q.add_argument("--urls", action="store_true", help="mostra também a URL")
     q.set_defaults(func=cmd_search)
+    f = sub.add_parser("find", help="busca por nome (sem acentos/maiúsculas; exato, depois início, depois parcial) com disponibilidade em português")
+    f.add_argument("nome", nargs="+")
+    f.add_argument("--type", choices=["pkg", "rar", "rar-multiparte", "zip", "7z"])
+    f.add_argument("--source")
+    f.add_argument("--disponiveis", action="store_true", help="só o que tem link validado e identidade lida")
+    f.add_argument("--research", default="local/research.json")
+    f.add_argument("--limit", type=int, default=20)
+    f.add_argument("--urls", action="store_true", help="mostra a URL (só de itens com link validado)")
+    f.set_defaults(func=cmd_find)
     rc = sub.add_parser("resume-check", help="prontidão para retomada/arquivos grandes: Range em offsets, tamanho e ETag estáveis (≤3 requisições de 64 KiB por título)")
     rc.add_argument("--title", action="append", default=[], metavar="ID", help="título (repetível); sem isto, os maiores instaláveis")
     rc.add_argument("--source", help="só esta fonte (ex.: own-rar para checar todos os volumes de um RAR dividido)")
