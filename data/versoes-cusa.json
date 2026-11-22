@@ -1,0 +1,67 @@
+{
+  "schema": "ps4store.versoes/v1",
+  "_nota": "Versões CUSA conhecidas, ligadas ao jogo pelo Q-id do Wikidata. Cada campo só existe se alguma evidência o sustenta (campo 'afirma'); o que não é sustentado fica null/desconhecido. status 'citado' = a URL da fonte apareceu em resultado de busca em 2026-11-22 e NÃO foi aberta (a loja não é alcançável do ambiente de desenvolvimento); 'confirmado' = alguém abriu a página e conferiu (use --confirmar). Nenhum CUSA é inferido por semelhança de nome.",
+  "versoes": [
+    {
+      "qid": "Q15891648",
+      "qidEvidencia": "Q-id citado por agregador de terceiros (golden.com) em resultado de busca; NÃO verificado no Wikidata daqui. Conferir com: python -m ps4store.versoes --validar",
+      "jogo": "Batman: Arkham Knight",
+      "cusa": "CUSA00133",
+      "contentId": "UP1018-CUSA00133_00-B000000000001563",
+      "edicao": "Premium Edition",
+      "versao": null,
+      "regiao": {"codigo": "US", "prefixo": "UP", "base": "prefixo UP do Content ID (convenção da Sony) e páginas das lojas en-us e en-ca"},
+      "idiomas": null,
+      "lojas": ["en-us", "en-ca"],
+      "status": "citado",
+      "evidencias": [
+        {"fonte": "PlayStation Store (en-us)", "tipo": "loja-oficial", "url": "https://store.playstation.com/en-us/product/UP1018-CUSA00133_00-B000000000001563",
+         "obtidoEm": "2026-11-22", "afirma": ["cusa", "contentId", "edicao", "regiao"], "trecho": "título da página: Batman™: Arkham Knight Premium Edition"},
+        {"fonte": "PlayStation Store (en-ca)", "tipo": "loja-oficial", "url": "https://store.playstation.com/en-ca/product/UP1018-CUSA00133_00-B000000000001563",
+         "obtidoEm": "2026-11-22", "afirma": ["cusa", "contentId", "edicao"]},
+        {"fonte": "PlayStation Store (en-us), DLC Season Pass do mesmo jogo", "tipo": "loja-oficial", "url": "https://store.playstation.com/en-us/product/UP1018-CUSA00133_00-DLCSEASONPASS000",
+         "obtidoEm": "2026-11-22", "afirma": ["cusa"], "trecho": "o Season Pass do jogo usa o mesmo CUSA00133 no Content ID"}
+      ],
+      "nota": "Premium Edition (base + Season Pass). Idiomas e versão do pacote: não aparecem nas evidências."
+    },
+    {
+      "qid": "Q15891648",
+      "qidEvidencia": "idem",
+      "jogo": "Batman: Arkham Knight",
+      "cusa": "CUSA00135",
+      "contentId": "EP1018-CUSA00135_00-BAKPREMIUMED0000",
+      "edicao": "Premium Edition",
+      "versao": null,
+      "regiao": {"codigo": "EU", "prefixo": "EP", "base": "prefixo EP do Content ID (convenção da Sony) e página da loja en-ie"},
+      "idiomas": null,
+      "lojas": ["en-ie"],
+      "status": "citado",
+      "evidencias": [
+        {"fonte": "PlayStation Store (en-ie)", "tipo": "loja-oficial", "url": "https://store.playstation.com/en-ie/product/EP1018-CUSA00135_00-BAKPREMIUMED0000",
+         "obtidoEm": "2026-11-22", "afirma": ["cusa", "contentId", "edicao", "regiao"], "trecho": "título da página: Batman: Arkham Knight Premium Edition"}
+      ],
+      "nota": "Uma alegação em planilha enviada por usuário (Scribd) associa CUSA00135 ao jogo-base; NÃO foi usada (fonte não verificável). Idiomas e versão: desconhecidos."
+    },
+    {
+      "qid": "Q15891648",
+      "qidEvidencia": "idem",
+      "jogo": "Batman: Arkham Knight",
+      "cusa": "CUSA00133",
+      "contentId": "UP1018-CUSA00133_00-ASIA000000000003",
+      "edicao": "Premium Edition",
+      "versao": null,
+      "regiao": null,
+      "idiomas": ["English", "Korean"],
+      "idiomasBase": "título da listagem da loja: 'Premium Edition (English, Korean)'; a listagem não especifica se são áudio, texto ou legendas",
+      "lojas": ["en-id", "en-hk"],
+      "status": "citado",
+      "evidencias": [
+        {"fonte": "PlayStation Store (en-id)", "tipo": "loja-oficial", "url": "https://store.playstation.com/en-id/product/UP1018-CUSA00133_00-ASIA000000000003",
+         "obtidoEm": "2026-11-22", "afirma": ["cusa", "contentId", "edicao", "idiomas"], "trecho": "título da página: Batman™: Arkham Knight Premium Edition (English, Korean)"},
+        {"fonte": "PlayStation Store (en-hk)", "tipo": "loja-oficial", "url": "https://store.playstation.com/en-hk/product/UP1018-CUSA00133_00-ASIA000000000003",
+         "obtidoEm": "2026-11-22", "afirma": ["cusa", "contentId", "edicao", "idiomas"]}
+      ],
+      "nota": "Aparece nas lojas en-id e en-hk, mas o Content ID tem prefixo UP: a região NÃO é afirmada. Mesmo CUSA00133 da edição dos EUA."
+    }
+  ]
+}
