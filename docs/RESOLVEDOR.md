@@ -1,9 +1,9 @@
-# Resolvedor de links (Etapa 4, 1ª entrega)
+# Resolvedor de links (Etapa 4 e 4B)
 
 Módulo independente (`src/ps4store/resolver.py`): recebe URLs e devolve o arquivo final **sem baixar nada além de 64 KiB** por URL. Não executa nada, não grava arquivos e não altera robô, catálogo, site, workflow ou SSPI.
 
 ```
-ps4store resolve URL [URL ...] [--arquivo lista.txt] [--permitir host] [--json]
+ps4store resolve URL [URL ...] [--arquivo lista.txt] [--permitir host] [--profundidade 2] [--max-paginas 10] [--max-requisicoes 40] [--json]
 python -m ps4store.resolver ...        # equivalente
 ```
 
@@ -15,6 +15,15 @@ python -m ps4store.resolver ...        # equivalente
 - Estados: `OK`, `INTERACAO_NECESSARIA` (CAPTCHA, JavaScript, anti-robô, login, espera, ou página sem link direto: **não contorna**), `PAGINA_SEM_ARQUIVO` (HTML com links estáticos a PKG/RAR, listados e **não seguidos**), `NAO_E_ARQUIVO` (200 com JSON/HTML de erro), `FORMATO_NAO_SUPORTADO` (zip/7z), `INACESSIVEL` (404, 403…), `HOST_NAO_PERMITIDO`.
 - "Enviável ao SSPI" = PKG ou RAR com link utilizável pelo baixador (hipótese pelo código do SSPI; só o console prova).
 
+## 4B: páginas intermediárias (links estáticos)
+Se a URL for uma página HTML, `crawl()` segue os `<a href>` **estáticos** (largura primeiro) até achar PKG/RAR:
+- relevantes: caminho terminando em `.pkg/.rar/.rNN` (a query é ignorada) ou texto/URL com *download, baixar, descarg, mirror, espelho, dl, arquivo*; `<meta http-equiv=refresh>` estático também; links relativos são resolvidos contra a página.
+- limites: profundidade 2, 10 páginas, 40 requisições, 30 links por página (ajustáveis). URL repetida (loop, fragmento, depois de redirect) não é revisitada. Host fora de `config/resolver-hosts.json` **não recebe requisição**.
+- **Busca truncada por limite nunca declara um conjunto RAR "completo"** (achado real: com 10 páginas só 9 de 11 volumes eram alcançados e o grupo saía "completo").
+- `INTERACAO_NECESSARIA` por ramo, com o motivo: CAPTCHA/anti-robô (marcação visível ou widget `<script src>`; o corpo de scripts é ignorado, pois flags como `octocaptcha_*` da página do GitHub não são CAPTCHA), exige JavaScript (inclui páginas montadas por script, como o pkg-zone.com), login (links de login/cadastro nunca são seguidos), formulário POST/botão, `javascript:`. Um ramo bloqueado não esconde os arquivos achados nos outros.
+- Se o host de entrada já falhou com TLS no SSPI (`config/sources.json`, p.ex. github.com), a URL final estável de outro host (raw.githubusercontent.com) é a que se cola no SSPI.
+- Saída: lista de arquivos com "colar no SSPI", conjuntos RAR na ordem (marque *parts of one RAR archive* só se o estilo não for `.partNN.rar`), páginas visitadas, ignorados com motivo, e `--json`.
+
 ## Resultados reais (22/11/2026)
 - PKG próprio (raw.githubusercontent.com): OK, 6,6 MB, direto, enviável.
 - 11 volumes RAR próprios, entrada embaralhada (03, 01, 02, 04…): todos OK; grupo **completo, 11 volumes, 6,6 MB**.
@@ -23,7 +32,10 @@ python -m ps4store.resolver ...        # equivalente
 - pacote inexistente no pkg-zone: o servidor responde **200 com `{"error":"Package not found."}`** → `NAO_E_ARQUIVO` com a mensagem (achado do teste real; sem isso viraria "formato desconhecido").
 - host fora da lista (`example.com`): `HOST_NAO_PERMITIDO`.
 
-Testes: `tests/test_resolver.py` (14, servidor HTTP local com arquivos próprios) e a suíte inteira (171) passam.
+Testes: `tests/test_resolver.py` (14) e `tests/test_resolver_paginas.py` (22): servidor HTTP local com páginas e arquivos próprios; suíte inteira: 193 passam.
 
-## Limites desta entrega
-Não lê HTML além de links `<a href>` estáticos; não segue esses links; não resolve páginas de hosters com JavaScript; RAR de estilo antigo (`.rar` + `.r00`) é ordenado, mas a contagem não é verificável; não lê o conteúdo do RAR (só a assinatura).
+- **4B, página real** `github.com/T-Justino/PS4/tree/.../rartest` (links estáticos, sem navegador): com `--max-paginas 30 --max-requisicoes 80`, **11 volumes RAR encontrados, conjunto completo, 6,6 MB**, URLs finais em `raw.githubusercontent.com`, 34 requisições, login/cadastro ignorados. Com o limite padrão: 9 volumes, **INCOMPLETO (busca truncada)**.
+- **4B, `https://pkg-zone.com/`:** `INTERACAO_NECESSARIA`: conteúdo montado por JavaScript (SvelteKit), sem links no HTML.
+
+## Limites
+Só links `<a href>` estáticos e meta refresh; não executa JavaScript, não preenche formulários, não resolve hosters com contagem/CAPTCHA (isso é o fluxo assistido por navegador); não segue links de outros hosts; RAR de estilo antigo (`.rar` + `.r00`) é ordenado, mas a contagem não é verificável; não lê o conteúdo do RAR (só a assinatura).
