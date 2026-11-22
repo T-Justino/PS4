@@ -2,7 +2,7 @@
 
 Catálogo pesquisável para o SSPI (PS4), com prioridade para PT-BR. Gera arquivos `.gssource` a partir de um catálogo canônico versionado. **Não hospeda nem baixa jogos.**
 
-**Status:** Gate 1 auditado (`docs/AUDITORIA_GATE1.md`). Gate 2 concluído no console (SSPI 5.11.7 Final): `NPXS`/`APOL` recusados como chave; chaves `CUSA` sintéticas (T4–T7): fonte importada, mas **instalação recusada** (T7) (`docs/TESTE_PS4.md`, `docs/CHAVES_SINTETICAS.md`). **T7: instalação recusada** (`expected CUSA90004 got NPXS39041`): chaves sintéticas abandonadas. Próximo: validação ponta a ponta com PKG de identidade compatível (`docs/VALIDACAO_E2E.md`).
+**Status:** Gate 1 auditado (`docs/AUDITORIA_GATE1.md`). Gate 2 concluído no console (SSPI 5.11.7 Final): `NPXS`/`APOL` recusados como chave; chaves `CUSA` sintéticas (T4–T7): fonte importada, mas **instalação recusada** (T7) (`docs/TESTE_PS4.md`, `docs/CHAVES_SINTETICAS.md`). **T7: instalação recusada** (`expected CUSA90004 got NPXS39041`): chaves sintéticas abandonadas. Próximo: **T8**, app próprio `CUSA95417` com identidade compatível (`docs/TESTE_T8.md`; ainda não testado no console).
 
 ## Uso
 
@@ -36,6 +36,8 @@ src/ps4store/cli.py      build / check
 data/fixtures/           fontes de teste reais (T2, T3)
 tests/fixtures/          .gssource aceito pelo console (contrato de formato; ID fictício, não reutilizar)
 dist/probes/             sondas históricas T4–T7 (não são produção)
+dist/t8/                 PKG e .gssource do T8 (app próprio)
+app/                     app de teste (OpenOrbis), build.sh e verify_pkg.py
 docs/                    REVIEW, SDD_REVISADO, AUDITORIA_GATE1, TESTE_PS4
 ```
 

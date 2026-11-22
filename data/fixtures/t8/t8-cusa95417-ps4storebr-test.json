@@ -1,0 +1,44 @@
+{
+  "schema": "ps4storebr.catalog/v1",
+  "source": {
+    "id": "ps4storebr.gate2.t8.cusa95417",
+    "name": "PS4 Store BR - T8 (PS4 Store BR Test)",
+    "description": "T8: instalacao ponta a ponta do app proprio PS4 Store BR Test, com o ID do catalogo igual ao ID real do pacote (CUSA95417, experimental, nao oficial).",
+    "version": "0.1.0"
+  },
+  "titles": [
+    {
+      "titleId": "CUSA95417",
+      "identityEvidence": "App proprio do projeto, compilado com OpenOrbis PS4 Toolchain. TITLE_ID do param.sfo = CUSA95417 e Content ID IV0000-CUSA95417_00-PS4STOREBRTEST00, conferidos por app/verify_pkg.py. ID EXPERIMENTAL: nao e oficial, escolhido na faixa CUSA9xxxx sem colisao encontrada; nao sera usado em producao.",
+      "name": "PS4 Store BR Test",
+      "region": null,
+      "aliases": [
+        "ps4 store br test",
+        "teste t8",
+        "store br"
+      ],
+      "languages": {
+        "audioPtBr": "unknown",
+        "subtitlesPtBr": "unknown",
+        "evidence": null
+      },
+      "packages": [
+        {
+          "id": "ps4storebr-test-pkg",
+          "kind": "base",
+          "accessType": "Direct",
+          "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/t8/IV0000-CUSA95417_00-PS4STOREBRTEST00.pkg",
+          "hoster": "GitHub (raw)",
+          "label": "App de teste do proprio projeto - so tela de confirmacao",
+          "sourcePageUrl": "https://github.com/T-Justino/PS4",
+          "version": null,
+          "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
+          "authorization": {
+            "basis": "license",
+            "evidence": "Software do proprio autor do projeto (codigo em app/ps4storebr-test/); toolchain OpenOrbis GPL-3.0."
+          }
+        }
+      ]
+    }
+  ]
+}
