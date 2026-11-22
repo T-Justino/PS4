@@ -13,9 +13,10 @@ KIND_BY_CATEGORY = {"gd": "base", "gde": "base", "gp": "update", "ac": "dlc"}
 
 
 class PkgError(ValueError):
-    def __init__(self, code: str, msg: str):
+    def __init__(self, code: str, msg: str, need: tuple[int, int] | None = None):
         super().__init__(msg)
         self.code = code
+        self.need = need            # (início, fim) do trecho que falta ler para concluir a análise (SFO_OUTSIDE_WINDOW)
 
 
 @dataclass
@@ -57,14 +58,16 @@ def parse_head(data: bytes) -> PkgHead:
     if not m:
         raise PkgError("BAD_CONTENT_ID", f"Content ID fora do formato: {content_id!r}")
     count, table = struct.unpack_from(">I", data, 0x10)[0], struct.unpack_from(">I", data, 0x18)[0]
-    if count == 0 or count > 512 or table + count * 32 > len(data):
-        raise PkgError("SFO_OUTSIDE_WINDOW", "tabela de entradas fora da janela baixada")
+    if count == 0 or count > 512:
+        raise PkgError("BAD_SFO", "contagem de entradas inválida")
+    if table + count * 32 > len(data):
+        raise PkgError("SFO_OUTSIDE_WINDOW", "tabela de entradas fora da janela baixada", (table, table + count * 32))
     sfo = None
     for i in range(count):
         eid, _fn, _f1, _f2, off, size = struct.unpack_from(">IIIIII", data, table + i * 32)
         if eid == SFO_ENTRY_ID:
             if off + size > len(data):
-                raise PkgError("SFO_OUTSIDE_WINDOW", "param.sfo fora da janela baixada")
+                raise PkgError("SFO_OUTSIDE_WINDOW", "param.sfo fora da janela baixada", (off, off + size))
             sfo = parse_sfo(data[off:off + size])
     if sfo is None:
         raise PkgError("BAD_SFO", "param.sfo não encontrado")

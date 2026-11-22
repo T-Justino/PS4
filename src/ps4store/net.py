@@ -107,7 +107,7 @@ class UrllibNet:
         except ValueError:
             raise NetError("resposta não é JSON")
 
-    def probe(self, url: str, nbytes: int = 65536) -> Probe:
+    def probe(self, url: str, nbytes: int = 65536, start: int = 0) -> Probe:
         try:
             self._check_url(url)
         except NetError as e:
@@ -115,7 +115,7 @@ class UrllibNet:
         redirects = _Redirects(self)
         opener = urllib.request.build_opener(redirects)
         redirects.hosts.append(urlsplit(url).hostname or "")
-        req = urllib.request.Request(url, headers={"User-Agent": UA, "Range": f"bytes=0-{nbytes - 1}",
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Range": f"bytes={start}-{start + nbytes - 1}",
                                                    "Accept-Encoding": "identity"})
         try:
             with opener.open(req, timeout=self.timeout) as r:

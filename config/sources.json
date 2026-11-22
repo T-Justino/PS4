@@ -71,6 +71,16 @@
       "critical": false,
       "authorization": null,
       "_nota": "Pesquisa apenas (sem autorizacao registrada): repositorio indicado pelo proprio catalogo publico do PKG-Zone."
+    },
+    {
+      "id": "own-rar",
+      "type": "github-contents",
+      "repo": "T-Justino/PS4",
+      "path": "rartest",
+      "enabled": true,
+      "critical": false,
+      "authorization": null,
+      "_nota": "Conjunto RAR multiparte de TESTE feito do proprio PKG do projeto (v1.02). So pesquisa/teste de volumes; multiparte nao e publicavel em catalogo (Gate 5)."
     }
   ]
 }

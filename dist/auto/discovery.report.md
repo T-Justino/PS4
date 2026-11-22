@@ -1,10 +1,10 @@
-# Relatório de descoberta — 2026-11-22T15:30:54Z
+# Relatório de descoberta — 2026-11-22T15:39:11Z
 
 > Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.
 
 | Descobertos | Acessíveis | PKG verificado | Compatíveis (regras) | Publicados | Novos | Rejeitados |
 |---|---|---|---|---|---|---|
-| 194 | 187 | 183 | 22 | 1 | 0 | 193 |
+| 194 | 187 | 185 | 22 | 1 | 0 | 193 |
 
 ## Fontes
 - `own-releases` (T-Justino/PS4): ok, 0 .pkg
@@ -60,7 +60,7 @@ Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.4 · títulos: CUSA95417 · 
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | AZIF00001 | AZIF00001_ps4_v1.02.pkg (1.02) | prefixo AZIF não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | UDAT99998 | UDAT99998_ps4_v2.04.pkg (2.04) | prefixo UDAT não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | LAPY10025 | LAPY10025_ps4_v1.04.pkg (1.04) | prefixo LAPY não comprovado no console |
-|  | DESCOBERTO | acessivel | rejeitado: `SFO_OUTSIDE_WINDOW` |  | LAPY10024_ps4_v1.01.pkg (1.01) | param.sfo fora da janela baixada |
+|  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | LAPY10024 | LAPY10024_ps4_v1.01.pkg (1.01) | prefixo LAPY não comprovado no console |
 |  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA01015 | CUSA01116_ps4_v2.32.pkg (2.32) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | LAPY20001 | LAPY20001_ps4_v1.34.pkg (1.34) | prefixo LAPY não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | SAAT29385 | SAAT29385_ps4_v2.20.pkg (2.20) | prefixo SAAT não comprovado no console |
@@ -209,7 +209,7 @@ Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.4 · títulos: CUSA95417 · 
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | LAPY20002 | LAPY20002_ps4_v1.08.pkg (1.08) | prefixo LAPY não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | NPXX51522 | NPXX51522_ps4_v1.00.pkg (1.00) | prefixo NPXX não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | LAPY10004 | LAPY10004_ps4_v1.03.pkg (1.03) | prefixo LAPY não comprovado no console |
-|  | DESCOBERTO | acessivel | rejeitado: `SFO_OUTSIDE_WINDOW` |  | BBFF12362_ps4_v1.00.pkg (1.00) | param.sfo fora da janela baixada |
+|  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | BBFF12362 | BBFF12362_ps4_v1.00.pkg (1.00) | prefixo BBFF não comprovado no console |
 |  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA03398 | CUSA03285_ps4_v1.46.pkg (1.46) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA02644 | CUSA02644_ps4_v1.34.pkg (1.34) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |
 |  | VERIFICADO | compativel_sspi | rejeitado: `RETAIL_STYLE_ID` | CUSA01850 | CUSA01850_ps4_v2.03.pkg (2.03) | aparência de conteúdo comercial: só na pesquisa; catálogo exige autorização POR ITEM |

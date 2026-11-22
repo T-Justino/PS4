@@ -40,8 +40,8 @@ class Zone(FakeNet):
         self.catalog_calls += 1
         return {"items": self.items, "categories": [], "site": {}}
 
-    def probe(self, url, nbytes=65536):
-        pr = super().probe(url, nbytes)
+    def probe(self, url, nbytes=65536, start=0):
+        pr = super().probe(url, nbytes, start)
         if pr.ok:
             tid, v = url.split("/")[-2], url.split("/")[-1]
             pr.final_url = SIGNED.format(t=tid, v=v)       # o servidor real responde 302 → URL assinada

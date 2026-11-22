@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-22T15:30:54Z",
+  "generatedAt": "2026-11-22T15:39:11Z",
   "dryRun": false,
   "note": "Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.",
   "sources": [
@@ -39,37 +39,37 @@
   "counts": {
     "descobertos": 194,
     "acessiveis": 187,
-    "pkgVerificados": 183,
+    "pkgVerificados": 185,
     "compativeisSspi": 22,
     "publicados": 1,
     "fases": {
-      "DESCOBERTO": 11,
-      "VERIFICADO": 182,
+      "DESCOBERTO": 9,
+      "VERIFICADO": 184,
       "PUBLICAVEL": 1
     },
     "novos": 0,
     "links": {
-      "classificados": 25,
-      "sspiBaixaveis": 25,
-      "redirectTemporario": 22,
+      "classificados": 31,
+      "sspiBaixaveis": 31,
+      "redirectTemporario": 28,
       "semRange": 0,
       "tipos": {
         "direto": 3,
-        "redirect": 22
+        "redirect": 28
       }
     },
     "restritos": 102,
     "duplicados": 2,
-    "listaPessoal": 16,
+    "listaPessoal": 21,
     "rejeitados": 193,
     "motivos": {
       "SUPERSEDED": 2,
-      "PREFIX_UNPROVEN": 153,
+      "PREFIX_UNPROVEN": 155,
       "NOT_PS4": 7,
-      "SFO_OUTSIDE_WINDOW": 4,
       "RETAIL_STYLE_ID": 19,
       "PREFIX_REJECTED_BY_SSPI": 2,
       "PLACEHOLDER_ID": 2,
+      "SFO_OUTSIDE_WINDOW": 2,
       "KIND_UNTESTED": 4
     }
   },
@@ -1916,26 +1916,42 @@
     },
     {
       "key": "pkg-zone#LAPY10024#ps4#1.01#2024-11-22T06:00:53.000Z",
-      "fase": "DESCOBERTO",
+      "fase": "VERIFICADO",
       "source": "pkg-zone",
       "release": "1.01",
       "asset": "LAPY10024_ps4_v1.01.pkg",
       "url": "https://pkg-zone.com/download/ps4/LAPY10024/1.01",
       "sizeFeed": 948830208,
-      "stage": "acessivel",
+      "stage": "pkg_verificado",
       "rejected": true,
-      "reason": "SFO_OUTSIDE_WINDOW",
-      "detail": "param.sfo fora da janela baixada",
-      "titleId": null,
-      "contentId": null,
-      "name": null,
-      "kind": null,
-      "version": null,
+      "reason": "PREFIX_UNPROVEN",
+      "detail": "prefixo LAPY não comprovado no console",
+      "titleId": "LAPY10024",
+      "contentId": "ED1234-LAPY10024_00-0000000000000000",
+      "name": "Live Die Repeat",
+      "kind": "base",
+      "version": "01.00",
       "sizeVerified": 948830208,
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -2231,7 +2247,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": true,
       "duplicateOf": null,
       "isNew": false,
@@ -3377,7 +3409,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -4228,7 +4276,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -4561,7 +4625,23 @@
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -7428,26 +7508,42 @@
     },
     {
       "key": "pkg-zone#BBFF12362#ps4#1.00#2024-05-10T18:19:31.000Z",
-      "fase": "DESCOBERTO",
+      "fase": "VERIFICADO",
       "source": "pkg-zone",
       "release": "1.00",
       "asset": "BBFF12362_ps4_v1.00.pkg",
       "url": "https://pkg-zone.com/download/ps4/BBFF12362/1.00",
       "sizeFeed": 1423507456,
-      "stage": "acessivel",
+      "stage": "pkg_verificado",
       "rejected": true,
-      "reason": "SFO_OUTSIDE_WINDOW",
-      "detail": "param.sfo fora da janela baixada",
-      "titleId": null,
-      "contentId": null,
-      "name": null,
-      "kind": null,
-      "version": null,
+      "reason": "PREFIX_UNPROVEN",
+      "detail": "prefixo BBFF não comprovado no console",
+      "titleId": "BBFF12362",
+      "contentId": "ED6433-BBFF12362_00-0000000000000000",
+      "name": "Kill'em All.",
+      "kind": "base",
+      "version": "01.00",
       "sizeVerified": 1423507456,
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
       "fileType": "pkg",
-      "link": {},
+      "link": {
+        "chain": [
+          "pkg-zone.com",
+          "api.pkg-zone.com"
+        ],
+        "etag": true,
+        "kind": "redirect",
+        "notes": [
+          "redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar"
+        ],
+        "rangeOk": true,
+        "redirects": 1,
+        "singleLane": false,
+        "sspiUsable": true,
+        "status": 206,
+        "temporaryFinalUrl": true
+      },
       "restricted": false,
       "duplicateOf": null,
       "isNew": false,
@@ -7612,6 +7708,7 @@
       ]
     }
   ],
+  "rarSets": [],
   "artifact": {
     "path": "dist/auto/ps4storebr-auto.gssource",
     "version": "1.0.4",

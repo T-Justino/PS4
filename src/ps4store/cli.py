@@ -85,7 +85,7 @@ def cmd_run(a, net=None) -> int:
     res = run(cfg, net, out_gssource=out_dir / "ps4storebr-auto.gssource",
               out_canonical=Path(a.canonical), out_report=out_dir / "discovery.report.json",
               state_path=Path(a.state), dry_run=a.dry_run, recheck=a.recheck,
-              refresh_links=a.refresh_links, out_research=Path(a.research_dir) / "research.json")
+              refresh_links=a.refresh_links, force_titles=frozenset(t.upper() for t in a.probe_title), out_research=Path(a.research_dir) / "research.json")
     c = res.report["counts"]
     for s in res.report["sources"]:
         print(f"fonte {s['source']} ({s['repo']}): {s['status']}" + (f" — {s['error']}" if s.get("error") else ""))
@@ -127,6 +127,8 @@ def main(argv: list[str] | None = None, *, net=None) -> int:
     r.add_argument("--state", default="data/state/discovery-state.json")
     r.add_argument("--refresh-links", type=int, default=0, metavar="N",
                    help="re-sonda até N itens em cache sem dados de link (enriquecimento incremental)")
+    r.add_argument("--probe-title", action="append", default=[], metavar="ID",
+                   help="re-sonda só este título (repetível), ignorando o cache; para validar candidatos sem sondagem em massa")
     r.add_argument("--research-dir", default="local", help="catálogo de pesquisa e lista pessoal (NUNCA commitar; padrão local/)")
     r.add_argument("--recheck", action="store_true", help="ignora o cache de verificação e sonda tudo de novo")
     r.add_argument("--dry-run", action="store_true", help="não grava nada (estado, catálogo, relatório)")

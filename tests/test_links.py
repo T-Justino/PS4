@@ -134,16 +134,72 @@ def test_personal_list_has_non_cusa_homebrew_but_not_restricted_and_never_the_pu
     assert rows["CUSA95603"]["restricted"] and rows["CUSA95603"]["sspiDownloadable"]      # baixável tecnicamente, mas fora de qualquer lista
 
 
-def test_multipart_rar_is_discovered_and_reported_not_probed(tmp_path):
+RAR5 = b"Rar!\x1a\x07\x01\x00" + b"\x00" * 600
+
+
+def test_multipart_rar_parts_are_probed_ordered_and_summarized(tmp_path):
     net = Repo()
-    net.put("jogo.part1.rar", b"Rar!", "a" * 40)
-    net.put("jogo.part2.rar", b"Rar!", "b" * 40)
+    for i in (1, 2, 10, 3):                                   # ordem de listagem embaralhada; 10 > 2 (ordem numérica)
+        net.put(f"jogo.part{i:02d}.rar", RAR5, f"{i:040d}")
     net.put("app.pkg", make_pkg("CUSA95701"), "c" * 40)
     r = go(tmp_path, net, contents_cfg(tmp_path))
     by = {e["asset"]: e for e in r.report["entries"]}
-    assert by["jogo.part1.rar"]["reason"] == "ARCHIVE_MULTIPART" and by["jogo.part1.rar"]["fileType"] == "rar-multiparte"
-    assert by["jogo.part1.rar"]["fase"] == "DESCOBERTO" and "Gate 5" in by["jogo.part1.rar"]["detail"]
-    assert by["app.pkg"]["fase"] == "PUBLICAVEL" and net.probes == 1               # só o .pkg foi sondado
+    p1 = by["jogo.part01.rar"]
+    assert (p1["reason"], p1["fileType"], p1["stage"], p1["fase"]) == ("ARCHIVE_MULTIPART", "rar-multiparte", "acessivel", "DESCOBERTO")
+    assert "Gate 5" in p1["detail"] and p1["link"]["rangeOk"]
+    st = r.report["rarSets"][0]
+    assert st["indexes"] == [1, 2, 3, 10] and st["missing"] == [4, 5, 6, 7, 8, 9] and not st["complete"]      # faltam partes
+    assert by["app.pkg"]["fase"] == "PUBLICAVEL" and net.probes == 5                                           # 4 partes + 1 pkg, 64 KiB cada
+
+
+def test_complete_rar_set_goes_to_the_personal_list_in_order_and_bad_magic_is_flagged(tmp_path):
+    net = Repo()
+    for i in (3, 1, 2):
+        net.put(f"g.part{i}.rar", RAR5, f"{i:040d}")
+    net.put("h.part1.rar", b"<html>nope" + b"0" * 600, "f" * 40)
+    r = go(tmp_path, net, contents_cfg(tmp_path))
+    sets = {x["set"]: x for x in r.report["rarSets"]}
+    g = sets["g.part*.rar"]
+    assert g["complete"] and g["volumes"] == 3 and [p["index"] for p in g["parts"]] == [1, 2, 3]
+    assert [e["reason"] for e in r.report["entries"] if e["asset"] == "h.part1.rar"] == ["NOT_RAR"]
+    txt = (tmp_path / "loc/links-sspi.txt").read_text().splitlines()
+    i = [n for n, l in enumerate(txt) if l.startswith("# RAR dividido g.part*.rar")][0]
+    assert [u.rsplit("/", 1)[1] for u in txt[i + 1:i + 4]] == ["g.part1.rar", "g.part2.rar", "g.part3.rar"]
+    assert not any("h.part1.rar" in l for l in txt)
+
+
+def test_param_sfo_beyond_the_first_window_is_read_with_one_small_extra_range(tmp_path):
+    base = bytearray(make_pkg("CUSA95902"))
+    from ps4store.pkginfo import parse_head
+    import struct
+    # move param.sfo (e a tabela) para depois dos 64 KiB, como nos PKGs grandes reais
+    tab = struct.unpack_from(">I", base, 0x18)[0]
+    cnt = struct.unpack_from(">I", base, 0x10)[0]
+    for i in range(cnt):
+        eid, fn, f1, f2, off, size = struct.unpack_from(">IIIIII", base, tab + i * 32)
+        if eid == 0x1000:
+            sfo = bytes(base[off:off + size])
+            new_off = 200_000
+            base[new_off:new_off + size] = sfo
+            struct.pack_into(">I", base, tab + i * 32 + 16, new_off)
+    net = Repo()
+    net.put("big.pkg", bytes(base), "a" * 40)
+    with pytest.raises(Exception):
+        parse_head(bytes(base[:65536]))                       # sem a 2ª faixa não dá
+    r = go(tmp_path, net, contents_cfg(tmp_path))
+    e = r.report["entries"][0]
+    assert e["titleId"] == "CUSA95902" and e["fase"] == "PUBLICAVEL" and net.probes == 2     # 64 KiB + uma faixa pequena
+
+
+def test_probe_title_forces_reprobe_of_just_that_title_ignoring_cache(tmp_path):
+    z = Zone()
+    for t in ("MOZI00001", "MOZI00002", "MOZI00003"):
+        z.add(t, t)
+    cfgp = zone_cfg(tmp_path, recheck_hours=720)
+    go(tmp_path, z, cfgp)
+    p0 = z.probes
+    go(tmp_path, z, cfgp, now="2026-11-22T13:00:00Z", force_titles=frozenset({"MOZI00002"}))
+    assert z.probes - p0 == 1
 
 
 def test_duplicate_same_file_in_two_places_is_marked(tmp_path):
@@ -185,3 +241,14 @@ def test_personal_list_excludes_hosts_with_known_tls_failure_even_if_rejected_ea
     go(tmp_path, net, cfgp)
     txt = (tmp_path / "loc/links-sspi.txt").read_text()
     assert "raw.githubusercontent.com" in txt and "github.com/acme/app/releases" not in txt
+
+
+def test_restricted_is_flagged_even_when_the_item_is_rejected_earlier_by_prefix(tmp_path):
+    z = Zone()
+    data = retail_pkg("MOZI00009", pub="UP9000")             # ID não-CUSA (rejeitado por prefixo) com Content ID UP9000-
+    z.items.append(pz.item("MOZI00009", "Port com Content ID de aparência comercial", size=len(data)))
+    z.files[f"{BASE}/download/ps4/MOZI00009/1.0.0"] = data
+    r = go(tmp_path, z, zone_cfg(tmp_path))
+    e = r.report["entries"][0]
+    assert e["reason"] == "PREFIX_UNPROVEN" and e["restricted"] is True
+    assert "MOZI00009" not in (tmp_path / "loc/links-sspi.txt").read_text()          # fora da lista pessoal, presente na pesquisa

@@ -68,14 +68,14 @@ class FakeNet:
             raise NetError(self.errors[repo])
         return self.releases.get(repo, [])
 
-    def probe(self, url, nbytes=65536):
+    def probe(self, url, nbytes=65536, start=0):
         self.probes += 1
         if url not in self.files:
             return Probe(False, 404, "HTTP 404", final_url=url)
         d = self.files[url]
         self.bytes_served += min(len(d), nbytes)
         ct = "text/html" if isinstance(d, Html) else "application/octet-stream"
-        return Probe(True, 206, None, len(d), bytes(d[:nbytes]), url, ct, range_ok=True)
+        return Probe(True, 206, None, len(d), bytes(d[start:start + nbytes]), url, ct, range_ok=True)
 
 
 def write_cfg(tmp_path, *, sources=None, tls=None):

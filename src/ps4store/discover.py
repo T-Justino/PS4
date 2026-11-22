@@ -30,6 +30,8 @@ REPO_RE = re.compile(r"^[A-Za-z0-9_.-]{1,100}/[A-Za-z0-9_.-]{1,100}$")
 STAGES = ("descoberto", "acessivel", "pkg_verificado", "compativel_sspi", "publicado")
 MAX_ASSETS_PER_SOURCE = 100
 HEAD_BYTES = 65536
+EXTRA_MAX = 8 * 1024 * 1024        # só lemos uma 2ª faixa pequena se tabela/param.sfo estiverem antes de 8 MiB
+RAR_MAGIC = (b"Rar!\x1a\x07\x00", b"Rar!\x1a\x07\x01\x00")
 
 
 class ConfigError(ValueError):
@@ -348,26 +350,52 @@ def _policy(e: Entry, cfg: Config) -> Entry:
     return e
 
 
+def _read_head(found: Found, pr, net):
+    """parse_head sobre os 64 KiB; se a tabela/param.sfo estiverem além, lê UMA faixa pequena extra (nunca o arquivo)."""
+    data = pr.head
+    for _ in range(2):
+        try:
+            return parse_head(data)
+        except PkgError as ex:
+            if ex.code != "SFO_OUTSIDE_WINDOW" or not ex.need or ex.need[1] > EXTRA_MAX:
+                raise
+            a, b = ex.need
+            p2 = net.probe(found.url, b - a, a)
+            if not p2.ok or len(p2.head) < b - a:
+                raise PkgError("SFO_OUTSIDE_WINDOW", "param.sfo além da janela e a 2ª faixa não veio")
+            buf = bytearray(max(len(data), b))
+            buf[:len(data)] = data
+            buf[a:b] = p2.head[:b - a]
+            data = bytes(buf)
+    return parse_head(data)
+
+
 def verify(found: Found, net, cfg: Config) -> Entry:
     e = Entry(found)
     mp = multipart_info(found.asset_name)
     if mp and not found.skip_reason:
         found.skip_reason = "ARCHIVE_MULTIPART"
         found.meta["multipart"] = mp
-    if found.skip_reason == "ARCHIVE_MULTIPART":
-        return e.reject("ARCHIVE_MULTIPART", f"RAR dividido ({found.meta['multipart']['set']}, parte {found.meta['multipart']['index']}): "
-                        "o SSPI suporta (volumes declarados), mas a publicação multiparte é o Gate 5; descoberto, não sondado")
-    if found.skip_reason:
+    archive = found.skip_reason == "ARCHIVE_MULTIPART"
+    if found.skip_reason and not archive:
         return e.reject(found.skip_reason, f"{found.meta.get('console')}: fora do alvo (PS4); não sondado")
     # 1) acessível? (uma requisição Range de 64 KiB; nunca o pacote inteiro)
     pr = net.probe(found.url, HEAD_BYTES)
     e.link = classify_link(pr)
+    if archive and pr.ok:
+        mp = found.meta["multipart"]
+        if not pr.head.startswith(RAR_MAGIC):
+            return e.reject("NOT_RAR", f"parte {mp['index']} de {mp['set']} sem assinatura RAR")
+        e.total_size = pr.total_size if pr.total_size is not None else found.size
+        e.stage = "acessivel"
+        return e.reject("ARCHIVE_MULTIPART", f"RAR dividido ({mp['set']}, volume {mp['index']}): o SSPI suporta (volumes em ordem), "
+                        "mas a publicação multiparte em catálogo é o Gate 5; usar o caminho de download direto")
     if not pr.ok:
         return e.reject("UNREACHABLE", pr.error or f"HTTP {pr.status}")
     e.final_host = urlsplit(pr.final_url).hostname
     if e.final_host != urlsplit(found.url).hostname:
         e.warnings.append(f"o link redireciona para {e.final_host} (URL assinada que expira): comportamento do SSPI nesse redirect não testado")
-    if pr.content_type and pr.content_type.startswith("text/"):
+    if pr.content_type and pr.content_type.startswith("text/") and not archive:
         return e.reject("NOT_FILE", f"content-type {pr.content_type}")
     if pr.total_size is not None and found.size is not None and pr.total_size != found.size:
         return e.reject("SIZE_MISMATCH", f"feed {found.size} B, servidor {pr.total_size} B")
@@ -375,7 +403,7 @@ def verify(found: Found, net, cfg: Config) -> Entry:
     e.stage = "acessivel"
     # 2) identidade lida do próprio PKG
     try:
-        head = parse_head(pr.head)
+        head = _read_head(found, pr, net)
     except PkgError as ex:
         return e.reject(ex.code, str(ex))
     e.content_id, e.name, e.kind = head.content_id, found.name_hint or (head.sfo.get("TITLE") or "").strip() or None, head.kind
@@ -385,6 +413,7 @@ def verify(found: Found, net, cfg: Config) -> Entry:
     if head.sfo.get("CONTENT_ID") not in (None, head.content_id):
         return e.reject("IDENTITY_MISMATCH", "CONTENT_ID do param.sfo ≠ cabeçalho do PKG")
     e.title_id = head.title_id
+    e.restricted = is_retail_style(head.content_id, found.meta.get("category"))     # marca já aqui, mesmo se rejeitado depois
     cat_id = found.meta.get("catalogTitleId")
     if cat_id and cat_id != head.title_id:
         e.warnings.append(f"o catálogo da fonte declara {cat_id}, mas o PKG é {head.title_id}: vale o ID lido do PKG")
@@ -403,7 +432,6 @@ def verify(found: Found, net, cfg: Config) -> Entry:
     if not found.url.startswith("https://"):
         return e.reject("NOT_HTTPS", "URL não é HTTPS")
     e.stage = "compativel_sspi"
-    e.restricted = is_retail_style(head.content_id, found.meta.get("category"))
     if e.restricted and found.source.authorized_titles.get(e.title_id) is None:
         return e.reject("RETAIL_STYLE_ID", f"Content ID {head.content_id}"
                         + (f" / categoria '{found.meta.get('category')}'" if found.meta.get("category") else "")
@@ -487,7 +515,7 @@ CONNECTORS = {"github-releases": discover_github, "github-contents": discover_co
 
 def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report: Path, state_path: Path,
         dry_run: bool = False, now: str | None = None, recheck: bool = False, sleep=time.sleep,
-        refresh_links: int = 0, out_research: Path | None = None) -> RunResult:
+        refresh_links: int = 0, out_research: Path | None = None, force_titles: frozenset = frozenset()) -> RunResult:
     now = now or _now()
     state = _load_state(state_path)
     entries: list[Entry] = []
@@ -507,6 +535,8 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
         for f in found:
             seen = state["seen"].get(f.key) or {}
             cached = seen.get("check")
+            if cached and (f.meta.get("catalogTitleId") in force_titles or cached.get("titleId") in force_titles):
+                cached = None                      # re-sondagem pedida para este título (--probe-title)
             needs_link = cached and not cached.get("link") and not f.skip_reason and cached["stage"] != "descoberto"
             if needs_link and refresh_left > 0 and probes < src.max_probes:
                 refresh_left -= 1
@@ -560,6 +590,7 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
             artifact = {"path": str(out_gssource), "version": f"1.0.{counter}", "sha256": sspi.sha256(data),
                         "contentSha256": sspi.content_sha256(data), "titles": rep.published_titles}
     report = build_report(cfg, now, source_status, entries, wrote, compile_error, canonical, dry_run)
+    report["rarSets"] = rar_sets(entries)
     if out_research is not None and not dry_run:
         write_research(out_research, entries, now, cfg)
     if wrote:
@@ -576,6 +607,31 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
     res = RunResult(report, len(published), wrote)
     res.critical_down = critical_down
     return res
+
+
+def rar_sets(entries: list[Entry]) -> list[dict]:
+    """Agrupa volumes `x.partN.rar` por fonte+conjunto: ordem, completude, tamanhos, acessibilidade e assinatura RAR."""
+    groups: dict[tuple, list[Entry]] = {}
+    for e in entries:
+        mp = e.found.meta.get("multipart")
+        if mp and mp.get("index") is not None:
+            groups.setdefault((e.found.source.id, mp["set"]), []).append(e)
+    out = []
+    for (src, name), es in sorted(groups.items()):
+        es.sort(key=lambda x: x.found.meta["multipart"]["index"])
+        idx = [x.found.meta["multipart"]["index"] for x in es]
+        top = max(idx)
+        missing = sorted(set(range(1, top + 1)) - set(idx))
+        dup = sorted({i for i in idx if idx.count(i) > 1})
+        ok = all(x.stage == "acessivel" and x.reason == "ARCHIVE_MULTIPART" for x in es)
+        total = sum(x.total_size or 0 for x in es)
+        out.append({"source": src, "set": name, "volumes": len(es), "indexes": idx, "missing": missing, "duplicates": dup,
+                    "allAccessible": ok, "complete": bool(not missing and not dup and len(es) >= 2 and ok), "totalBytes": total,
+                    "parts": [{"index": x.found.meta["multipart"]["index"], "name": x.found.asset_name, "bytes": x.total_size,
+                               "accessible": x.stage == "acessivel", "rangeOk": x.link.get("rangeOk"), "url": x.found.url} for x in es],
+                    "note": "colar os links NA ORDEM (até 50 por vez); se os nomes forem reconhecidos o SSPI agrupa sozinho, senão marcar "
+                            "'These links are parts of one RAR archive, in volume order'. Espaço de pico: arquivos + pacote extraído"})
+    return out
 
 
 def research_row(e: Entry) -> dict:
@@ -605,8 +661,9 @@ def personal_links(entries: list[Entry], cfg: Config | None = None) -> list[Entr
 
 def write_research(path: Path, entries: list[Entry], now: str, cfg: Config | None = None) -> None:
     rows = [research_row(e) for e in entries]
+    sets = rar_sets(entries)
     doc = {"generatedAt": now, "aviso": "USO PESSOAL. Pesquisa de metadados e disponibilidade; não é publicação. Não commitar nem hospedar este arquivo.",
-           "total": len(rows), "entries": rows}
+           "total": len(rows), "rarSets": sets, "entries": rows}
     write_atomic(path, (json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode())
     pl = personal_links(entries, cfg)
     lines = ["# USO PESSOAL: cole estes links no SSPI (Downloads → tocar no touchpad → colar link, ou a página do celular).",
@@ -615,6 +672,10 @@ def write_research(path: Path, entries: list[Entry], now: str, cfg: Config | Non
     for e in sorted(pl, key=lambda x: (x.name or "", x.version or "")):
         lines.append(f"# {e.name} {e.version or ''} [{e.title_id}] {e.total_size or '?'} B")
         lines.append(e.found.url)
+    for st in sets:
+        if st["complete"]:
+            lines.append(f"# RAR dividido {st['set']}: {st['volumes']} volumes, {st['totalBytes']} B. Cole TODOS, nesta ordem:")
+            lines += [p["url"] for p in st["parts"]]
     write_atomic(path.with_name("links-sspi.txt"), ("\n".join(lines) + "\n").encode())
 
 
