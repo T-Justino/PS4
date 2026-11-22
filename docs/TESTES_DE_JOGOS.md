@@ -101,7 +101,8 @@ Nada aqui garante jogos comerciais nem outros hosts. Nenhum identificador intern
 - O SSPI **reconheceu os 11 volumes como um único RAR** (identificação e agrupamento ✅).
 - O download começou e **chegou ao volume 7/11 (≈ 3,7–4 MB; 6 volumes × 614.400 B = 3,69 MB)** e **falhou**: `Provider TLS certificate not trusted on fresh probe sessions for two minutes with no useful progress (0x8095F00C)`, no painel do celular.
 - Hospedagem: `raw.githubusercontent.com`. **Extração, instalação e execução não foram alcançadas.** 5B e 5C pendentes.
-- Mesmo código TLS do Live Die Repeat (hospedado via PKG-Zone). **Investigação do código do SSPI e teste mínimo de confirmação: `docs/INVESTIGACAO_TLS_SSPI.md`** (causa mais provável: o worker residente do SSPI, que baixa arquivos RAR, não monta de forma intermitente a cadeia de certificado em sessões novas; a pilha usada por PKGs homebrew tem mais certificados fixados). Teste 5 **reprovado por transporte, não por descoberta**.
+- **Modo confirmado: In-app** (foto: "In-app · keep SSPI open · Downloading"); **Retry repetiu o erro**. Mesmo código TLS do Live Die Repeat (PKG-Zone).
+- **Investigação revista** (a hipótese do worker residente foi **retirada**): `docs/INVESTIGACAO_TLS_SSPI.md`. Causa mais provável, não confirmada: o firmware antigo falha de forma intermitente ao construir a cadeia de hierarquias novas (Let's Encrypt Gen Y no `raw`; GTS WE1 no PKG-Zone). **Próximo teste: 5A com os mesmos 11 volumes servidos pelo jsDelivr** (`rartest/links-jsdelivr-ordem.txt`; cadeia Sectigo R36 fixada pelo SSPI) + coleta dos logs. Teste 5 **reprovado por transporte, não por descoberta**.
 
 ## Teste 5 (RAR dividido): preparação (resultado do 5A acima)
 

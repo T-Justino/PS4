@@ -1,51 +1,81 @@
 # Investigação: erro TLS `0x8095F00C` no SSPI (RAR dividido e Live Die Repeat)
 
-**Escopo:** só o transporte do SSPI. O robô de descoberta/validação **não foi alterado** (os links, tamanhos e `Range` estão corretos e foram conferidos). Nenhuma verificação TLS foi desativada e nenhuma mudança de firmware é proposta.
-**Fonte:** código público do SSPI (`xyhlo/SSPI`, `main`, commit `1295abb`), lido localmente; **pode diferir do binário 5.11.7 instalado** (os arquivos `.pem` não estão no repositório). Não consegui ver a cadeia real de certificados de `raw.githubusercontent.com`: o ambiente de desenvolvimento intercepta TLS (a cadeia exibida é a do gateway) e o `crt.sh` é bloqueado.
+**Escopo:** transporte do SSPI. O robô de descoberta/validação **não foi alterado**. Nenhuma verificação TLS foi desativada; nenhuma mudança de firmware é proposta.
+**Fonte do código:** `xyhlo/SSPI` público (`main`, commit `1295abb`), que pode diferir do binário instalado; os `.pem` não estão no repositório.
 
-## Sintoma (teste 5A, 22/11/2026)
-O SSPI reconheceu os 11 volumes como **um** RAR e baixou os volumes 1–6 (≈ 3,69 MB = 6 × 614.400 B). No volume 7: `Provider TLS certificate not trusted on fresh probe sessions for two minutes with no useful progress (0x8095F00C)`.
-O mesmo código apareceu no Live Die Repeat (PKG-Zone/Cloudflare, aos 915,3 MB, depois de uma interrupção). Hosts, CAs e tamanhos diferentes, mesmo erro.
+## 0. Correção da hipótese anterior (retirada)
+A versão anterior deste documento dizia que o RAR era baixado pelo **worker residente** (que não fixa o certificado do GitHub). **A foto do 5A mostrava "In-app · keep SSPI open · Downloading" e isso refuta aquela explicação.** Reli o código:
+- O rótulo vem de `app/SearchWindow.cs:3739` (`ActiveTransferOwnerText`): só aparece se o job **não** for do residente (`item.Background && item.BgftResident` mostraria "Resident owns this job").
+- No modo In-app, `TryHandoffArchive` não é usado (exige `UseBgftDirect`); o RAR vai por `DownloadArchiveVolumes` (`app/DownloadManager.Archive.cs:406-520`), com o status `RAR volume i/N · Keep SSPI open`.
+- Além disso, a cadeia real de `raw.githubusercontent.com` **já está fixada** (seção 2). Logo "falta pin no worker" não explica o 5A.
 
-## O que o código diz
+## 1. Pilha de rede e rotina de sondagem, RAR em modo In-app (código)
+1. **Loop por volume:** `DownloadArchiveVolumes` baixa os volumes **um a um**; para cada um chama `NetHttp.DownloadFileResumable` (`DownloadManager.Archive.cs:~480`) dentro de `DownloadLinkRecovery.Run` (renovação de link, só útil com provedores).
+2. **Motor:** `NetHttp.cs:351` → `TransferClient.Download` (`app/TransferClient.cs:118-190`) → módulo nativo **`libSspiTransfer.prx`** (`sspi_xfer_start/poll`), o **mesmo `transfer/gs_xfer.c`** do worker (por isso a mensagem é a do motor nativo, `gs_xfer.c:1217/1427`).
+3. **Contexto TLS:** `sspi_xfer_init(NativeHttp.TransferContext)` (`TransferClient.cs:58-67`): o contexto `sceHttp` do **app** (`NativeHttp._httpCtx`, `NativeHttp.cs:154`), cuja confiança é montada em `TryLoadBundledRoots` (`NativeHttp.cs:305-372`): **subconjunto curado de raízes** (`NativeRootSubjectMarkers`, `:75-92`: ISRG X1/X2, DigiCert Global G2/Trusted G4, GlobalSign R3/R6/R46, USERTrust RSA/ECC, COMODO RSA, Sectigo R46/E46, Amazon Root CA 1, GTS R1–R4, GoDaddy G2, Microsoft RSA 2017) **+ pins** (Let's Encrypt Gen Y, GitHub Sectigo, GoDaddy G2, Google WE1 cross-sign, GeoTrust).
+4. **Sondagem:** cada transferência (cada volume) faz uma **sondagem nova** (`gs_xfer.c:1330-1394`): `gs_http_open` com `Range 0-0xFFF`, **sessão nova**, fechada ao fim (`gs_http_close`), com redirects manuais (`gs_http.c:268-300`, até 8 saltos, só HTTPS→HTTPS). Em `0x8095F00C` repete com espera e só desiste (`tls_episode_terminal`, `:692-701`) após **≥ 8 falhas, ≥ 120 s, todas as lanes testadas e nenhum byte útil**: é a mensagem "…two minutes with no useful progress".
+5. **Pacote único vs RAR:** um PKG faz **1 sondagem + lanes** (poucas sessões novas). Um RAR de 11 volumes faz **11 sondagens independentes + 11 conexões de dados** (≈ 22+ handshakes novos), e **um** volume cuja sondagem falhe por 2 min derruba o conjunto (`Retry` recomeça no volume 7, `.part` durável).
+6. **Validadores:** o motor só paraleliza/retoma com ETag **forte** ou `Last-Modified` válido; senão usa **uma conexão** por arquivo (`gs_xfer.c`, `fallback_reason`).
 
-**1. De onde vem a mensagem.** `transfer/gs_xfer.c:1427` (e `:1217` para lanes). A sondagem de identidade de cada transferência (`gs_http_open` com `Range 0-0xFFF`, `:1330-1394`) abre uma **sessão nova**, fecha-a (`gs_http_close`) e, ao receber `0x8095F00C`, registra o evento `preparation-probe-failed … ssl=0x… verify=0x… host=…` (`:1385-1390`), tenta de novo com espera (`retry_delay`) e só desiste (`tls_episode_terminal`, `:692-701`) quando há **≥ 8 falhas TLS, ≥ 120 s, todas as lanes testadas falharam e nenhum byte útil chegou depois da 1ª falha**. Ou seja: o painel só mostra "dois minutos" depois de ≥ 8 tentativas *frescas* seguidas falharem. Não é um erro isolado.
+## 2. O que as cadeias reais mostram (GitHub Actions, sem interceptação; `docs/evidencia/tls-cadeias-22-11-2026.md`)
 
-**2. O que o `0x8095F00C` significa.** É a recusa do certificado pela `libSceSsl` do console. O SSPI decodifica o campo `verify` (`app/DownloadManager.Resident.cs:335-355`): `0x04` nome do host, `0x08`/`0x10` datas de validade, **`0x20` emissor desconhecido**. O próprio autor documenta (`app/NativeHttp.cs:87-125`) que a `libSceSsl` de firmware antigo **falha de forma *intermitente* em montar a cadeia (intermediário servido) mesmo com a raiz carregada**: "The console still reported unknown CA intermittently with both roots loaded, so trust the exact issuing intermediates directly". A correção dele é **fixar (pin) o intermediário exato de cada host conhecido** (GitHub/Sectigo DV E36/R36, Let's Encrypt Gen Y, GoDaddy G2, Google WE1, GeoTrust).
-
-**3. Há duas pilhas de rede, com conjuntos de confiança diferentes.**
-
-| | Pacote único de **homebrew** (OpenTyrian, Live Die Repeat) | **RAR dividido** (e pacotes `CUSA`, em modo Background) |
+| Host | Cadeia servida | Âncoras do SSPI |
 |---|---|---|
-| Quem baixa | transferência **no app** (`NetHttp`/`NativeHttp`, C#); homebrew não espera o worker (`DownloadManager.Resident.cs:359`) | **worker residente** em C (`gs_xfer.c`); arquivos `.rar` só são entregues a ele (`DownloadManager.Archive.cs:246-300`, exige `UseBgftDirect`, padrão `true` em `AppSettings.cs:103`) |
-| Confiança | Mozilla + **pins** (GitHub Sectigo `github-sectigo-dv.pem`, Gen Y, GoDaddy, WE1, GeoTrust) (`NativeHttp.cs:305-372`) | Mozilla + Gen Y, WE1, GoDaddy G2, GeoTrust, **sem pin do GitHub** (`resident/plugin/gs_resident_worker.inc:775-784`) |
-| Sessões TLS | 1 sondagem + lanes por arquivo | **por volume**: 1 sondagem no app (todos os 11 antes de começar, `NetHttp.ReadRangeDirect`, "Checking RAR part n/N") + **uma sondagem nova no worker para cada volume** + lanes |
+| **`raw.githubusercontent.com`** (e `release-assets`/`objects`/`github.io`) | folha `*.github.io` ← **LE `YR1`** ← **`Root YR` (versão cruzada por ISRG X1)** | `YR1` **fixado**; raiz `Root YR` fixada é a **autoassinada** (outro certificado); a servida é a cruzada (`072639D0…`, não fixada) |
+| `github.com` | Sectigo `DV E36` (ou `R36`) ← Root E46/R46 | intermediário **fixado** + raízes na lista |
+| **`api.pkg-zone.com`** (Cloudflare) | folha ← **GTS `WE1`** (comum) ← GTS Root R4 | raiz na lista; o pin do SSPI é o **WE1 *cross-sign***, **não** este `WE1` |
+| `pkg-zone.com` | LE `YE1` ← Root YE ← ISRG Root X2 | `YE1` fixado |
+| **`cdn.jsdelivr.net`** | `*.jsdelivr.net` ← Sectigo **`DV R36`** ← Root R46 | **fixado** (o mesmo `R36` do GitHub) + raiz na lista |
+| `archive.org` | GoDaddy G2 (intermediário) ← Go Daddy Root G2 | **fixado** + raiz na lista |
+| `gitlab.com` / `codeberg.org` | Sectigo R36 / LE `YE1` | fixados |
+| `storage.googleapis.com` | GTS `WE2`/`WR2` ← GTS R4/R1 | raiz ok; `WE2` **não** fixado |
+| `s3.amazonaws.com`, `huggingface.co` | Amazon RSA 2048 M01 ← Amazon Root CA 1 | raiz ok; intermediário não fixado |
 
-Cada volume é uma transferência independente (caminho e tamanho próprios; "um conjunto multi-volume perde só o volume em andamento", doc do SSPI). Então um RAR de 11 volumes faz ≈ 20+ handshakes novos em poucos segundos, no stack **com menos pins**, e basta **uma** sondagem falhar por 2 min para derrubar o conjunto. Um PKG único faz poucos handshakes e usa o stack com mais pins.
+**Leitura:** (a) para o `raw`, o intermediário **está fixado**; o que pode atrapalhar é o servidor enviar também a `Root YR` **cruzada**, que o firmware antigo pode tentar seguir ("Older NanoSSL firmware may not build even the shortened chain", `NativeHttp.cs:~120`). (b) `api.pkg-zone.com` usa o `WE1` **comum**, que o SSPI **não** fixa: é o cenário que o autor descreve como "firmware chain discovery". (c) O primeiro erro TLS da sessão (download em `github.com/.../releases/...`) acabou no **mesmo conjunto de certificados Gen Y** (`release-assets.githubusercontent.com`), não em `github.com`.
 
-## Causa mais provável
-**O worker residente do SSPI não consegue, de forma intermitente, montar a cadeia de certificado de `raw.githubusercontent.com` em sessões novas** (emissor desconhecido, `verify=0x20`), porque o intermediário desse host não está entre os que o worker fixa. O mesmo mecanismo (cadeia não montada em handshake novo) explica o Live Die Repeat (`api.pkg-zone.com`, também em sessão nova após a interrupção), no stack do app. O RAR expõe o problema porque multiplica os handshakes novos e usa o stack residente.
+## 3. Hipóteses revistas (da mais para a menos provável)
+**H1 (principal): construção de cadeia pelo firmware antigo em hierarquias novas (LE Gen Y no `raw`; GTS WE1 no `api.pkg-zone.com`), de forma intermitente.** É o modo de falha que o próprio autor documenta ("unknown CA intermittently with both roots loaded"). Explica hosts/CAs diferentes com o mesmo `0x8095F00C`, os 6 volumes que passaram e o 7º que falhou, e o Retry que repetiu (a borda/IP escolhido pode persistir por alguns minutos). *Não confirmada.*
+**H2: data/hora do console** (`verify` 0x08/0x10): o certificado folha do `raw` é recente (`*.github.io`, expira 29/12/2026). Se o relógio do PS4 estiver atrasado, folhas novas parecem "ainda não válidas"; intermitente se as bordas alternarem folhas.
+**H3: borda específica** com variante de certificado/cadeia (`verify` 0x20 ou 0x04).
+**Descartada:** "worker residente sem pin do GitHub" (pilha In-app confirmada; `YR1` fixado).
 
-**Evidências a favor:** (a) o autor descreve exatamente esse modo de falha, intermitente, no GitHub; (b) o worker não carrega o pin do GitHub e o app carrega; (c) os volumes 1–6 passaram e o 7 falhou: intermitência por handshake, não bloqueio do host; (d) as 11 sondagens do app (com pin) passaram antes do worker começar: a entrega só chega ao worker depois de todas (inferência, pois o download começou); (e) `T8b`/`T9` (poucos handshakes) funcionaram em `raw`.
-**Contra/lacunas:** não vi a cadeia real de `raw.githubusercontent.com` (pode ser DigiCert, não Sectigo); o modo de download usado no 5A não foi registrado; não temos o `verify=` do log; o repositório público pode diferir do binário.
-**Hipóteses alternativas** (testáveis): relógio do console (`verify` 0x08/0x10); DNS/filtro devolvendo borda com outro certificado (`verify` 0x04); limite de novas conexões do host ou do roteador.
+## 4. Registros que confirmam host, `verify` e rota
+Local: `/data/SSPI/logs/` (`SspiLog.cs:17-25`): `download.log`, `network.log`, `resident.log`, `combined.log` (`startup.log` também). URLs são trocadas por `[url]` (`SspiLog.Clean`), mas `host=` aparece.
 
-## Teste mínimo para confirmar (2 passos, sem desenvolver nada)
-**1) Ler o log do SSPI** (por FTP do GoldHEN, `/data/SSPI/logs/download.log`, `resident.log`, `network.log`; ou o que a página do celular/ajuda do SSPI oferecer para exportar logs). Procure, na hora da falha:
-`event=preparation-probe-failed … ssl=0x… verify=0x… host=…` e a linha `Resident HTTPS ready with bundled PEM trust` / contagem de CAs. Copie 3–4 linhas (as URLs são filtradas pelo SSPI).
-**2) Repetir o 5A com o modo de download no app:** *OPTIONS → Settings → General → Download mode = **In-app*** (o SSPI diz que ele roda os downloads dentro do app; a doc cita renovação de link de arquivos no modo In-app) e colar de novo `links-ordem.txt`. Anote em que volume termina ou se conclui; **registre antes qual era o modo** (padrão: Background).
+| Procure em | O que confirma |
+|---|---|
+| `download.log`/`combined.log`: **`event=preparation-probe-failed … hex=0x8095F00C … ssl=0x… verify=0x… errno=0x… host=…`** (`gs_xfer.c:1385-1390`) | **host real** que falhou; **`verify`**: `0x20` emissor desconhecido (H1/H3) · `0x08/0x10` datas (H2) · `0x04` nome do host/DNS; **estágio** (`phase=`/`stage=`) |
+| mesma linha, **`attempt=`** e o campo de tempo `ms=` | quantas tentativas e em quanto tempo (confirma ≥ 8 falhas em ≥ 120 s) |
+| `download.log`: `event=retry … raw=… hex=0x8095F00C … scope=tls-quarantine … reused=` | se houve reaproveitamento de conexão |
+| `network.log`: `native_http ready=true … native_gen_y=N; native_gen_y_intermediates=N; native_github_intermediates=N; sceHttpsLoadCert=0` (`NativeHttp.cs:~315-345`) | **quais pins o app carregou nesta execução** (se `native_gen_y*` = 0, os pins Gen Y não foram carregados) |
+| `network.log`: `sceHttp send 0x8095F00C host=… ssl=0x… verify=0x…` (`NativeHttp`) | mesmo dado vindo do HTTP do app |
+| **Rota:** status do cartão `RAR volume 7/11 · Keep SSPI open` + **ausência** de `Handing RAR volumes to resident downloader`/`Checking RAR part` e de `Resident owns this job` | confirma **In-app** (motor `libSspiTransfer.prx`) |
 
-| `verify` / host no log | 5A em **In-app** | Conclusão |
-|---|---|---|
-| `0x20`, host `raw.githubusercontent.com` | **conclui** 11/11 | o stack residente não confia no emissor do `raw` (falta o pin que o app tem) → causa confirmada |
-| `0x20`, host `raw…` | **também falha** (qualquer volume) | intermitência da `libSceSsl` para esse host em qualquer stack → precisa fixar o intermediário exato no SSPI (autor) ou mudar de host |
-| `0x08`/`0x10` | indiferente | data/hora do console |
-| `0x04` | indiferente | DNS/borda com certificado de outro nome |
-| host **diferente** de `raw…` (p.ex. um host de CDN) | indiferente | o `raw` redireciona para outro host que precisa de pin |
-Também ajuda saber se uma nova tentativa falha **no mesmo volume 7** (determinístico: borda/IP fixo) ou em outro (aleatório por handshake).
+## 5. Como coletar sem mexer no PS4
+A **página do celular do SSPI tem uma aba *Logs*** (`app/PhoneCompanion.html:422-440`): lista "Log files" (grupo SSPI: `combined.log`, `download.log`…), "Kernel log" e **"Save a report"**. A página **guarda no próprio celular o `combined.log` enquanto está conectada** (`:1732`), então, se ela estava aberta durante o teste, o log do 5A pode já estar lá.
+1. Abra a aba **Logs**, toque em `combined.log` (e `download.log`, `network.log`) e **copie as linhas** com `preparation-probe-failed`, `tls-quarantine`, `sceHttp send 0x8095F00C` e `native_http ready`.
+2. (Alternativa) *Save a report* e me envie o arquivo/trecho.
+Sem FTP, sem PC e sem alterar o PS4. **Verifique também a data/hora do console** (Settings → System → Date and Time).
 
-## Se confirmado: opções (não implementadas; nenhuma desativa TLS)
-1. **Usar o modo In-app** para RAR (sem mudança de código; o app tem mais pins).
-2. **Hospedar em um host cuja cadeia o worker já fixa** (Let's Encrypt Gen Y, GoDaddy G2, Google WE1) ou que o app/worker consigam montar; precisa de teste no console (o único host provado em download é `raw`, em Background só com poucos handshakes, e `pkg-zone.com`).
-3. **Pedir ao autor do SSPI** o pin do intermediário do `raw.githubusercontent.com` na lista do worker (mudança no SSPI, fora do nosso código).
-4. Menos volumes (maiores) reduz os handshakes, mas não corrige a causa.
+## 6. Hospedagem HTTPS alternativa para os 11 volumes
+Critério: a cadeia termina em raiz **carregada** pelo SSPI e o **intermediário é fixado** (sem depender de "descoberta de cadeia"), com `Range` e sem conta nova.
+
+| Opção | Cadeia (medida) | Setup | Observações |
+|---|---|---|---|
+| **`cdn.jsdelivr.net` (recomendada para o teste)** | Sectigo **R36 fixado** ← Root R46 listada; **evita a Gen Y** | **nenhum** (usa o repositório atual) | 11/11 volumes **idênticos byte a byte** e `Range` 206 em offset arbitrário, conferidos no Actions. ETag **fraco** e sem `Last-Modified` ⇒ o SSPI baixa **1 conexão por volume** (600 KB: sem custo). URL por **commit** é imutável. Só para **nossos** arquivos (open source): a política do jsDelivr não permite outros usos |
+| `archive.org` | GoDaddy G2 **fixado** ← GoDaddy Root G2; o motor do SSPI tem tratamento explícito de espelhos do Internet Archive (`gs_xfer.c`) | conta e upload manuais | alternativa mais "provada" pelo autor; só conteúdo próprio |
+| `gitlab.com` raw / `codeberg.org` raw | Sectigo R36 / LE `YE1`, ambos fixados | conta + repositório | viável, com setup |
+| GitHub Pages / `raw` / Releases | LE Gen Y (`YR1` + `Root YR` cruzada) | — | **a cadeia sob suspeita**; sem ganho |
+| Google Cloud Storage, S3, Hugging Face | raiz listada, intermediário **não** fixado | conta (cobrança/termos) | sem vantagem sobre os acima |
+
+**Teste mínimo para decidir (sem desenvolvimento):** repetir o **5A com os links do jsDelivr**: `https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/rartest/links-jsdelivr-ordem.txt` (copiar o texto e colar na caixa Downloads; **o mesmo modo In-app**, para só mudar o host).
+
+| Resultado | Conclusão |
+|---|---|
+| **conclui** 11/11, extrai, instala, abre | a cadeia Gen Y/borda do `raw` era o problema prático; hospedar os RAR (nossos) no jsDelivr |
+| falha **também**, com `verify=0x20` em `cdn.jsdelivr.net` | o firmware falha com qualquer cadeia nova/fresca; precisaria de pin no SSPI (autor) |
+| falha com `verify=0x08/0x10` | **relógio do console** (H2): ajustar data/hora |
+| falha com outro erro (reset, timeout) | deixa de ser TLS: investigar por log |
+
+## 7. Limites
+Não vi a cadeia que o **seu** console recebe (outra região/borda pode diferir); o repositório público pode não ser o build instalado; o firmware pode ter raízes próprias. `0x8095F00C` pelo SSPI: a recusa vem da `libSceSsl`. Nada aqui altera o robô nem desativa TLS.
