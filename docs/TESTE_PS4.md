@@ -8,7 +8,16 @@ Versão exibida na tela: **BETA 5.11 / 0eb783eca1f3** (não é a 5.11.7 Final).
 Conclusão: o binário é mais restrito que o código público (que aceitaria os dois). Só `CUSA` está comprovado
 (fixture original `CUSA99999`). Os arquivos T2/T3 foram movidos para `dist/rejected/` e o `build` agora os bloqueia.
 
-## Hipótese e teste
+## Resultado do Gate 2b (22/11/2026, relato do usuário)
+
+**T4 foi instalado** pelo SSPI (BETA 5.11 / 0eb783eca1f3). Logo, no console: importação aceita, e a instalação de um PKG
+com ID real `NPXS39041` sob a chave de catálogo `CUSA99999` funciona. O SSPI **não** exige que a chave bata com o ID do PKG.
+Não foram relatados separadamente busca por nome/ID e detalhes (implícitos, pois a instalação parte deles).
+
+**Regra comprovada:** chave de catálogo com prefixo `CUSA` + URL de download real = fluxo completo funcional.
+`NPXS` e `APOL` como chave: recusados.
+
+## Hipótese e teste (histórico)
 
 O `titleId` do catálogo é só uma chave de busca; o fixture que funcionou usava `CUSA99999` (fictício) com o PKG do Apollo.
 Teste T4 = o mesmo PKG do Store (download comprovado, 24,8 MB) sob a chave `CUSA99999`.

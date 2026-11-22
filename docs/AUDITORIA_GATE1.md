@@ -60,3 +60,7 @@ O console recusou T2 (NPXS) e T3 (APOL) na importação: `Unsupported catalog ti
 Mudanças: `NPXS`/`APOL` viram **erro** no `check`; fixtures movidas para `data/fixtures/rejected/`; novo campo
 opcional `catalogKey: true` permite a chave fictícia `CUSA99999` (comprovada) como chave de catálogo; T4 gerado.
 Os hashes de conteúdo de T2/T3 acima valem só como histórico.
+
+## Gate 2b: T4 instalado (22/11/2026)
+
+Relato do usuário: T4 (`CUSA99999` + Store-R2.pkg) foi instalado. Fluxo importar → instalar comprovado no console com chave sintética `CUSA`.
