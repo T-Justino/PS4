@@ -1,6 +1,3813 @@
 {
   "catalogHash": "",
   "schema": "ps4storebr.discovery-state/v1",
-  "seen": {},
+  "seen": {
+    "pkg-zone#AMIN00048#ps4#1.00#2026-11-21T17:49:50.237Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-AMIN00048_00-MEDIACENTER00001",
+        "detail": "prefixo AMIN não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Media Center For PS4",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "AMIN00048",
+        "totalSize": 46137344,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#AONI00001#ps4#1.0.0#2026-11-16T17:36:27.868Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-AONI00001_00-AOONIPS4PORT0000",
+        "detail": "prefixo AONI não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Ao Oni",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "AONI00001",
+        "totalSize": 76480512,
+        "version": "0.10",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#APOL00004#ps4#2.4.0#2026-10-17T12:15:33.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
+        "detail": "prefixo APOL recusado na importação (Gate 2)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Apollo Save Tool",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "stage": "pkg_verificado",
+        "titleId": "APOL00004",
+        "totalSize": 22806528,
+        "version": "02.40",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#AZIF00001#ps4#1.02#2024-05-10T18:19:33.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-AZIF00001_00-PS4VIBE000000000",
+        "detail": "prefixo AZIF não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4Vibe",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "AZIF00001",
+        "totalSize": 6619136,
+        "version": "1.02",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#AZIF00003#ps4#0.98#2024-05-10T18:20:54.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-AZIF00003_00-PAYLOADGUEST0000",
+        "detail": "prefixo AZIF não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Payload Guest",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "AZIF00003",
+        "totalSize": 34865152,
+        "version": "0.98",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BALL00001#ps4#1.00#2024-05-10T18:20:05.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BALL00001_00-BALLBLASTERGMST0",
+        "detail": "prefixo BALL não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Ball Blaster",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BALL00001",
+        "totalSize": 58064896,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BBAR00505#ps4#1.00#2024-05-10T18:19:32.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BBAR00505_00-PS4REDBREWPSNIO0",
+        "detail": "prefixo BBAR não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "B&nder Bar",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BBAR00505",
+        "totalSize": 19333120,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BBFF12362#ps4#1.00#2024-05-10T18:19:31.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "param.sfo fora da janela baixada",
+        "finalHost": "api.pkg-zone.com",
+        "kind": null,
+        "name": null,
+        "reason": "SFO_OUTSIDE_WINDOW",
+        "stage": "acessivel",
+        "titleId": null,
+        "totalSize": 1423507456,
+        "version": null,
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "acessivel"
+    },
+    "pkg-zone#BORC00007#ps4#1.00#2024-05-10T18:19:50.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-BORC00007_00-BORC000070000001",
+        "detail": "prefixo BORC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Crisis evil 2",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BORC00007",
+        "totalSize": 103481344,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BORC00014#ps4#1.00#2024-05-10T18:19:38.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-BORC00014_00-BORC000140000001",
+        "detail": "prefixo BORC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Street Fighter Beats Of Rage Remix 2",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BORC00014",
+        "totalSize": 99942400,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BORC00018#ps4#1.00#2024-05-10T18:19:37.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-BORC00018_00-BORC000180000001",
+        "detail": "prefixo BORC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Golden Axe Curse Of The Death Adder",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BORC00018",
+        "totalSize": 58327040,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BORC00024#ps4#1.00#2024-05-10T18:19:49.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-BORC00024_00-BORC000240000001",
+        "detail": "prefixo BORC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Mega Man War Of the Past",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BORC00024",
+        "totalSize": 106496000,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BORC00078#ps4#1.00#2024-05-10T18:19:48.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-BORC00078_00-BORC000780000001",
+        "detail": "prefixo BORC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Batman Gotham Knights",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BORC00078",
+        "totalSize": 82116608,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BORP09801#ps4#1.00#2024-05-10T18:19:37.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-BORP09801_00-BORP098010000001",
+        "detail": "prefixo BORP não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Mortal Kombat Konquest",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BORP09801",
+        "totalSize": 193396736,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BORR00007#ps4#1.00#2024-05-10T18:19:48.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-BORR00007_00-BORR000070000001",
+        "detail": "prefixo BORR não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Cadillacs and Dinosaurs",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BORR00007",
+        "totalSize": 65339392,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BORR00044#ps4#1.00#2024-05-10T18:20:18.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-BORR00044_00-BORR000440000001",
+        "detail": "prefixo BORR não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Night Slashers X",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BORR00044",
+        "totalSize": 51183616,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00009#ps4#0.0.1#2024-05-10T18:20:42.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00009_00-TELNETSHELL00000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Tiny PS4 Shell (Telnet Shell)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00009",
+        "totalSize": 6619136,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00080#ps4#1.00#2024-05-10T18:20:30.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00080_00-AUDIOWAVEX000000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "OpenOrbis Audio Sample",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00080",
+        "totalSize": 30474240,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00081#ps4#1.00#2024-05-10T18:20:30.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00081_00-FONTDRAWEX000000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "OpenOrbis Font Sample",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00081",
+        "totalSize": 6619136,
+        "version": "1.01",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00082#ps4#1.00#2024-05-10T18:20:30.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00082_00-GRAPHICSEX000000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "OpenOrbis Graphics Sample",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00082",
+        "totalSize": 6619136,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00084#ps4#1.00#2024-05-10T18:20:29.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00084_00-CONTROLREX000000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "OpenOrbis Input Sample",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00084",
+        "totalSize": 6619136,
+        "version": "1.02",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00086#ps4#1.02#2024-05-10T18:20:30.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00086_00-IPNGDRAWEX000000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "OpenOrbis PNG Sample",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00086",
+        "totalSize": 6619136,
+        "version": "1.02",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00088#ps4#1.00#2024-05-10T18:20:31.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00088_00-GETUSRIDEX000000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "OpenOrbis System Sample",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00088",
+        "totalSize": 6619136,
+        "version": "1.02",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00089#ps4#1.3.2.5#2026-11-14T00:52:42.633Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00089_00-PS4HDDTOOLS00000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 HDD Tools",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00089",
+        "totalSize": 6619136,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00090#ps4#1.00#2024-05-10T18:20:28.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00090_00-SDLEXAMPLE000000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "OpenOrbis SDL Sample",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00090",
+        "totalSize": 6619136,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW00179#ps4#0.2.3#2024-05-10T18:20:31.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00179_00-LOGMEINHAMACHI00",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "LogMeIn Hamachi (UNOFFICIAL)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00179",
+        "totalSize": 7798784,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW34965#ps4#0.10#2024-05-10T18:20:52.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW34965_00-OLIPS4PICO800000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 P-8 / Pico8",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW34965",
+        "totalSize": 7208960,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW69420#ps4#initial#2026-11-14T00:23:44.215Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "TX0000-BREW69420_00-BREWSTORE0000000",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Brew",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW69420",
+        "totalSize": 2752512,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#BREW91909#ps4#1.00#2024-05-10T18:20:29.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW91909_00-NIKPS4HOMEBREW00",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Is it, or isn't?",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW91909",
+        "totalSize": 15597568,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CBFD00064#ps4#00.13#2026-11-14T01:19:14.015Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-CBFD00064_00-CONKERRECOMPPS40",
+        "detail": "prefixo CBFD não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Conker's Bad Fur Day: Recompiled",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CBFD00064",
+        "totalSize": 124059648,
+        "version": "00.13",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CDRR00001#ps4#1.00#2024-05-10T18:19:51.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "CD0000-CDRR00001_00-CHIPANDDALEPS400",
+        "detail": "prefixo CDRR não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Chip and Dale: Remastered",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CDRR00001",
+        "totalSize": 100466688,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CHIP80020#ps4#1.04#2024-05-10T18:20:56.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-CHIP80020_00-CHIPEMULAT000000",
+        "detail": "prefixo CHIP não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Chip 8",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CHIP80020",
+        "totalSize": 7012352,
+        "version": "1.04",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CHTM00777#ps4#1.2.2#2024-06-15T15:23:40.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-CHTM00777_00-PS4CHEATSMANAGER",
+        "detail": "prefixo CHTM não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 Cheats Manager",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CHTM00777",
+        "totalSize": 19202048,
+        "version": "01.22",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CREP00001#ps4#1.00#2024-05-10T18:20:00.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-CREP00001_00-CREEPERDIVR00000",
+        "detail": "prefixo CREP não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "CreeperDiver",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CREP00001",
+        "totalSize": 19070976,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSA00000#ps4#1.00#2024-05-10T18:20:10.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP1000-CUSA00000_00-SLUS000000000000",
+        "detail": "CUSA00000 é ID fictício",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "unknown",
+        "name": "SNES STATION",
+        "reason": "PLACEHOLDER_ID",
+        "stage": "pkg_verificado",
+        "titleId": "CUSA00000",
+        "totalSize": 44695552,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSA00002#ps4#1.00#2024-05-10T18:19:56.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSA00000_00-SCUS974900000001",
+        "detail": "CUSA00000 é ID fictício",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Half-Life Blue Shift",
+        "reason": "PLACEHOLDER_ID",
+        "stage": "pkg_verificado",
+        "titleId": "CUSA00000",
+        "totalSize": 386531328,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSA00127#ps4#1.53#2024-06-14T01:53:35.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP4350-CUSA00127_00-NETFLIXPOLLUX001",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Netflix",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA00127",
+        "totalSize": 64028672,
+        "version": "01.53",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA00131#ps4#2.33#2024-05-10T18:20:44.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UT0008-CUSA00131_00-TESSERACT0000001",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Hulu",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA00131",
+        "totalSize": 63045632,
+        "version": "02.33",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA01116#ps4#2.32#2024-09-04T18:59:21.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP4381-CUSA01015_00-YOUTUBESCEA00000",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Youtube",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA01015",
+        "totalSize": 151650304,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA01850#ps4#2.03#2024-08-05T23:13:56.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP4544-CUSA01850_00-PLEX000000000000",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Plex",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA01850",
+        "totalSize": 68681728,
+        "version": "02.03",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA02012#ps4#4.01#2024-05-10T18:20:46.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IP9100-CUSA02012_00-PS4MEDIAPLAYER00",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 Media Player",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA02012",
+        "totalSize": 16842752,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA02222#ps4#1.00#2024-05-10T18:19:36.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSA02222_00-SCUS974900000001",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Rogue Galaxy™ (uLaunchELF)",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA02222",
+        "totalSize": 15597568,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA02222#ps4#1.00#2024-05-10T18:20:02.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSA02222_00-SCUS974900000001",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Rogue Galaxy™ (uLaunchELF)",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA02222",
+        "totalSize": 15597568,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA02644#ps4#1.34#2024-05-10T18:19:32.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP8805-CUSA02644_00-20150410XCRUNCHY",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Crunchyroll",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA02644",
+        "totalSize": 55640064,
+        "version": "01.34",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA03285#ps4#1.46#2024-05-10T18:19:31.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP8816-CUSA03398_00-TWITCHPS4APPSCEE",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Twitch",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA03398",
+        "totalSize": 52363264,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA03290#ps4#1.03#2024-05-10T18:19:34.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP4062-CUSA03290_00-RIPTIDEGAME00000",
+        "detail": "tipo 'update' (CATEGORY=gp): só 'base' é publicado; update/DLC não testados",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "update",
+        "name": "Dead Island: Riptide - Dev Menu Edition",
+        "reason": "KIND_UNTESTED",
+        "stage": "pkg_verificado",
+        "titleId": "CUSA03290",
+        "totalSize": 65732608,
+        "version": "01.99",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSA03291#ps4#1.00#2024-05-10T18:19:35.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP4062-CUSA03291_00-DEADISLANDGAME00",
+        "detail": "tipo 'update' (CATEGORY=gp): só 'base' é publicado; update/DLC não testados",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "update",
+        "name": "Dead Island - Dev Menu Edition",
+        "reason": "KIND_UNTESTED",
+        "stage": "pkg_verificado",
+        "titleId": "CUSA03291",
+        "totalSize": 93519872,
+        "version": "01.99",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSA03991#ps4#1.00#2024-05-10T18:19:34.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP1018-CUSA03991_00-DLEEGAME00000000",
+        "detail": "tipo 'update' (CATEGORY=gp): só 'base' é publicado; update/DLC não testados",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "update",
+        "name": "Dying Light: The Following – Enhanced Edition",
+        "reason": "KIND_UNTESTED",
+        "stage": "pkg_verificado",
+        "titleId": "CUSA03991",
+        "totalSize": 77987840,
+        "version": "01.99",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSA04688#ps4#3.43#2024-05-10T18:20:50.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP8809-CUSA04688_00-0000000000000001",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Pluto TV",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA04688",
+        "totalSize": 53084160,
+        "version": "03.43",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA05214#ps4#4.00#2024-05-10T18:20:47.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP8813-CUSA05214_00-WATCHESPNPS40000",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "ESPN",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA05214",
+        "totalSize": 161087488,
+        "version": "04.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA05365#ps4#2.00#2024-05-10T18:20:45.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP8815-CUSA05365_00-CBSIALLACCESSPS4",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Paramount+",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA05365",
+        "totalSize": 80609280,
+        "version": "02.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA08223#ps4#1.03#2024-05-10T18:20:53.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP8838-CUSA08223_00-ADNSTREAMINGPROD",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "ADN",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA08223",
+        "totalSize": 67371008,
+        "version": "01.03",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA16881#ps4#1.00#2024-05-10T18:19:41.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UT0001-CUSA16881_00-UNTRTHEME0100000",
+        "detail": "tipo 'dlc' (CATEGORY=ac): só 'base' é publicado; update/DLC não testados",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "dlc",
+        "name": "Uncharted & Tomb.R_Theme_by latioboy",
+        "reason": "KIND_UNTESTED",
+        "stage": "pkg_verificado",
+        "titleId": "CUSA16881",
+        "totalSize": 15073280,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSA18680#ps4#01.01#2024-05-10T18:20:50.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP4381-CUSA18680_00-YOUTUBETVSCEA000",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "YouTube TV",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA18680",
+        "totalSize": 71958528,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA24386#ps4#1.11#2024-05-10T18:20:54.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP6365-CUSA24386_00-6058076879904191",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Apple TV",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA24386",
+        "totalSize": 132448256,
+        "version": "01.11",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA33666#ps4#2#2024-05-10T18:20:12.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSA33666_00-SCUS974900000001",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Brutal Plissken DooM v2",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA33666",
+        "totalSize": 170590208,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA36666#ps4#2.5#2024-05-10T18:19:58.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSA36666_00-SCUS974900000001",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Brutal PS4 DooM v2.5",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA36666",
+        "totalSize": 169279488,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA36666#ps4#4#2024-05-10T18:20:11.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSA36666_00-SCUS974900000001",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Brutal PS4 DooM v2.5",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA36666",
+        "totalSize": 169279488,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSA99900#ps4#1.00#2024-05-10T18:19:33.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSA99900_00-SCUS974900000001",
+        "detail": "fonte 'pkg-zone' sem autorização de listagem registrada (config/sources.json)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Streets Of Rage MOD",
+        "reason": "NO_AUTHORIZATION",
+        "stage": "compativel_sspi",
+        "titleId": "CUSA99900",
+        "totalSize": 180551680,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "compativel_sspi"
+    },
+    "pkg-zone#CUSB00000#ps4#1.00#2024-05-10T18:19:55.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSB00000_00-SCUS974900000001",
+        "detail": "prefixo CUSB não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "RetroArch NES (PS2)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CUSB00000",
+        "totalSize": 67895296,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSB00001#ps4#1.00#2024-05-10T18:19:54.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSB00001_00-SCUS974900000001",
+        "detail": "prefixo CUSB não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "RetroArch 2048 (PS2)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CUSB00001",
+        "totalSize": 68681728,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSB00002#ps4#1.00#2024-05-10T18:19:57.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSB00002_00-SCUS974900000001",
+        "detail": "prefixo CUSB não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Emu Mégadrive/Genesis (PS2)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CUSB00002",
+        "totalSize": 26935296,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSB00005#ps4#1.00#2024-05-10T18:20:04.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSB00005_00-SCUS974900000001",
+        "detail": "prefixo CUSB não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Emu Game Boy Advance (PS2)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CUSB00005",
+        "totalSize": 23855104,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSB99997#ps4#1.00#2024-05-10T18:19:47.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSB99997_00-SCUS974900000001",
+        "detail": "prefixo CUSB não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "RetroArch Picodrive (PS2)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CUSB99997",
+        "totalSize": 26476544,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSB99999#ps4#1.00#2024-05-10T18:19:47.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSB99999_00-SCUS974900000001",
+        "detail": "prefixo CUSB não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "RetroArch QuickNES (PS2)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CUSB99999",
+        "totalSize": 26345472,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#CUSC00000#ps4#1.00#2024-05-10T18:19:59.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-CUSC00000_00-UCUS987020000001",
+        "detail": "prefixo CUSC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Emu Master System (PSP)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "CUSC00000",
+        "totalSize": 124583936,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#DELT00001#ps4#1.00#2024-05-10T18:20:00.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0002-DELT00001_00-DELTARUNECHAP100",
+        "detail": "prefixo DELT não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Deltarune",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "DELT00001",
+        "totalSize": 94437376,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#FLTZ00001#ps4#1.00#2024-05-10T18:19:56.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-FLTZ00001_00-PAYLOADLDR000000",
+        "detail": "prefixo FLTZ não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Payload Loader",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "FLTZ00001",
+        "totalSize": 8257536,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#FLTZ00003#ps4#1.02#2024-05-10T18:19:53.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-FLTZ00003_00-REMOTEPKGINSTALL",
+        "detail": "prefixo FLTZ não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Remote PKG installer",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "FLTZ00003",
+        "totalSize": 4259840,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#FMSX00000#ps4#1.00#2024-05-10T18:20:13.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0002-FMSX00000_00-AABBCCDD00000000",
+        "detail": "prefixo FMSX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Orbis MSX",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "FMSX00000",
+        "totalSize": 10616832,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#FPKP00001#ps4#01.00#2026-11-18T19:10:24.361Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-FPKP00001_00-FPKGIPLUS0000000",
+        "detail": "prefixo FPKP não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "FPKGi+",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "FPKP00001",
+        "totalSize": 17170432,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#FTPC00001#ps4#1.0.8#2024-05-10T18:21:02.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-FTPC00001_00-FTPC000010100800",
+        "detail": "prefixo FTPC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 FTP Client",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "FTPC00001",
+        "totalSize": 30801920,
+        "version": "01.08",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#GBTX00000#ps4#0.00#2024-05-10T18:21:05.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "XX0000-GBTX00000_00-GBTXXXXXXXXXXXXX",
+        "detail": "prefixo GBTX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "GameBaTo",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "GBTX00000",
+        "totalSize": 21626880,
+        "version": "00.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#GMSP00006#ps4#1.00#2024-05-10T18:19:52.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-GMSP00006_00-GAMEMAKERSTUDIO0",
+        "detail": "prefixo GMSP não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "SHEPHARD",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "GMSP00006",
+        "totalSize": 18022400,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#ITEM00001#ps4#1.08#2026-05-31T21:59:53.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0002-ITEM00001_00-STOREUPD00000000",
+        "detail": "prefixo ITEM não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Itemzflow Game Manager",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "ITEM00001",
+        "totalSize": 27131904,
+        "version": "01.08",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#ITEM00001#ps5#1.14#2025-12-22T07:41:54.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "ps5: fora do alvo (PS4); não sondado",
+        "finalHost": null,
+        "kind": null,
+        "name": null,
+        "reason": "NOT_PS4",
+        "stage": "descoberto",
+        "titleId": null,
+        "totalSize": null,
+        "version": null,
+        "warnings": []
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "descoberto"
+    },
+    "pkg-zone#JFPS40000#ps4#1.16#2026-11-18T17:13:41.464Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-JFPS40000_00-JELLYFINPS400000",
+        "detail": "prefixo JFPS não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "JellyFin [PS] for PS4",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "JFPS40000",
+        "totalSize": 38862848,
+        "version": "01.16",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#KRGR00001#ps4#release-1.0#2026-11-14T00:24:10.425Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "KG1633-KRGR00001_00-HAMER00000000000",
+        "detail": "prefixo KRGR não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Hamer!! (PORT)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "KRGR00001",
+        "totalSize": 235667456,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10004#ps4#1.03#2024-05-10T18:20:08.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10004_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Overcome",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10004",
+        "totalSize": 87883776,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10005#ps4#1.00#2024-05-10T18:20:38.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10005_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Overcome Save the Girl",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10005",
+        "totalSize": 100728832,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10007#ps4#1.01#2024-05-10T18:20:16.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10007_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Shoot Test",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10007",
+        "totalSize": 86507520,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10008#ps4#1.01#2024-05-10T18:20:16.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10008_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Duck Hunt Remake",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10008",
+        "totalSize": 98369536,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10009#ps4#1.02#2024-05-10T18:20:39.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10009_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Wild Gunman Remake",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10009",
+        "totalSize": 112525312,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10010#ps4#1.01#2024-05-10T18:20:40.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10010_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS Scene The Quiz Game",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10010",
+        "totalSize": 261685248,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10012#ps4#1.00#2024-05-10T18:20:19.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10012_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Lapy Games Collection",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10012",
+        "totalSize": 192282624,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10014#ps4#1.00#2024-05-10T18:19:42.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10014_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Lapy's River Raid",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10014",
+        "totalSize": 87490560,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10015#ps4#1.00#2024-05-10T18:20:26.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10015_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Super Console Wars",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10015",
+        "totalSize": 183894016,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10016#ps4#1.00#2024-05-10T18:20:28.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10016_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Nanospeed The Game",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10016",
+        "totalSize": 102825984,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10017#ps4#1.01#2024-05-10T18:20:32.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10017_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Brain Splitter",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10017",
+        "totalSize": 103415808,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10018#ps4#1.00#2024-05-10T18:21:00.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10018_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Ghost of Tsushima Mini Games",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10018",
+        "totalSize": 91488256,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10020#ps4#1.00#2024-05-10T18:21:01.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "VR1234-LAPY10020_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Lapy's River Raid VR",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10020",
+        "totalSize": 69533696,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10021#ps4#1.00#2024-05-10T18:21:03.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "VR1234-LAPY10021_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Duck Hunt Remake VR",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10021",
+        "totalSize": 96993280,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10022#ps4#1.00#2024-05-10T18:21:04.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "VR1234-LAPY10022_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Drum VR",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10022",
+        "totalSize": 71303168,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10023#ps4#1.00#2024-05-10T18:21:03.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10023_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "I Know that Song",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10023",
+        "totalSize": 226033664,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY10024#ps4#1.01#2024-11-22T06:00:53.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "param.sfo fora da janela baixada",
+        "finalHost": "api.pkg-zone.com",
+        "kind": null,
+        "name": null,
+        "reason": "SFO_OUTSIDE_WINDOW",
+        "stage": "acessivel",
+        "titleId": null,
+        "totalSize": 948830208,
+        "version": null,
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "acessivel"
+    },
+    "pkg-zone#LAPY10025#ps4#1.04#2024-12-13T18:35:34.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY10025_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Senua's Saga Hellblade II",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY10025",
+        "totalSize": 60358656,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20001#ps4#1.34#2024-05-10T18:19:47.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY20001_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4-Xplorer",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY20001",
+        "totalSize": 73531392,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20002#ps4#1.08#2024-05-12T16:11:40.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY20002_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 Player",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY20002",
+        "totalSize": 52428800,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20004#ps4#1.07#2024-05-13T15:03:15.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY20004_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 App Lock",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY20004",
+        "totalSize": 53936128,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20006#ps4#1.07#2024-05-12T15:20:47.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY20006_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 Temperature",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY20006",
+        "totalSize": 50331648,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20007#ps4#1.16#2025-01-21T17:39:28.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY20007_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Icon Mask",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY20007",
+        "totalSize": 74055680,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20009#ps4#2.10#2026-11-20T02:21:18.422Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY20009_00-PS4XPLORER200000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4-Xplorer 2.0",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY20009",
+        "totalSize": 63832064,
+        "version": "02.10",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20010#ps4#1.00#2024-05-10T18:21:06.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY20010_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 Kernel BTTF",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY20010",
+        "totalSize": 52822016,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20011#ps5#01.007.001#2026-11-20T02:26:44.769Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "ps5: fora do alvo (PS4); não sondado",
+        "finalHost": null,
+        "kind": null,
+        "name": null,
+        "reason": "NOT_PS4",
+        "stage": "descoberto",
+        "titleId": null,
+        "totalSize": null,
+        "version": null,
+        "warnings": []
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "descoberto"
+    },
+    "pkg-zone#LAPY20012#ps5#1.00#2024-05-10T18:21:08.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "ps5: fora do alvo (PS4); não sondado",
+        "finalHost": null,
+        "kind": null,
+        "name": null,
+        "reason": "NOT_PS4",
+        "stage": "descoberto",
+        "titleId": null,
+        "totalSize": null,
+        "version": null,
+        "warnings": []
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "descoberto"
+    },
+    "pkg-zone#LAPY20014#ps4#1.01#2024-05-12T16:01:20.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "VR1234-LAPY20014_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 Player 3D",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY20014",
+        "totalSize": 57475072,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20015#ps4#1.02#2025-03-03T15:28:02.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-LAPY20015_00-0000000000000000",
+        "detail": "prefixo LAPY não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Avatar Changer",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LAPY20015",
+        "totalSize": 54788096,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#LAPY20016#ps5#1.00#2025-03-12T14:59:21.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "ps5: fora do alvo (PS4); não sondado",
+        "finalHost": null,
+        "kind": null,
+        "name": null,
+        "reason": "NOT_PS4",
+        "stage": "descoberto",
+        "titleId": null,
+        "totalSize": null,
+        "version": null,
+        "warnings": []
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "descoberto"
+    },
+    "pkg-zone#LIBR00001#ps4#01.00#2026-11-18T18:03:37.516Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-LIBR00001_00-LIBRARIANPS40000",
+        "detail": "prefixo LIBR não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Librarian [PS4]",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "LIBR00001",
+        "totalSize": 26542080,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#MAND00001#ps4#1.00#2026-08-16T18:53:06.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-MAND00001_00-MANDELZOOM000000",
+        "detail": "prefixo MAND não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Mandelbrot Zoom",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "MAND00001",
+        "totalSize": 7143424,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#MARC00001#ps4#4.21#2026-11-19T00:55:58.570Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP0001-MARC00001_00-0000000000000000",
+        "detail": "prefixo MARC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Hyper Neiva",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "MARC00001",
+        "totalSize": 185139200,
+        "version": "4.21",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#MARK00095#ps4#1.00#2024-05-10T18:20:14.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP0000-MARK00095_00-0000000000000000",
+        "detail": "prefixo MARK não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Resident Evil CODE: Ps4",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "MARK00095",
+        "totalSize": 27066368,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#MEDN00001#ps4#1.00#2024-05-10T18:20:19.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-MEDN00001_00-SCUS974900000001",
+        "detail": "prefixo MEDN não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Mednafen",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "MEDN00001",
+        "totalSize": 33554432,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#MODS00001#ps4#1.02#2024-05-10T18:19:59.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-MODS00001_00-WEBRTE0000000000",
+        "detail": "prefixo MODS não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "WebRTE",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "MODS00001",
+        "totalSize": 2818048,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#MOZI00001#ps4#1.0.0#2026-11-21T19:40:45.765Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:12:39Z",
+        "contentId": "IV0000-MOZI00001_00-ORBISMOZI0000000",
+        "detail": "prefixo MOZI não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Orbis Mozi",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "MOZI00001",
+        "totalSize": 13893632,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:12:39Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#MRPH00001#ps4#1.00#2024-05-10T18:20:10.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "DE0001-MRPH00001_00-RELEASE000000001",
+        "detail": "prefixo MRPH não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "ps4Gearsystem",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "MRPH00001",
+        "totalSize": 6619136,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXS29129#ps4#1.00#2024-05-10T18:19:58.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0002-NPXS29129_00-APP0990000000022",
+        "detail": "prefixo NPXS recusado na importação (Gate 2)",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "A GameMaker: Studio Game",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "stage": "pkg_verificado",
+        "titleId": "NPXS29129",
+        "totalSize": 32571392,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX10001#ps4#1.00#2024-05-10T18:20:04.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-NPXX10001_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "El Pollo de Lapy",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX10001",
+        "totalSize": 65208320,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX10002#ps4#1.00#2024-05-10T18:20:02.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-NPXX10002_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Save The Scene",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX10002",
+        "totalSize": 108855296,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX10003#ps4#1.00#2024-05-10T18:19:52.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1234-NPXX10003_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "El Pollo 2.0",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX10003",
+        "totalSize": 90832896,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX10129#ps4#0.3#2024-05-10T18:20:03.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX10129_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Snake Ball v0.3",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX10129",
+        "totalSize": 93913088,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX33362#ps4#1.00#2024-05-10T18:19:53.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "HW1633-NPXX33362_00-HOMEBREWSSSSSSSS",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "ORBISMAN (BETA)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX33362",
+        "totalSize": 99352576,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX33382#ps4#1.00#2024-05-10T18:20:09.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "HW1633-NPXX33382_00-HOMEBREWSSSSSSSS",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "File Manager for PS4™",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX33382",
+        "totalSize": 74776576,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX33392#ps4#1.00#2024-05-10T18:19:36.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "HW1633-NPXX33392_00-HOMEBREWSSSSSSSS",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "LibOrbis PKG Loader Sample (Tetris)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX33392",
+        "totalSize": 11272192,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX50003#ps4#1.00#2024-05-10T18:19:45.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX50003_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "tank game",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX50003",
+        "totalSize": 118620160,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX50004#ps4#1.00#2024-05-10T18:19:44.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX50004_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "SpaceShooter",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX50004",
+        "totalSize": 84475904,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX51351#ps4#1.00#2024-05-10T18:20:10.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX51351_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Soilder Mayham v1",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX51351",
+        "totalSize": 164298752,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX51363#ps4#1.00#2024-05-10T18:19:41.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1634-NPXX51363_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "MediaPlayer PS4",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX51363",
+        "totalSize": 116129792,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX51364#ps4#1.00#2024-05-10T18:19:36.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX51362_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 Controller Homebrew",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX51362",
+        "totalSize": 115212288,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX51365#ps4#1.00#2024-05-10T18:19:39.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX51365_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Roll The Ball for PS4",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX51365",
+        "totalSize": 144572416,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX51369#ps4#1.00#2024-05-10T18:20:15.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX51362_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Pinball Wizard",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX51362",
+        "totalSize": 191430656,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX51373#ps4#1.00#2024-05-10T18:19:44.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX51362_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Strike Elite",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX51362",
+        "totalSize": 605224960,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX51374#ps4#1.00#2024-05-10T18:20:08.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX51362_00-TER1520000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "★ FLAPPY BIRD  ★ By TER152 ★",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX51362",
+        "totalSize": 80084992,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX51385#ps4#1.01#2024-05-10T18:19:41.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1685-NPXX52385_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4-GBEmu",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX52385",
+        "totalSize": 66519040,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX51522#ps4#1.00#2024-05-10T18:20:07.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1523-NPXX51522_00-00TER15200000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "★ Pokemon ★ By TER152 ★",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX51522",
+        "totalSize": 325648384,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX52599#ps4#1.00#2024-05-10T18:20:17.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "CH1105-NPXX52599_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Greedy Gutz Gary",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX52599",
+        "totalSize": 90505216,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NPXX88888#ps4#1.00#2024-05-10T18:20:01.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-NPXX88888_00-0000000000000000",
+        "detail": "prefixo NPXX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Block Buster",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NPXX88888",
+        "totalSize": 89325568,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NTXS10053#ps4#1.30#2026-11-01T17:14:52.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-NTXS10053_00-SCRATCHPS4000000",
+        "detail": "prefixo NTXS não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Scratch Everywhere!",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NTXS10053",
+        "totalSize": 71696384,
+        "version": "01.30",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#NUEX00001#ps4#3.0#2026-11-21T17:40:44.291Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-NUEX00001_00-NUEEXMTP00000000",
+        "detail": "prefixo NUEX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS MTP Explorer",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "NUEX00001",
+        "totalSize": 7012352,
+        "version": "03.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#OPEN00001#ps4#1.01#2024-05-10T18:20:47.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-OPEN00001_00-OPEN000010000000",
+        "detail": "prefixo OPEN não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "OpenTyrian @ cpasjuste",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "OPEN00001",
+        "totalSize": 19791872,
+        "version": "01.01",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#OVBD00001#ps4#1.1.2.1#2024-05-10T18:20:56.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-OVBD00001_00-SONICTIMETWISTED",
+        "detail": "prefixo OVBD não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Sonic Time Twisted",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "OVBD00001",
+        "totalSize": 165871616,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PCMN99999#ps4#1.00#2024-05-10T18:19:45.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "TX0000-PCMN99999_00-0000000000PACMAN",
+        "detail": "prefixo PCMN não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "pacman",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PCMN99999",
+        "totalSize": 67764224,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PCSX00002#ps4#1.00#2024-05-10T18:20:31.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-PCSX00002_00-MGBA000000000000",
+        "detail": "prefixo PCSX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PCSX-R (Playstation)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PCSX00002",
+        "totalSize": 6815744,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PFBN00001#ps4#6.7#2024-05-10T18:20:48.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-PFBN00001_00-PFBN000016070000",
+        "detail": "prefixo PFBN não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Portable Final Burn Neo",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PFBN00001",
+        "totalSize": 123666432,
+        "version": "6.7",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PGEN00001#ps4#6.7#2024-05-10T18:21:04.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-PGEN00001_00-PGEN000016070000",
+        "detail": "prefixo PGEN não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "pGEN - Portable Genesis Plus GX",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PGEN00001",
+        "totalSize": 48365568,
+        "version": "6.7",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PKGI00001#ps4#1.00#2024-05-10T18:20:29.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-PKGI00001_00-YYYYYYYYYY000000",
+        "detail": "prefixo PKGI não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PKGi",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PKGI00001",
+        "totalSize": 3407872,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PKGI13337#ps4#1.10.0#2026-01-28T02:15:12.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-PKGI13337_00-0000000000000000",
+        "detail": "prefixo PKGI não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "FPKGi",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PKGI13337",
+        "totalSize": 85458944,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PKGI13337#ps5#1.10.0#2026-01-28T02:15:16.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "ps5: fora do alvo (PS4); não sondado",
+        "finalHost": null,
+        "kind": null,
+        "name": null,
+        "reason": "NOT_PS4",
+        "stage": "descoberto",
+        "titleId": null,
+        "totalSize": null,
+        "version": null,
+        "warnings": []
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "descoberto"
+    },
+    "pkg-zone#PLTB00000#ps4#1.2.0#2026-11-21T18:10:49.130Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-PLTB00000_00-PLTB000000100000",
+        "detail": "prefixo PLTB não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Playtube",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PLTB00000",
+        "totalSize": 53215232,
+        "version": "01.02",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PNES00001#ps4#6.7#2024-05-10T18:20:49.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-PNES00001_00-PNES000016070000",
+        "detail": "prefixo PNES não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "pNES - Portable Nestopia",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PNES00001",
+        "totalSize": 41287680,
+        "version": "6.7",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PNES00002#ps4#1.01#2024-05-10T18:19:38.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "EP0001-PNES00001_00-RELEASE000000001",
+        "detail": "prefixo PNES não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4NES",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PNES00001",
+        "totalSize": 7405568,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PONG00000#ps4#1.00#2024-05-10T18:19:46.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "TX0000-PONG00000_00-0000000000TOXXIC",
+        "detail": "prefixo PONG não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Pong",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PONG00000",
+        "totalSize": 70254592,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PPLA00008#ps4#1.01#2026-11-14T01:37:20.053Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-PPLA00008_00-PICOPLAYPS400000",
+        "detail": "prefixo PPLA não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PicoPlay",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PPLA00008",
+        "totalSize": 6619136,
+        "version": "01.01",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PPPP00002#ps4#1.00#2024-05-10T18:20:13.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-PPPP00002_00-0000000000000000",
+        "detail": "prefixo PPPP não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Yabause (Saturn)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PPPP00002",
+        "totalSize": 8388608,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PPSA01615#ps5#6.00#2025-11-14T15:22:57.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "ps5: fora do alvo (PS4); não sondado",
+        "finalHost": null,
+        "kind": null,
+        "name": null,
+        "reason": "NOT_PS4",
+        "stage": "descoberto",
+        "titleId": null,
+        "totalSize": null,
+        "version": null,
+        "warnings": []
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "descoberto"
+    },
+    "pkg-zone#PPSA01650#ps5#1.03#2025-11-14T15:30:08.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "ps5: fora do alvo (PS4); não sondado",
+        "finalHost": null,
+        "kind": null,
+        "name": null,
+        "reason": "NOT_PS4",
+        "stage": "descoberto",
+        "titleId": null,
+        "totalSize": null,
+        "version": null,
+        "warnings": []
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "descoberto"
+    },
+    "pkg-zone#PSNE00001#ps4#6.7#2024-05-10T18:20:49.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-PSNE00001_00-PSNE000016070000",
+        "detail": "prefixo PSNE não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "pSNES - Portable Snes9x",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PSNE00001",
+        "totalSize": 42598400,
+        "version": "6.7",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#PSNE99999#ps4#1.00#2024-05-10T18:19:50.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "TX0000-PSNE99999_00-0000000000TOXXIC",
+        "detail": "prefixo PSNE não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PSN-Enabler (Troll)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "PSNE99999",
+        "totalSize": 93847552,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#QUIG00001#ps4#1.00#2024-05-10T18:20:01.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-QUIG00001_00-QUICKZGAME000001",
+        "detail": "prefixo QUIG não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Quickz Game",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "QUIG00001",
+        "totalSize": 18546688,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#QUIG00003#ps4#1.00#2024-05-10T18:19:51.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-QUIG00003_00-SAVETHEBLUEBOI00",
+        "detail": "prefixo QUIG não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Blue Boi | Quickz",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "QUIG00003",
+        "totalSize": 12845056,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#RHZR00001#ps4#1.0.0#2024-05-10T18:20:57.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-RHZR00001_00-RELICHUNTERSZER0",
+        "detail": "prefixo RHZR não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Relic Hunters Zero",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "RHZR00001",
+        "totalSize": 71696384,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#RMTC00001#ps4#2.11#2026-11-14T02:36:28.619Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-RMTC00001_00-RMTC000010201100",
+        "detail": "prefixo RMTC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "ezRemote Client",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "RMTC00001",
+        "totalSize": 54722560,
+        "version": "02.11",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SAAT29385#ps4#2.20#2024-05-31T19:06:02.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "PL1985-SAAT29385_00-00000000000SNAKE",
+        "detail": "prefixo SAAT não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 TOOLSET",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SAAT29385",
+        "totalSize": 158793728,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SCUS00000#ps4#1.00#2024-05-10T18:20:59.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-SCUS00000_00-SCUS00000PSXFPKG",
+        "detail": "prefixo SCUS não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Friday Night Funkin'",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SCUS00000",
+        "totalSize": 179961856,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SFIN00000#ps4#0.9.6#2026-11-21T16:40:46.490Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-SFIN00000_00-SFIN000000009600",
+        "detail": "prefixo SFIN não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Switchfin",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SFIN00000",
+        "totalSize": 58654720,
+        "version": "00.96",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SILI00009#ps4#1.00#2024-05-10T18:20:48.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-BREW00009_00-STREETRACERS4IO0",
+        "detail": "prefixo BREW não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Street Racer HB",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "BREW00009",
+        "totalSize": 25100288,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SKID02048#ps4#1.01#2025-11-26T21:00:49.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-SKID02048_00-GAME204800000000",
+        "detail": "prefixo SKID não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "2048 Game (PS4 Native)",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SKID02048",
+        "totalSize": 38273024,
+        "version": "1.01",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SLUS26912#ps4#1.00#2024-05-10T18:19:51.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-SLUS26912_00-SLUS269120000001",
+        "detail": "prefixo SLUS não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Neo Thunder",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SLUS26912",
+        "totalSize": 29622272,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SMBC00001#ps4#1.10#2024-05-10T18:21:01.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-SMBC00001_00-SMBC000010101000",
+        "detail": "prefixo SMBC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 SMB Client",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SMBC00001",
+        "totalSize": 30998528,
+        "version": "01.10",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SMSR00001#ps4#1.9.2-ps4#2026-11-14T00:23:36.255Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-SMSR00001_00-SONIC1SMSREMAKE0",
+        "detail": "prefixo SMSR não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Sonic SMS Remake",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SMSR00001",
+        "totalSize": 47972352,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SMSR00002#ps4#2.9.2-ps4#2026-11-14T00:23:43.173Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-SMSR00002_00-SONIC2SMSREMAKE0",
+        "detail": "prefixo SMSR não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Sonic SMS Remake 2",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SMSR00002",
+        "totalSize": 65863680,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SNEK99999#ps4#1.00#2024-05-10T18:19:46.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "TX0000-SNEK99999_00-0000000000000000",
+        "detail": "prefixo SNEK não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "snake",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SNEK99999",
+        "totalSize": 72810496,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SPAC30000#ps4#1.00#2024-05-10T18:19:54.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "TX0000-SPAC30000_00-0000000000INVADE",
+        "detail": "prefixo SPAC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Space Invaders",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SPAC30000",
+        "totalSize": 67698688,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SPLK00001#ps4#1.00#2024-05-10T18:19:59.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "SP0000-SPLK00001_00-SPELUNKYCLASSIC0",
+        "detail": "prefixo SPLK não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Spelunky Classic HD",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SPLK00001",
+        "totalSize": 87883776,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SRCE00001#ps4#14.26#2026-11-16T17:37:07.770Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-SRCE00001_00-SOURCEENGINE0001",
+        "detail": "prefixo SRCE não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "half-life 2",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SRCE00001",
+        "totalSize": 353370112,
+        "version": "14.26",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SSNE10000#ps4#4.00#2024-05-10T18:20:20.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP0001-SSNE10000_00-0000000000000001",
+        "detail": "prefixo SSNE não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Unofficial RetroArch",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SSNE10000",
+        "totalSize": 28835840,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SSNE20000#ps4#4.00#2024-05-10T18:20:25.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "param.sfo fora da janela baixada",
+        "finalHost": "api.pkg-zone.com",
+        "kind": null,
+        "name": null,
+        "reason": "SFO_OUTSIDE_WINDOW",
+        "stage": "acessivel",
+        "titleId": null,
+        "totalSize": 1452474368,
+        "version": null,
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "acessivel"
+    },
+    "pkg-zone#STRE00001#ps4#1.00#2024-05-10T18:20:03.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-STRE00001_00-STREETRACING0000",
+        "detail": "prefixo STRE não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Street Racing",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "STRE00001",
+        "totalSize": 18415616,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#SYNC00001#ps4#1.00#2024-05-10T18:20:05.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "SY0000-SYNC00001_00-SYNCSIMPLEPS4000",
+        "detail": "prefixo SYNC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Sync Simple",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "SYNC00001",
+        "totalSize": 14024704,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#TEFO11111#ps4#1.00#2024-05-10T18:19:40.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-TEFO11111_00-0000000000000000",
+        "detail": "prefixo TEFO não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "The Enchanted Forest",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "TEFO11111",
+        "totalSize": 318504960,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#UDAT99998#ps4#2.04#2024-12-19T21:53:26.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-UDAT99998_00-UPDATE0000000PS4",
+        "detail": "prefixo UDAT não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "NoBD Toolkit",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "UDAT99998",
+        "totalSize": 8781824,
+        "version": "02.04",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#UDAT99999#ps4#1.01#2024-05-10T18:20:37.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": null,
+        "detail": "param.sfo fora da janela baixada",
+        "finalHost": "api.pkg-zone.com",
+        "kind": null,
+        "name": null,
+        "reason": "SFO_OUTSIDE_WINDOW",
+        "stage": "acessivel",
+        "titleId": null,
+        "totalSize": 1153302528,
+        "version": null,
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "acessivel"
+    },
+    "pkg-zone#UNTI00001#ps4#1.00#2024-05-10T18:20:03.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-UNTI00001_00-ANUNTITLEDSTORY0",
+        "detail": "prefixo UNTI não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "An Untitled Story",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "UNTI00001",
+        "totalSize": 64487424,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#VTHX21368#ps4#1.32#2024-05-10T18:20:52.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-VTHX21368_00-1267003901084356",
+        "detail": "prefixo VTHX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Consolepedia 3D",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "VTHX21368",
+        "totalSize": 253886464,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#WDVC00001#ps4#1.04#2024-05-10T18:21:02.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-WDVC00001_00-WDVC000010100400",
+        "detail": "prefixo WDVC não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 WebDAV Client",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "WDVC00001",
+        "totalSize": 36044800,
+        "version": "01.04",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#WILI00000#ps4#1.6.0#2026-04-25T07:45:23.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0001-WILI00000_00-WILI000000106000",
+        "detail": "prefixo WILI não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "wiliwili",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "WILI00000",
+        "totalSize": 74711040,
+        "version": "01.60",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#XDPX20004#ps4#1.33#2024-05-10T18:20:41.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-XDPX20004_00-0000000000000000",
+        "detail": "prefixo XDPX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 Tools",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "XDPX20004",
+        "totalSize": 238485504,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#XDPX20006#ps4#1.00#2024-05-10T18:20:42.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "ED1633-XDPX20006_00-0000000000000000",
+        "detail": "prefixo XDPX não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "PS4 PluginX",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "XDPX20006",
+        "totalSize": 97189888,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#YTSB42069#ps4#1.0.1#2025-10-06T04:45:07.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "IV0000-YTSB42069_00-SPONSORBLK000000",
+        "detail": "prefixo YTSB não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Sponsorblock Installer",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "YTSB42069",
+        "totalSize": 6619136,
+        "version": "1.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#ZZZZ00001#ps4#1.00#2024-05-10T18:20:14.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-ZZZZ00001_00-REICST0000000000",
+        "detail": "prefixo ZZZZ não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "Reicast Beta 2",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "ZZZZ00001",
+        "totalSize": 34603008,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    },
+    "pkg-zone#ZZZZ00002#ps4#1.00#2024-05-10T18:20:13.000Z": {
+      "check": {
+        "checkedAt": "2026-11-22T14:07:24Z",
+        "contentId": "UP9000-ZZZZ00002_00-MGBA000000000000",
+        "detail": "prefixo ZZZZ não comprovado no console",
+        "finalHost": "api.pkg-zone.com",
+        "kind": "base",
+        "name": "mGBA",
+        "reason": "PREFIX_UNPROVEN",
+        "stage": "pkg_verificado",
+        "titleId": "ZZZZ00002",
+        "totalSize": 7798784,
+        "version": "01.00",
+        "warnings": [
+          "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:07:24Z",
+      "lastStage": "pkg_verificado"
+    }
+  },
   "versionCounter": 0
 }

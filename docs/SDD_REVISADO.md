@@ -108,7 +108,7 @@ python -m ps4store check dist/X.gssource
 | 0 | REVIEW + SDD 1.1 | aprovado pelo usuário ✅ |
 | 1 | gerador, validador, CLI, testes, fixtures T2/T3 | `pytest` verde; build reproduzível; `check` OK |
 | 2 | teste no PS4 (`docs/TESTE_PS4.md`, T7) | importação e busca comprovadas; **instalação com identidade compatível ainda pendente** (`docs/VALIDACAO_E2E.md`) |
-| 3 | 1 adaptador autorizado + links + relatório | **MVP implementado** (`docs/GATE3.md`): API de Releases do GitHub; entrada nova detectada sem cadastro de URL (feed simulado + API real vazia); link inválido não publicado. Pendente: fonte ao vivo com publicação e T8 |
+| 3 | 1 adaptador autorizado + links + relatório | **Descoberta real comprovada** (`docs/GATE3.md`): PKG-Zone, 191 releases descobertas/verificadas sem cadastro; fases DESCOBERTO/VERIFICADO/PUBLICÁVEL; **0 publicáveis** (autorização por app ausente; IDs CUSA da fonte são apps comerciais). Pendente: T8, autorizações, conector GitHub fora desta sessão |
 | 4 | Actions + hospedagem + rollback | HTTPS comprovado no SSPI ou USB oficial |
 | 5 | RAR multipartes | ciclo comprovado com fixture pequena |
 | 6 | UI própria | fora do MVP |

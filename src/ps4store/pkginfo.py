@@ -8,7 +8,8 @@ from dataclasses import dataclass
 MAGIC = b"\x7fCNT"
 SFO_ENTRY_ID = 0x1000
 CONTENT_ID_RE = re.compile(r"^[A-Z]{2}[0-9]{4}-([A-Z]{4}[0-9]{5})_[0-9]{2}-[A-Z0-9_-]{16}$")
-KIND_BY_CATEGORY = {"gd": "base", "gp": "update", "ac": "dlc"}
+# gde: categoria observada em apps homebrew reais do PKG-Zone (CUSA02012); tratada como app base (não testada no console)
+KIND_BY_CATEGORY = {"gd": "base", "gde": "base", "gp": "update", "ac": "dlc"}
 
 
 class PkgError(ValueError):

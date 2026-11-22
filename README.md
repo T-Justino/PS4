@@ -9,7 +9,7 @@ Catálogo pesquisável para o SSPI (PS4), com prioridade para PT-BR. Gera arquiv
 ```bash
 PYTHONPATH=src python3 -m ps4store run     # descobre → verifica links (Range) → gera dist/auto/ps4storebr-auto.gssource + relatório
 ```
-Detalhes, fonte escolhida e evidências em `docs/GATE3.md`.
+Fonte real: PKG-Zone (catálogo JSON público). Resultado, bloqueio de autorização e opções em `docs/GATE3.md`.
 
 ## Uso
 

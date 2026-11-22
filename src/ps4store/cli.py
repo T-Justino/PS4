@@ -84,14 +84,15 @@ def cmd_run(a, net=None) -> int:
     out_dir = Path(a.out_dir)
     res = run(cfg, net, out_gssource=out_dir / "ps4storebr-auto.gssource",
               out_canonical=Path(a.canonical), out_report=out_dir / "discovery.report.json",
-              state_path=Path(a.state), dry_run=a.dry_run)
+              state_path=Path(a.state), dry_run=a.dry_run, recheck=a.recheck)
     c = res.report["counts"]
     for s in res.report["sources"]:
         print(f"fonte {s['source']} ({s['repo']}): {s['status']}" + (f" — {s['error']}" if s.get("error") else ""))
     print(f"descobertos={c['descobertos']} acessíveis={c['acessiveis']} pkg_verificados={c['pkgVerificados']} "
           f"compatíveis={c['compativeisSspi']} publicados={c['publicados']} novos={c['novos']} rejeitados={c['rejeitados']}")
+    print("fases: " + " · ".join(f"{k}={v}" for k, v in c["fases"].items()))
     for e in res.report["entries"]:
-        print(f"  {'NOVO ' if e['isNew'] else '     '}{e['stage']:<16} {e['asset']} ({e['release']})"
+        print(f"  {'NOVO ' if e['isNew'] else '     '}{e['fase']:<10} {e['stage']:<16} {e['asset']} ({e['release']})"
               + (f" → rejeitado {e['reason']}: {e['detail']}" if e["rejected"] else f" → {e['titleId']}"))
     if res.wrote_catalog:
         print(f"catálogo atualizado: {res.report['artifact']['path']} v{res.report['artifact']['version']}" + (" [dry-run: nada foi gravado]" if a.dry_run else ""))
@@ -120,6 +121,7 @@ def main(argv: list[str] | None = None, *, net=None) -> int:
     r.add_argument("--out-dir", default="dist/auto")
     r.add_argument("--canonical", default="data/generated/auto-catalog.json")
     r.add_argument("--state", default="data/state/discovery-state.json")
+    r.add_argument("--recheck", action="store_true", help="ignora o cache de verificação e sonda tudo de novo")
     r.add_argument("--dry-run", action="store_true", help="não grava nada (estado, catálogo, relatório)")
     r.set_defaults(func=lambda a: cmd_run(a, net))
     a = ap.parse_args(argv)

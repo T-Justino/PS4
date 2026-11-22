@@ -35,6 +35,17 @@
         "basis": "official-developer-release",
         "evidence": "Releases publicas do autor (bucanero/apollo-ps4, GPL-3.0). Listar o link oficial; nenhum arquivo e hospedado aqui."
       }
+    },
+    {
+      "id": "pkg-zone",
+      "type": "pkg-zone-catalog",
+      "base_url": "https://pkg-zone.com",
+      "enabled": true,
+      "delay_seconds": 0.5,
+      "max_probes": 250,
+      "recheck_hours": 168,
+      "authorization": null,
+      "_nota": "Sem autorizacao registrada: itens sao descobertos e verificados, mas NAO publicados. Os Termos do PKG-Zone nao concedem permissao de listagem a terceiros (docs/GATE3.md). Para publicar, preencha authorization com basis=written-permission e a evidencia."
     }
   ]
 }

@@ -11,10 +11,11 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 from . import sspi
 from .build import compile_catalog, write_atomic, zip_files
@@ -46,6 +47,25 @@ class Source:
     auth_basis: str
     auth_evidence: str
     api_base: str = "https://api.github.com"
+    base_url: str = ""             # pkg-zone-catalog
+    delay_seconds: float = 0.0     # pausa entre sondagens (educação com a fonte)
+    max_probes: int = 250          # teto de sondagens por execução (o resto fica para a próxima)
+    recheck_hours: float = 0.0     # 0 = sem cache; reaproveita a verificação por este tempo (evita repetir downloads parciais)
+
+    authorized_titles: dict = field(default_factory=dict)   # titleId -> {basis, evidence}: autorização POR ITEM
+
+    def auth_for(self, title_id: str | None) -> tuple[str, str] | None:
+        """Autorização que vale para este título: a do item (se houver) ou a da fonte inteira. Nunca presumida."""
+        a = self.authorized_titles.get(title_id or "")
+        if a:
+            return a["basis"], a["evidence"]
+        if self.auth_basis in AUTH_BASES and self.auth_evidence:
+            return self.auth_basis, self.auth_evidence
+        return None
+
+    @property
+    def authorized(self) -> bool:
+        return self.auth_for(None) is not None
 
 
 @dataclass
@@ -79,16 +99,30 @@ def load_config(path: str | Path) -> Config:
         if not re.match(r"^[a-z0-9][a-z0-9-]{0,62}$", sid) or sid in seen:
             errs.append(f"{w}: id inválido ou duplicado")
         seen.add(sid)
-        if s.get("type") != "github-releases":
-            errs.append(f"{w}: type deve ser github-releases")
-        if not REPO_RE.match(s.get("repo") or ""):
+        typ = s.get("type")
+        if typ not in ("github-releases", "pkg-zone-catalog"):
+            errs.append(f"{w}: type deve ser github-releases ou pkg-zone-catalog")
+        if typ == "github-releases" and not REPO_RE.match(s.get("repo") or ""):
             errs.append(f"{w}: repo deve ser dono/nome")
-        a = s.get("authorization") or {}
-        if a.get("basis") not in AUTH_BASES or not a.get("evidence"):
-            errs.append(f"{w}: authorization.basis ∈ {AUTH_BASES} e evidence são obrigatórios (sem autorização, a fonte não entra)")
-        srcs.append(Source(sid, s.get("type", ""), s.get("repo", ""), s.get("enabled", True) is True,
+        base = s.get("base_url") or ""
+        if typ == "pkg-zone-catalog" and not re.match(r"^https://[a-z0-9.-]+$", base):
+            errs.append(f"{w}: base_url deve ser https://host")
+        a = s.get("authorization")
+        if a is None:
+            a = {}                                   # sem autorização: descobre e verifica, mas NUNCA publica
+        elif a.get("basis") not in AUTH_BASES or not a.get("evidence"):
+            errs.append(f"{w}: authorization (se presente) exige basis ∈ {AUTH_BASES} e evidence; use null se não houver")
+        at: dict = {}
+        for tid, aa in (s.get("authorized_titles") or {}).items():
+            if not sspi.TITLE_ID_RE.match(tid) or not isinstance(aa, dict) or aa.get("basis") not in AUTH_BASES or not aa.get("evidence"):
+                errs.append(f"{w}: authorized_titles[{tid}] exige ID válido, basis ∈ {AUTH_BASES} e evidence")
+            else:
+                at[tid] = {"basis": aa["basis"], "evidence": aa["evidence"]}
+        srcs.append(Source(sid, typ or "", s.get("repo", ""), s.get("enabled", True) is True,
                            s.get("include_prereleases") is True, int(s.get("max_releases", 20)),
-                           a.get("basis", ""), a.get("evidence", ""), s.get("api_base", "https://api.github.com")))
+                           a.get("basis", ""), a.get("evidence", ""), s.get("api_base", "https://api.github.com"),
+                           base, float(s.get("delay_seconds", 0)), int(s.get("max_probes", 250)),
+                           float(s.get("recheck_hours", 0)), at))
     if not srcs:
         errs.append("nenhuma fonte configurada")
     if errs:
@@ -109,6 +143,43 @@ class Found:
     asset_name: str
     url: str
     size: int | None
+    name_hint: str | None = None      # nome do catálogo da fonte (mais legível que o TITLE do PKG)
+    skip_reason: str | None = None    # descoberto, mas não vale sondar (ex.: PS5)
+    meta: dict = field(default_factory=dict)
+
+
+def discover_pkgzone(src: Source, net) -> list[Found]:
+    """Lê o catálogo JSON público do PKG-Zone (o mesmo que o site carrega ao abrir): 1 requisição por execução.
+
+    Só releases ativas. A URL guardada é o link ESTÁVEL `/download/{console}/{titleId}/{versão}`; o redirect para a URL
+    assinada (que expira) nunca é gravado.
+    """
+    doc = net.get_json(f"{src.base_url}/api/v1/catalog")
+    items = doc.get("items") if isinstance(doc, dict) else None
+    if not isinstance(items, list):
+        raise ValueError("catálogo do PKG-Zone sem 'items'")
+    found: list[Found] = []
+    for it in items:
+        if not isinstance(it, dict) or not isinstance(it.get("titleId"), str):
+            continue
+        for r in it.get("releases") or []:
+            if not isinstance(r, dict) or r.get("active") is not True:
+                continue
+            console, ver = str(r.get("console") or ""), str(r.get("version") or "")
+            if not console or not ver:
+                continue
+            tid = it["titleId"].upper()
+            url = f"{src.base_url}/download/{quote(console)}/{quote(tid)}/{quote(ver, safe='')}"
+            size = r.get("size")
+            found.append(Found(
+                f"{src.id}#{tid}#{console}#{ver}#{r.get('date') or ''}", src, ver, f"{src.base_url}/",
+                str(r.get("date") or ""), f"{tid}_{console}_v{ver}.pkg", url,
+                size if isinstance(size, int) and not isinstance(size, bool) else None,
+                name_hint=str(it.get("name") or "")[:200] or None,
+                skip_reason=None if console == "ps4" else "NOT_PS4",
+                meta={"catalogTitleId": tid, "console": console, "author": it.get("author"),
+                      "category": it.get("category"), "firmware": r.get("pv")}))
+    return found
 
 
 def discover_github(src: Source, net) -> list[Found]:
@@ -153,26 +224,65 @@ class Entry:
     is_new: bool = False
     warnings: list[str] = field(default_factory=list)
 
+    @property
+    def phase(self) -> str:
+        """DESCOBERTO (achado na fonte) → VERIFICADO (URL e metadados examinados) → PUBLICAVEL (autorizado e compatível)."""
+        if self.stage == "publicado":
+            return "PUBLICAVEL"
+        return "VERIFICADO" if self.stage in ("pkg_verificado", "compativel_sspi") else "DESCOBERTO"
+
+    def to_cache(self, now: str) -> dict:
+        return {"checkedAt": now, "stage": self.stage, "reason": self.reason, "detail": self.detail,
+                "titleId": self.title_id, "contentId": self.content_id, "name": self.name, "kind": self.kind,
+                "version": self.version, "totalSize": self.total_size, "finalHost": self.final_host,
+                "warnings": self.warnings}
+
+    def load_cache(self, c: dict) -> "Entry":
+        self.stage, self.reason, self.detail = c["stage"], c["reason"], c["detail"]
+        self.title_id, self.content_id, self.name, self.kind = c["titleId"], c["contentId"], c["name"], c["kind"]
+        self.version, self.total_size, self.final_host = c["version"], c["totalSize"], c["finalHost"]
+        self.warnings = list(c["warnings"]) + ["resultado reaproveitado do cache (não sondado nesta execução)"]
+        return self
+
     def reject(self, reason: str, detail: str = "") -> "Entry":
         self.reason, self.detail = reason, detail
         return self
 
     def to_dict(self) -> dict:
         f = self.found
-        return {"key": f.key, "source": f.source.id, "release": f.tag, "asset": f.asset_name, "url": f.url,
+        return {"key": f.key, "fase": self.phase, "source": f.source.id, "release": f.tag, "asset": f.asset_name, "url": f.url,
                 "sizeFeed": f.size, "stage": self.stage, "rejected": self.reason is not None,
                 "reason": self.reason, "detail": self.detail, "titleId": self.title_id, "contentId": self.content_id,
                 "name": self.name, "kind": self.kind, "version": self.version, "sizeVerified": self.total_size,
-                "downloadHost": urlsplit(f.url).hostname, "isNew": self.is_new, "warnings": self.warnings}
+                "downloadHost": urlsplit(f.url).hostname, "finalHost": self.final_host,
+                "isNew": self.is_new, "meta": f.meta, "warnings": self.warnings}
+
+
+def _policy(e: Entry, cfg: Config) -> Entry:
+    """Reavalia TLS e autorização sobre um resultado já verificado (cache), pois a política muda sem nova sondagem."""
+    if e.stage not in ("compativel_sspi", "publicado"):
+        return e
+    e.stage, e.reason, e.detail = "compativel_sspi", None, ""
+    host = urlsplit(e.found.url).hostname or ""
+    if cfg.tls_enforce and host in cfg.tls_known_bad:
+        return e.reject("TLS_HOST_BLOCKED", f"{host}: {cfg.tls_known_bad[host]}")
+    if e.found.source.auth_for(e.title_id) is None:
+        return e.reject("NO_AUTHORIZATION", f"nem a fonte '{e.found.source.id}' nem o título {e.title_id} têm autorização de listagem registrada (config/sources.json)")
+    e.stage = "publicado"
+    return e
 
 
 def verify(found: Found, net, cfg: Config) -> Entry:
     e = Entry(found)
+    if found.skip_reason:
+        return e.reject(found.skip_reason, f"{found.meta.get('console')}: fora do alvo (PS4); não sondado")
     # 1) acessível? (uma requisição Range de 64 KiB; nunca o pacote inteiro)
     pr = net.probe(found.url, HEAD_BYTES)
     if not pr.ok:
         return e.reject("UNREACHABLE", pr.error or f"HTTP {pr.status}")
     e.final_host = urlsplit(pr.final_url).hostname
+    if e.final_host != urlsplit(found.url).hostname:
+        e.warnings.append(f"o link redireciona para {e.final_host} (URL assinada que expira): comportamento do SSPI nesse redirect não testado")
     if pr.content_type and pr.content_type.startswith("text/"):
         return e.reject("NOT_FILE", f"content-type {pr.content_type}")
     if pr.total_size is not None and found.size is not None and pr.total_size != found.size:
@@ -184,13 +294,16 @@ def verify(found: Found, net, cfg: Config) -> Entry:
         head = parse_head(pr.head)
     except PkgError as ex:
         return e.reject(ex.code, str(ex))
-    e.content_id, e.name, e.kind = head.content_id, head.sfo.get("TITLE"), head.kind
+    e.content_id, e.name, e.kind = head.content_id, found.name_hint or head.sfo.get("TITLE"), head.kind
     e.version = head.sfo.get("APP_VER") or head.sfo.get("VERSION")
     if head.sfo.get("TITLE_ID") != head.title_id:
         return e.reject("IDENTITY_MISMATCH", f"param.sfo TITLE_ID={head.sfo.get('TITLE_ID')} ≠ Content ID ({head.title_id})")
     if head.sfo.get("CONTENT_ID") not in (None, head.content_id):
         return e.reject("IDENTITY_MISMATCH", "CONTENT_ID do param.sfo ≠ cabeçalho do PKG")
     e.title_id = head.title_id
+    cat_id = found.meta.get("catalogTitleId")
+    if cat_id and cat_id != head.title_id:
+        e.warnings.append(f"o catálogo da fonte declara {cat_id}, mas o PKG é {head.title_id}: vale o ID lido do PKG")
     e.stage = "pkg_verificado"
     # 3) regras do SSPI (importação já comprovada só para CUSA; NPXS/APOL recusados; instalação ainda não comprovada)
     if not sspi.TITLE_ID_RE.match(head.title_id):
@@ -210,7 +323,9 @@ def verify(found: Found, net, cfg: Config) -> Entry:
     host = urlsplit(found.url).hostname or ""
     if cfg.tls_enforce and host in cfg.tls_known_bad:
         return e.reject("TLS_HOST_BLOCKED", f"{host}: {cfg.tls_known_bad[host]}")
-    # autorização vem da allowlist da fonte (validada no load_config)
+    # 5) autorização: só a da fonte (allowlist); sem ela o item fica VERIFICADO, nunca PUBLICAVEL
+    if found.source.auth_for(e.title_id) is None:
+        return e.reject("NO_AUTHORIZATION", f"nem a fonte '{found.source.id}' nem o título {e.title_id} têm autorização de listagem registrada (config/sources.json)")
     e.stage = "publicado"
     return e
 
@@ -240,7 +355,7 @@ def build_canonical(cfg: Config, published: list[Entry], version: str) -> dict:
             "id": _row_id(e), "kind": "base", "accessType": "Direct", "url": f.url,
             "hoster": (urlsplit(f.url).hostname or "")[:200], "label": f"{f.source.id} {f.tag}".strip()[:200],
             "sourcePageUrl": f.release_url or None, "version": ver, "contentId": e.content_id, "size": e.total_size,
-            "authorization": {"basis": f.source.auth_basis, "evidence": f.source.auth_evidence}})
+            "authorization": dict(zip(("basis", "evidence"), f.source.auth_for(e.title_id)))})
     return {"schema": "ps4storebr.catalog/v1",
             "source": {"id": cfg.catalog_id, "name": cfg.catalog_name, "description": cfg.catalog_description[:500],
                        "version": version},
@@ -270,8 +385,16 @@ def _load_state(path: Path) -> dict:
     return {"schema": STATE_SCHEMA, "versionCounter": 0, "catalogHash": "", "seen": {}}
 
 
+def _age_hours(a: str, b: str) -> float:
+    fmt = "%Y-%m-%dT%H:%M:%SZ"
+    return (datetime.strptime(b, fmt) - datetime.strptime(a, fmt)).total_seconds() / 3600
+
+
+CONNECTORS = {"github-releases": discover_github, "pkg-zone-catalog": discover_pkgzone}
+
+
 def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report: Path, state_path: Path,
-        dry_run: bool = False, now: str | None = None) -> RunResult:
+        dry_run: bool = False, now: str | None = None, recheck: bool = False, sleep=time.sleep) -> RunResult:
     now = now or _now()
     state = _load_state(state_path)
     entries: list[Entry] = []
@@ -281,13 +404,30 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
             source_status.append({"source": src.id, "repo": src.repo, "status": "desativada"})
             continue
         try:
-            found = discover_github(src, net)
+            found = CONNECTORS[src.type](src, net)
         except Exception as ex:                      # uma fonte fora do ar não derruba as demais
             source_status.append({"source": src.id, "repo": src.repo, "status": "erro", "error": str(ex)})
             continue
         source_status.append({"source": src.id, "repo": src.repo, "status": "ok", "discovered": len(found)})
+        probes = 0
         for f in found:
-            e = verify(f, net, cfg)
+            seen = state["seen"].get(f.key) or {}
+            cached = seen.get("check")
+            if (cached and not recheck and cached["reason"] != "UNREACHABLE"
+                    and _age_hours(cached["checkedAt"], now) < src.recheck_hours):
+                e = Entry(f).load_cache(cached)
+                # a política (TLS/autorização) é reavaliada a cada execução, mesmo com cache
+                if e.reason in ("TLS_HOST_BLOCKED", "NO_AUTHORIZATION") or e.stage == "publicado":
+                    e = _policy(e, cfg)
+            elif f.skip_reason:
+                e = verify(f, net, cfg)                       # sem rede
+            elif probes >= src.max_probes:
+                e = Entry(f).reject("PROBE_BUDGET", f"teto de {src.max_probes} sondagens por execução; fica para a próxima")
+            else:
+                if probes and src.delay_seconds:
+                    sleep(src.delay_seconds)
+                probes += 1
+                e = verify(f, net, cfg)
             e.is_new = f.key not in state["seen"]
             entries.append(e)
 
@@ -321,7 +461,10 @@ def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report
         report["artifact"] = artifact
     if not dry_run:
         for e in entries:
-            state["seen"].setdefault(e.found.key, {"firstSeen": now})["lastStage"] = e.stage
+            rec = state["seen"].setdefault(e.found.key, {"firstSeen": now})
+            rec["lastStage"] = e.stage
+            if e.reason not in ("PROBE_BUDGET",) and not any("cache" in w for w in e.warnings):
+                rec["check"] = e.to_cache(now)
         write_atomic(state_path, (json.dumps(state, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode())
         write_atomic(out_report, (json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode())
         write_atomic(out_report.with_suffix(".md"), render_markdown(report).encode())
@@ -339,7 +482,9 @@ def build_report(cfg, now, source_status, entries, wrote, compile_error, canonic
             "sources": source_status,
             "counts": {"descobertos": len(entries), "acessiveis": reached("acessivel"),
                        "pkgVerificados": reached("pkg_verificado"), "compativeisSspi": reached("compativel_sspi"),
-                       "publicados": reached("publicado"), "novos": sum(1 for e in entries if e.is_new),
+                       "publicados": reached("publicado"),
+                       "fases": {ph: sum(1 for e in entries if e.phase == ph) for ph in ("DESCOBERTO", "VERIFICADO", "PUBLICAVEL")},
+                       "novos": sum(1 for e in entries if e.is_new),
                        "rejeitados": sum(1 for e in entries if e.reason), "motivos": reasons},
             "catalogUpdated": wrote, "catalogError": compile_error,
             "entries": [e.to_dict() for e in entries]}
@@ -358,8 +503,8 @@ def render_markdown(r: dict) -> str:
     if r.get("artifact"):
         a = r["artifact"]
         L.append(f"Artefato: `{a['path']}` v{a['version']} · títulos: {', '.join(a['titles'])} · contentSha256 `{a['contentSha256'][:16]}…`")
-    L += ["", "## Entradas", "", "| Novo | Estágio | Resultado | Título | Arquivo | Detalhe |", "|---|---|---|---|---|---|"]
+    L += ["", "## Entradas", "", "| Novo | Fase | Estágio | Resultado | Título | Arquivo | Detalhe |", "|---|---|---|---|---|---|---|"]
     for e in r["entries"]:
         res = "**publicado**" if not e["rejected"] else f"rejeitado: `{e['reason']}`"
-        L.append(f"| {'sim' if e['isNew'] else ''} | {e['stage']} | {res} | {e['titleId'] or ''} | {e['asset']} ({e['release']}) | {e['detail']} |")
+        L.append(f"| {'sim' if e['isNew'] else ''} | {e['fase']} | {e['stage']} | {res} | {e['titleId'] or ''} | {e['asset']} ({e['release']}) | {e['detail']} |")
     return "\n".join(L) + "\n"
