@@ -207,3 +207,50 @@ def test_erros_claros(tmp_path, capsys):
 
     assert main(["--atualizar", "--cache", str(tmp_path / "c.json"), "--indice", str(tmp_path / "i.json"), "--pausa", "0"], fetch=quebra) == 1
     assert not (tmp_path / "i.json").exists()                                                               # falha de rede não cria índice vazio
+
+
+# ---------- teste rápido (--testar): não grava nada ----------
+def fetch_testar(url):
+    q = urllib.parse.unquote(urllib.parse.urlsplit(url).query.split("query=", 1)[1])
+    if "COUNT(DISTINCT" in q:
+        return json.dumps({"results": {"bindings": [{"n": {"type": "literal", "value": "1234"}}]}}).encode()
+    assert 'CONTAINS(LCASE(?l), "batman")' in q
+    return json.dumps({"results": {"bindings": [x for x in SIM if "Batman" in json.dumps(x)]}}).encode()
+
+
+def test_testar_lista_do_servico_sem_gravar_nada(tmp_path, capsys):
+    idx, cache = tmp_path / "idx.json", tmp_path / "cache.json"
+    rc = main(["--testar", "--cache", str(cache), "--indice", str(idx)], fetch=fetch_testar)
+    out = capsys.readouterr().out
+    assert rc == 0 and "(contagem do serviço): 1234" in out and "Batman: Arkham Knight" in out and "LEGO Batman: The Videogame" in out
+    assert "Nada foi gravado" in out and "não indicam PKG" in out and not idx.exists() and not cache.exists()
+
+
+def test_testar_com_termo_e_contagem_ausente_nao_inventa_numero(capsys):
+    def f(url):
+        q = urllib.parse.unquote(urllib.parse.urlsplit(url).query.split("query=", 1)[1])
+        assert 'CONTAINS(LCASE(?l), "spider-man")' in q or "COUNT(DISTINCT" in q
+        return json.dumps({"results": {"bindings": []}}).encode()
+
+    assert main(["--testar", "Spider-Man"], fetch=f) == 0
+    out = capsys.readouterr().out
+    assert "não obtida" in out and 'Com "Spider-Man" no nome: 0' in out
+
+
+def test_termo_do_teste_nao_injeta_sparql():
+    q = wikidata.consulta_nome('x") } DELETE { ?s ?p ?o } #\\ "y')
+    lit = q.split('CONTAINS(LCASE(?l), "')[1].split('")')[0]                 # o que vai dentro do literal
+    assert not any(c in lit for c in '"\\{}#()?') and lit == "x delete s p o y"
+    assert q.count("{") == q.count("}")                                      # estrutura da consulta intacta
+    assert wikidata._literal("Pokémon: Café-Mix!") == "pokémon: café-mix!"
+
+
+def test_testar_nao_combina_com_atualizar(capsys):
+    assert main(["--testar", "--atualizar"]) == 2
+
+
+def test_testar_erro_de_rede_e_claro(capsys):
+    def quebra(url):
+        raise urllib.error.URLError("sem rede")
+
+    assert main(["--testar"], fetch=quebra) == 1 and "URLError" in capsys.readouterr().err

@@ -46,6 +46,47 @@ def consulta(limite: int, deslocamento: int) -> str:
 }} GROUP BY ?g ?label_en ?label_pt ?enwiki ?ptwiki ORDER BY ?g"""
 
 
+def _literal(termo: str) -> str:
+    """Termo livre -> texto seguro para literal SPARQL: só letras, dígitos, espaço e pontuação simples; sem aspas nem barra invertida."""
+    t = re.sub(r"[^\w\s:'\-.&!]", " ", str(termo), flags=re.UNICODE)
+    return re.sub(r"\s+", " ", t).strip().casefold()[:60]
+
+
+def consulta_contagem() -> str:
+    return f"SELECT (COUNT(DISTINCT ?g) AS ?n) WHERE {{ ?g wdt:P31/wdt:P279* wd:{Q_VIDEO_GAME} ; wdt:P400 wd:{Q_PLAYSTATION_4} . }}"
+
+
+def consulta_nome(termo: str, limite: int = 100) -> str:
+    """Jogos de PS4 cujo rótulo en/pt contém o termo (teste rápido: não serve para importar tudo). Mesmas colunas de consulta()."""
+    t = _literal(termo)
+    return f"""SELECT ?g ?label_en ?label_pt ?enwiki ?ptwiki (MIN(?d) AS ?data) WHERE {{
+  {{ SELECT DISTINCT ?g WHERE {{ ?g wdt:P31/wdt:P279* wd:{Q_VIDEO_GAME} ; wdt:P400 wd:{Q_PLAYSTATION_4} ; rdfs:label ?l .
+      FILTER(LANG(?l) IN ("en", "pt") && CONTAINS(LCASE(?l), "{t}")) }} LIMIT {int(limite)} }}
+  OPTIONAL {{ ?g rdfs:label ?label_en . FILTER(LANG(?label_en) = "en") }}
+  OPTIONAL {{ ?g rdfs:label ?label_pt . FILTER(LANG(?label_pt) = "pt") }}
+  OPTIONAL {{ ?enwiki schema:about ?g ; schema:isPartOf <https://en.wikipedia.org/> . }}
+  OPTIONAL {{ ?ptwiki schema:about ?g ; schema:isPartOf <https://pt.wikipedia.org/> . }}
+  OPTIONAL {{ ?g wdt:P577 ?d . }}
+}} GROUP BY ?g ?label_en ?label_pt ?enwiki ?ptwiki ORDER BY ?g"""
+
+
+def url_consulta(q: str) -> str:
+    return ENDPOINT + "?format=json&query=" + urllib.parse.quote(q)
+
+
+def testar(fetch, termo: str = "batman") -> dict:
+    """Teste de conexão SEM gravar nada: conta os jogos de PS4 e lista os que contêm o termo. Devolve só o que o serviço respondeu."""
+    n = None
+    try:
+        c = json.loads(fetch(url_consulta(consulta_contagem())))["results"]["bindings"]
+        n = int(c[0]["n"]["value"]) if c else None
+    except (KeyError, IndexError, ValueError, TypeError):
+        n = None
+    bind = json.loads(fetch(url_consulta(consulta_nome(termo))))["results"]["bindings"]
+    itens, est = para_itens(bind)
+    return {"total": n, "termo": termo, "itens": itens, "estatisticas": est}
+
+
 def url_pagina(limite: int, deslocamento: int) -> str:
     return ENDPOINT + "?format=json&query=" + urllib.parse.quote(consulta(limite, deslocamento))
 
@@ -177,6 +218,7 @@ def main(argv=None, fetch=None) -> int:
     ap = argparse.ArgumentParser(prog="python -m ps4store.wikidata", description="importa metadados CC0 de jogos de PS4 do Wikidata para o índice de busca")
     ap.add_argument("--atualizar", action="store_true", help="consulta o Wikidata (precisa de internet) e reconstrói o índice")
     ap.add_argument("--offline", action="store_true", help="reconstrói o índice só a partir do cache local (sem rede)")
+    ap.add_argument("--testar", nargs="?", const="batman", metavar="TERMO", help="teste rápido de conexão (2 consultas pequenas, não grava nada): conta jogos de PS4 e lista os que contêm TERMO (padrão: batman)")
     ap.add_argument("--cache", default=CACHE_PADRAO)
     ap.add_argument("--indice", default=busca.INDICE_PADRAO)
     ap.add_argument("--fontes", default=busca.FONTES_PADRAO)
@@ -185,8 +227,23 @@ def main(argv=None, fetch=None) -> int:
     ap.add_argument("--max-paginas", type=int, default=40)
     ap.add_argument("--pausa", type=float, default=1.0, help="segundos entre páginas")
     a = ap.parse_args(argv)
+    if a.testar is not None:
+        if a.atualizar or a.offline:
+            print("ERRO  --testar não se combina com --atualizar/--offline", file=sys.stderr)
+            return 2
+        try:
+            r = testar(fetch or (lambda u: fetch_http(u, a.user_agent)), a.testar)
+        except (OSError, ValueError, KeyError, urllib.error.URLError) as e:
+            print(f"ERRO  {type(e).__name__}: {str(e)[:200]}", file=sys.stderr)
+            return 1
+        print(f"Wikidata respondeu. Jogos de PS4 no Wikidata (contagem do serviço): {r['total'] if r['total'] is not None else 'não obtida'}")
+        print(f"Com \"{r['termo']}\" no nome: {len(r['itens'])} (sem rótulo en/pt: {r['estatisticas']['semRotulo']})")
+        for it in r["itens"][:30]:
+            print(f"  {it['nome']}" + (f" ({it['lancamento']})" if it.get("lancamento") else "") + f"\n    {it['url']}   [{it['idFonte']}]")
+        print("Nada foi gravado. Se a lista parece certa, rode --atualizar. São metadados: não indicam PKG ou download.")
+        return 0
     if a.atualizar == a.offline:
-        print("ERRO  use --atualizar (rede) ou --offline (cache local)", file=sys.stderr)
+        print("ERRO  use --atualizar (rede), --offline (cache local) ou --testar (teste rápido)", file=sys.stderr)
         return 2
     try:
         if a.atualizar:

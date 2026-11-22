@@ -14,9 +14,16 @@ Wikidata: dados estruturados em **CC0 1.0** (registrado em `config/busca-fontes.
 - **Campo ausente fica ausente:** item sem rótulo en/pt é descartado e contado; sem data não há ano; sem Wikipedia não há link da Wikipedia; sem rótulo pt não há alias. URL fora de `https://{en,pt}.wikipedia.org` é ignorada.
 
 ## Comandos (Termux)
+**Passo 0, teste rápido (2 consultas pequenas, não grava nada):** confirma que a API responde e que os identificadores estão certos antes da importação completa.
+```sh
+export WIKIDATA_USER_AGENT="MeuApp/1.0 (seu-contato@exemplo)"
+PYTHONPATH=src python -m ps4store.wikidata --testar batman
+```
+Mostra a contagem de jogos de PS4 do serviço e os jogos com "batman" no nome (nome, ano, URL, Q-id). Se a contagem for 0 ou absurda, os Q-ids/propriedades da consulta estão errados e **não** vale rodar `--atualizar`: me envie a saída.
+
 ```sh
 cd ~/PS4 && git pull
-# 1) atualizar o índice (precisa de internet; use o SEU contato no User-Agent, como o Wikimedia pede)
+# 1) atualizar o índice (completo; pode levar alguns minutos no celular) (precisa de internet; use o SEU contato no User-Agent, como o Wikimedia pede)
 export WIKIDATA_USER_AGENT="MeuApp/1.0 (seu-contato@exemplo)"
 PYTHONPATH=src python -m ps4store.wikidata --atualizar
 # 2) pesquisar (offline, só o nome)
