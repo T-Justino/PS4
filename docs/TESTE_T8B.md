@@ -1,3 +1,10 @@
+> ## RESULTADO (22/11/2026, relato do usuário; PS4 Pro 9.00, GoldHEN, SSPI 5.11.7 Final): **T8b APROVADO — Parte 1**
+>
+> Importou a fonte gerada pelo robô, baixou e instalou o PKG corrigido pelo SSPI e **abriu o app normalmente**. Tela exibida: "PS4 STORE BR TEST", "INSTALACAO OK",
+> "TITLE ID: CUSA95417", "VERSAO 1.00", "CONTENT ID: IV0000-CUSA95417_00-PS4STOREBRTEST00".
+> **Ressalva:** comprova o ciclo descoberta → catálogo → importação → download → instalação → execução **para este aplicativo próprio, neste console e nesta versão do SSPI**.
+> Não garante compatibilidade universal, nem jogos comerciais, nem outros hosts, atualizações ou DLC. Parte 2 (atualização da fonte): ver `docs/USO_NO_PS4.md`.
+
 # T8b — teste no PS4 do PKG corrigido, do catálogo gerado pelo robô e da atualização
 
 **Antes de tudo:** apague **só** o app defeituoso "PS4 Store BR Test" (Biblioteca → Opções → Excluir). Não toque em outros apps. Remova do SSPI as fontes de teste antigas (T4–T9).

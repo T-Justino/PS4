@@ -12,11 +12,11 @@
 | Link verificado, identidade do PKG validada | sim | **sim**: `Range` 64 KiB no `raw`; Content ID = `TITLE_ID` = `CUSA95417`; tamanho confere | — |
 | `.gssource` gerado sem cadastrar a URL; sem duplicar o ID | sim | **sim**: v1.0.2 (só v1.00) e v1.0.3 (só v1.01; v1.00 `SUPERSEDED`) | — |
 | Importar, achar, baixar | — | — | **T8 (22/11): sim** (importou, achou, 6,6/6,6 MB, "Installed") |
-| **Abrir o app** | — | — | **T8: NÃO** (defeito corrigido; **T8b pendente**) |
+| **Abrir o app** | — | — | T8 original: não; **T8b: SIM** (v1.00 corrigida, tela "INSTALACAO OK", 22/11/2026) |
 | Atualização da fonte | regras do SSPI lidas no código público | — | **pendente** (T8b, Parte 2) |
 | Automação agendada | workflow escrito; mesmo comando testado | — | **não executado no GitHub ainda** |
 
-**O MVP técnico NÃO está concluído** até o T8b abrir o app. Evidência antes/depois: `docs/evidencia/gate3-antes.report.md` e `gate3-depois.report.md`. Diagnóstico: `docs/DIAGNOSTICO_T8.md`.
+**Ciclo de instalação e execução comprovado para o app próprio (T8b). O MVP ainda depende da atualização por URL e do workflow agendado.** Evidência antes/depois: `docs/evidencia/gate3-antes.report.md` e `gate3-depois.report.md`. Diagnóstico: `docs/DIAGNOSTICO_T8.md`.
 Automação e atualização: `docs/AUTOMACAO_E_ATUALIZACAO.md`. Procedimento: `docs/TESTE_T8B.md`.
 
 ## Ciclo real anterior: descoberta → validação → catálogo (T8 original, defeituoso)

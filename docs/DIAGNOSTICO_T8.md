@@ -12,7 +12,7 @@
 | Cabeçalho do FSELF (`eboot.bin`) | magic/ver/flags/8 segmentos | `BREW00086` | equivalente |
 | **Conteúdo do PFS interno** | `eboot.bin`, `right.sprx`, `keystone` | `BREW00086`: **também `sce_module/libc.prx` e `sce_module/libSceFios2.prx`** | **DIFERENÇA** |
 
-## Causa mais provável (não confirmada no console)
+## Causa (CONFIRMADA no console em 22/11/2026: o PKG corrigido, com `sce_module`, instalou e abriu — T8b Parte 1)
 
 O PKG foi empacotado **sem `sce_module/libc.prx` e `sce_module/libSceFios2.prx`**. Apps OpenOrbis ligam com `-lc` e carregam a libc desses módulos empacotados; sem eles o PS4 instala
 (o container é válido) mas não consegue iniciar o app. Origem do erro: copiei só o `Makefile` do sample e a pasta `sce_module/` ficou vazia (o `.gitkeep` do repositório não traz os módulos; os samples do release sim).
@@ -26,5 +26,5 @@ Descartado por comparação: estrutura do PKG, `param.sfo`, cabeçalho do FSELF.
 ## Estado
 
 - PKG original (defeituoso) preservado em `dist/t8/` com aviso; **não** é monitorado nem publicado.
-- PKGs corrigidos: `pkgs/PS4StoreBRTest_CUSA95417_v1.00.pkg` e `..._v1.01.pkg`. **Funcionamento no console: não testado.** Procedimento: `docs/TESTE_T8B.md`.
+- PKG corrigido `pkgs/PS4StoreBRTest_CUSA95417_v1.00.pkg`: **aprovado no console** (T8b Parte 1). Os suspeitos listados abaixo ficam descartados para este caso.
 - Se o app ainda não abrir, os próximos suspeitos são o corpo do `eboot.bin`/dependência de módulo do sistema (`-lSceVideoOut`) ou o tratamento de ID `CUSA` como jogo comercial; não afirmo que a causa seja só a libc.
