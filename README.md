@@ -9,7 +9,7 @@ Catálogo pesquisável para o SSPI (PS4), com prioridade para PT-BR. Gera arquiv
 ```bash
 PYTHONPATH=src python3 -m ps4store run     # descobre → verifica links (Range) → gera dist/auto/ps4storebr-auto.gssource + relatório
 ```
-**Estado do MVP:** ciclo descoberta → catálogo → importação → download → instalação → execução **comprovado no PS4 Pro 9.00 para o app próprio** (T8b, 22/11/2026; o T8 original abria com erro por falta de `sce_module`, corrigido). Faltam a atualização por URL e o workflow agendado (`docs/USO_NO_PS4.md`). Não garante compatibilidade universal. Fontes reais: PKG-Zone (prova de descoberta; 0 publicáveis sem autorização) e pasta autorizada do próprio repositório (ciclo descoberta → catálogo gerado; instalação pendente do T8/T9). Ver `docs/GATE3.md`.
+**Estado do MVP:** ciclo descoberta → catálogo → importação → download → instalação → execução **comprovado no PS4 Pro 9.00 para o app próprio** (T8b, 22/11/2026; o T8 original abria com erro por falta de `sce_module`, corrigido). Workflow do GitHub Actions executado com sucesso (descobriu a v1.02 sozinho e atualizou a fonte para 1.0.4); falta provar no console a importação por URL e a atualização (T9, `docs/USO_NO_PS4.md`). Não garante compatibilidade universal. Fontes reais: PKG-Zone (prova de descoberta; 0 publicáveis sem autorização) e pasta autorizada do próprio repositório (ciclo descoberta → catálogo gerado; instalação pendente do T8/T9). Ver `docs/GATE3.md`.
 
 ## Uso
 

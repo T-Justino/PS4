@@ -13,8 +13,8 @@
 | `.gssource` gerado sem cadastrar a URL; sem duplicar o ID | sim | **sim**: v1.0.2 (só v1.00) e v1.0.3 (só v1.01; v1.00 `SUPERSEDED`) | — |
 | Importar, achar, baixar | — | — | **T8 (22/11): sim** (importou, achou, 6,6/6,6 MB, "Installed") |
 | **Abrir o app** | — | — | T8 original: não; **T8b: SIM** (v1.00 corrigida, tela "INSTALACAO OK", 22/11/2026) |
-| Atualização da fonte | regras do SSPI lidas no código público | — | **pendente** (T8b, Parte 2) |
-| Automação agendada | workflow escrito; mesmo comando testado | — | **não executado no GitHub ainda** |
+| Atualização da fonte | regras do SSPI lidas no código público | **sim**: o workflow publicou a fonte 1.0.4 (v1.02) e o link estável passou a servi-la em ≈4 min | **pendente** (T9, `docs/USO_NO_PS4.md`) |
+| Automação (Actions) | 113 testes no job | **sim, 2 execuções manuais com sucesso** (descobriu o v1.02 sozinho e commitou); disparo por `cron` ainda não observado | — |
 
 **Ciclo de instalação e execução comprovado para o app próprio (T8b). O MVP ainda depende da atualização por URL e do workflow agendado.** Evidência antes/depois: `docs/evidencia/gate3-antes.report.md` e `gate3-depois.report.md`. Diagnóstico: `docs/DIAGNOSTICO_T8.md`.
 Automação e atualização: `docs/AUTOMACAO_E_ATUALIZACAO.md`. Procedimento: `docs/TESTE_T8B.md`.

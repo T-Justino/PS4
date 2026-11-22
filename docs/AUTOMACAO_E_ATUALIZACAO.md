@@ -8,7 +8,10 @@
 - **Preserva o último catálogo válido:** sem entradas publicáveis, ou com **fonte crítica fora do ar** (`critical`, padrão `true`), o `.gssource` anterior é mantido e o job fica vermelho (código de saída 3). PKG-Zone e Apollo estão `critical: false` (só descoberta/relatório).
 - **Registra resultados e erros:** relatório completo no *Summary* do job; estado em `data/state/`.
 - **Carga no PKG-Zone:** o estado commitado guarda a verificação por 30 dias (`recheck_hours: 720`); só itens novos são sondados. Mesmo assim, defina antes se quer manter o PKG-Zone no agendado (permissão pendente, `docs/PKGZONE_PEDIDO.md`).
-- **Não executado ainda:** o workflow nunca rodou no GitHub (só aqui, com o mesmo comando). Primeira execução: *Run workflow*. O token do Actions dá acesso à API de repositórios de terceiros, o que esta sessão não tinha (conector Releases/Apollo).
+- **Executado no GitHub (disparo manual, 22/11/2026):** run `45035493735` (sucesso; achou 5 releases reais do `bucanero/apollo-ps4`, todas rejeitadas com `PREFIX_REJECTED_BY_SSPI`; só gravou o estado) e run `45035584333` (sucesso): **detectou sozinho o `pkgs/…_v1.02.pkg` recém-commitado, gerou a fonte 1.0.4 com uma única linha (v1.02; v1.00 e v1.01 `SUPERSEDED`) e commitou `catalogo: atualizacao automatica`**. Log em `docs/evidencia/actions-run-v1.02.txt`.
+  O token do Actions dá acesso à API de terceiros, que a sessão de desenvolvimento não tinha.
+- **Ainda não observado:** o disparo pelo **agendamento** (`cron`). Os dois runs foram manuais; o primeiro run agendado deve ocorrer nas próximas 6 h (o GitHub pode atrasar ou desativar agendamentos em repositórios inativos).
+- **Propagação:** o link `raw` demorou ≈4 min para servir a versão nova (cache de 5 min).
 - **Hospedagem:** o próprio repositório (`raw.githubusercontent.com`, download de 6,6 MB comprovado no seu console no T8). Link estável do catálogo:
   `https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/auto/ps4storebr-auto.gssource`
 

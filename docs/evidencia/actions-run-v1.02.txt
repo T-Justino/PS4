@@ -1,0 +1,14 @@
+Log do job (GitHub Actions, run 45035584333, disparo manual após commitar pkgs/..._v1.02.pkg; linhas de rejeição de itens não instaláveis omitidas)
+
+fonte own-releases (T-Justino/PS4): ok
+fonte own-contents (T-Justino/PS4): ok
+fonte apollo-releases (bucanero/apollo-ps4): ok
+fonte pkg-zone (): ok
+descobertos=199 acessíveis=192 pkg_verificados=188 compatíveis=22 publicados=1 novos=1 rejeitados=198
+fases: DESCOBERTO=11 · VERIFICADO=187 · PUBLICAVEL=1
+       VERIFICADO compativel_sspi  PS4StoreBRTest_CUSA95417_v1.00.pkg (fedfa66) → rejeitado SUPERSEDED: CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo
+       VERIFICADO compativel_sspi  PS4StoreBRTest_CUSA95417_v1.01.pkg (cac7d81) → rejeitado SUPERSEDED: CUSA95417: versão 1.02 (PS4StoreBRTest_CUSA95417_v1.02.pkg) é mais nova; só uma versão por ID entra no catálogo
+  NOVO PUBLICAVEL publicado        PS4StoreBRTest_CUSA95417_v1.02.pkg (9175adc) → CUSA95417
+       VERIFICADO pkg_verificado   APOL00004_ps4_v2.4.0.pkg (2.4.0) → rejeitado PREFIX_REJECTED_BY_SSPI: prefixo APOL recusado na importação (Gate 2)
+       VERIFICADO pkg_verificado   NPXS29129_ps4_v1.00.pkg (1.00) → rejeitado PREFIX_REJECTED_BY_SSPI: prefixo NPXS recusado na importação (Gate 2)
+catálogo atualizado: dist/auto/ps4storebr-auto.gssource v1.0.4

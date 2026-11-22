@@ -19,7 +19,7 @@
 2. Pesquise `ps4 store br test` ou `CUSA95417` → detalhes (versão 1.00) → baixe (6,6 MB) → instale.
 3. **Abra o app.** Esperado: tela verde "PS4 STORE BR TEST / INSTALACAO OK / VERSAO 1.00". Saia com o botão PS.
 
-## Parte 2 — atualização da fonte e do app (só se a Parte 1 abriu)
+## Parte 2 — atualização da fonte e do app (substituída pelo T9: `docs/USO_NO_PS4.md`)
 1. **Atualizar a fonte** (a pergunta do mecanismo): importe o arquivo da Parte 2 **por USB** ou, melhor, **por link** (mais próximo do uso real): na página do celular do SSPI (aba *Sources*) cole
    `https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/auto/ps4storebr-auto.gssource` → *Install source on PS4*.
    Anote: aceitou como versão nova? A lista de fontes mostra `1.0.3`? O item agora é v1.01?
