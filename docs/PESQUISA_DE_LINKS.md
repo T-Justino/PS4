@@ -17,7 +17,7 @@ PYTHONPATH=src python3 -m ps4store run --refresh-links 10   # descobre → valid
 `--refresh-links N` re-sonda até N itens em cache sem dados de link por execução (o workflow usa 10), então a cobertura cresce sem sondagem em massa. `--research-dir` muda a pasta local.
 
 ## O que cada link diz (`linkStatus` e `linkNotes`)
-`direto` · `redirect` (+ `temporaryRedirect` se a URL final é assinada/expira) · `pagina-intermediaria` (HTML: não automatizamos) · `exige-autenticacao` (401/403: **não tentamos contornar**) ·
+`direto` · `redirect` (+ `temporaryRedirect` se a URL final é assinada/expira) · `pagina-intermediaria` (HTML: não automatizamos) · `exige-autenticacao` (401) · `acesso-negado` (403: o servidor recusa; **não tentamos contornar** nem presumimos o motivo) ·
 `expirado` (403 numa URL assinada) · `removido` (404/410) · `erro-de-rede`/`erro-http`. Também `rangeOk`, `fileType` (`pkg`, `rar-multiparte`), tamanho verificado, ID e Content ID lidos **do próprio PKG**, `duplicateOf` (mesmo Content ID+versão+tamanho em outro lugar) e `sspiDownloadable`.
 
 ## Como o SSPI usa uma URL (lido no código público `transfer/gs_http.c`, `gs_xfer.c`; **ainda sem prova no console para redirects**)

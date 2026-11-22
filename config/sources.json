@@ -81,6 +81,24 @@
       "critical": false,
       "authorization": null,
       "_nota": "Conjunto RAR multiparte de TESTE feito do proprio PKG do projeto (v1.02). So pesquisa/teste de volumes; multiparte nao e publicavel em catalogo (Gate 5)."
+    },
+    {
+      "id": "gh-search",
+      "type": "github-search",
+      "queries": [
+        "topic:ps4-homebrew",
+        "topic:openorbis",
+        "topic:goldhen",
+        "topic:ps4 topic:pkg"
+      ],
+      "max_repos": 10,
+      "max_releases": 3,
+      "max_probes": 60,
+      "delay_seconds": 0.3,
+      "enabled": true,
+      "critical": false,
+      "authorization": null,
+      "_nota": "Busca generica na API publica de busca de repositorios do GitHub (consultas fixas). So DESCOBERTA: sem autorizacao registrada, nada e publicado."
     }
   ]
 }

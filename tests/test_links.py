@@ -35,7 +35,7 @@ def test_classify_direct_redirect_signed_and_range():
 
 @pytest.mark.parametrize("pr,kind", [
     (Probe(False, 404, "HTTP 404"), "removido"), (Probe(False, 410, "HTTP 410"), "removido"),
-    (Probe(False, 401, "HTTP 401"), "exige-autenticacao"), (Probe(False, 403, "HTTP 403"), "exige-autenticacao"),
+    (Probe(False, 401, "HTTP 401"), "exige-autenticacao"), (Probe(False, 403, "HTTP 403"), "acesso-negado"),
     (Probe(False, 403, "HTTP 403", signed=True), "expirado"), (Probe(False, None, "falha de rede"), "erro-de-rede"),
     (Probe(False, 500, "HTTP 500"), "erro-http"), (P(content_type="text/html"), "pagina-intermediaria")])
 def test_classify_failures(pr, kind):

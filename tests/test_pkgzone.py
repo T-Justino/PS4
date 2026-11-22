@@ -50,7 +50,7 @@ class Zone(FakeNet):
 
 
 def cfg_file(tmp_path, **src):
-    base = {"id": "pkg-zone", "type": "pkg-zone-catalog", "base_url": BASE, "authorization": None}
+    base = {"id": "pkg-zone", "type": "pkg-zone-catalog", "base_url": BASE, "authorization": None, "include_inactive": False}
     base.update(src)
     p = tmp_path / "s.json"
     p.write_text(json.dumps({"schema": "ps4storebr.sources/v1", "catalog": {"id": "t.auto", "name": "T"},

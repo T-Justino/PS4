@@ -51,8 +51,10 @@ def classify_link(pr) -> dict:
     notes: list[str] = []
     if not pr.ok:
         st = pr.status
-        if st in (401, 403):
-            kind = "expirado" if pr.signed else "exige-autenticacao"
+        if st == 401:
+            kind = "exige-autenticacao"
+        elif st == 403:
+            kind = "expirado" if pr.signed else "acesso-negado"      # o servidor recusa (versão desativada, bloqueio...): não presumimos o motivo
         elif st in (404, 410):
             kind = "removido"
         elif st is None:
