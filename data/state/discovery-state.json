@@ -2,6 +2,106 @@
   "catalogHash": "28e439f41649e61723cfa7336b5ca20dc25d2dabb6435c565519b024ddc295f4",
   "schema": "ps4storebr.discovery-state/v1",
   "seen": {
+    "apollo-releases#213764292#250718366": {
+      "check": {
+        "checkedAt": "2026-11-22T14:56:22Z",
+        "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
+        "detail": "prefixo APOL recusado na importação (Gate 2)",
+        "finalHost": "release-assets.githubusercontent.com",
+        "kind": "base",
+        "name": "Apollo Save Tool",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "stage": "pkg_verificado",
+        "titleId": "APOL00004",
+        "totalSize": 16384000,
+        "version": "02.20",
+        "warnings": [
+          "o link redireciona para release-assets.githubusercontent.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:56:22Z",
+      "lastStage": "pkg_verificado"
+    },
+    "apollo-releases#258999632#311606567": {
+      "check": {
+        "checkedAt": "2026-11-22T14:56:22Z",
+        "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
+        "detail": "prefixo APOL recusado na importação (Gate 2)",
+        "finalHost": "release-assets.githubusercontent.com",
+        "kind": "base",
+        "name": "Apollo Save Tool",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "stage": "pkg_verificado",
+        "titleId": "APOL00004",
+        "totalSize": 16842752,
+        "version": "02.24",
+        "warnings": [
+          "o link redireciona para release-assets.githubusercontent.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:56:22Z",
+      "lastStage": "pkg_verificado"
+    },
+    "apollo-releases#287360361#360177363": {
+      "check": {
+        "checkedAt": "2026-11-22T14:56:22Z",
+        "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
+        "detail": "prefixo APOL recusado na importação (Gate 2)",
+        "finalHost": "release-assets.githubusercontent.com",
+        "kind": "base",
+        "name": "Apollo Save Tool",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "stage": "pkg_verificado",
+        "titleId": "APOL00004",
+        "totalSize": 22675456,
+        "version": "02.30",
+        "warnings": [
+          "o link redireciona para release-assets.githubusercontent.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:56:22Z",
+      "lastStage": "pkg_verificado"
+    },
+    "apollo-releases#313201081#405334055": {
+      "check": {
+        "checkedAt": "2026-11-22T14:56:22Z",
+        "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
+        "detail": "prefixo APOL recusado na importação (Gate 2)",
+        "finalHost": "release-assets.githubusercontent.com",
+        "kind": "base",
+        "name": "Apollo Save Tool",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "stage": "pkg_verificado",
+        "titleId": "APOL00004",
+        "totalSize": 22675456,
+        "version": "02.32",
+        "warnings": [
+          "o link redireciona para release-assets.githubusercontent.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:56:22Z",
+      "lastStage": "pkg_verificado"
+    },
+    "apollo-releases#410919334#648516222": {
+      "check": {
+        "checkedAt": "2026-11-22T14:56:22Z",
+        "contentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
+        "detail": "prefixo APOL recusado na importação (Gate 2)",
+        "finalHost": "release-assets.githubusercontent.com",
+        "kind": "base",
+        "name": "Apollo Save Tool",
+        "reason": "PREFIX_REJECTED_BY_SSPI",
+        "stage": "pkg_verificado",
+        "titleId": "APOL00004",
+        "totalSize": 22806528,
+        "version": "02.40",
+        "warnings": [
+          "o link redireciona para release-assets.githubusercontent.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        ]
+      },
+      "firstSeen": "2026-11-22T14:56:22Z",
+      "lastStage": "pkg_verificado"
+    },
     "own-contents#47211795f25e46073e255b846e446d43ff761970": {
       "check": {
         "checkedAt": "2026-11-22T14:36:05Z",
@@ -24,7 +124,7 @@
     },
     "own-contents#cac7d81c05d22f17d7419743dfb36634cf693282": {
       "check": {
-        "checkedAt": "2026-11-22T14:46:17Z",
+        "checkedAt": "2026-11-22T14:56:22Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "",
         "finalHost": "raw.githubusercontent.com",
@@ -42,7 +142,7 @@
     },
     "own-contents#fedfa6645b2994d6aa90f9fd375c3da62713c9ee": {
       "check": {
-        "checkedAt": "2026-11-22T14:46:17Z",
+        "checkedAt": "2026-11-22T14:56:22Z",
         "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
         "detail": "CUSA95417: versão 1.01 (PS4StoreBRTest_CUSA95417_v1.01.pkg) é mais nova; só uma versão por ID entra no catálogo",
         "finalHost": "raw.githubusercontent.com",
