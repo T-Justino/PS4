@@ -1,0 +1,33 @@
+# Interface web local (Etapa 5D)
+
+Painel visual para pesquisar jogos e consultar versões CUSA no **navegador do Android**, sem digitar comandos. Usa `busca.py` e `versoes.py` como bibliotecas e o servidor `http.server` da biblioteca padrão. Só leitura; sem login; nada externo.
+
+## Iniciar (um comando no Termux)
+```sh
+cd ~/PS4 && git pull && PYTHONPATH=src python -m ps4store.painel
+```
+Depois abra **http://127.0.0.1:8765** no navegador do Android.
+
+## Encerrar
+- No Termux: **Ctrl+C** (volume-baixo + C no teclado do Termux).
+- Ou, de outra sessão do Termux: `pkill -f ps4store.painel`.
+- Porta ocupada (já há um painel rodando)? Use `--porta 8766` e abra o endereço novo.
+
+## Como usar
+1. Digite parte do nome (sem acentos/maiúsculas) e toque em **Buscar**; ou **Mostrar só jogos com versões cadastradas**.
+2. A lista mostra nome, ano, fonte (ex.: Wikidata) e o Q-id, com "N registro(s) · M CUSA(s)" ou "sem versões cadastradas".
+3. Toque num jogo para ver as versões ligadas ao **Q-id**: CUSA ("identificador do título"), Content ID ("NÃO é o CUSA"), edição ("registro de edição, não de jogo-base"), região, idiomas, versão do pacote, lojas, status (**CITADO** × **CONFIRMADO**) e fontes. O que não tem evidência aparece como **desconhecido**.
+4. **Filtros opcionais** (CUSA, região, idioma) ficam em "Filtros das versões"; sem filtros, todos os registros aparecem. Campo desconhecido não casa com filtro e a tela diz quantos ficaram de fora.
+5. Sem versões cadastradas: "Nenhuma versão CUSA cadastrada… Nada foi inventado."
+Funciona offline com os dados já importados (`local/busca-indice.json` e `data/versoes-cusa.json`); se mudarem no disco, o painel os recarrega sozinho.
+
+## Segurança
+- Escuta **só em `127.0.0.1`** (sem opção de outro endereço) e confere o cabeçalho `Host` (contra DNS rebinding).
+- **Somente GET/HEAD**; POST/PUT/DELETE/PATCH/OPTIONS retornam 405. Nada é gravado em disco.
+- Rotas fixas (`/`, `/estilo.css`, `/app.js`, `/api/estado`, `/api/jogos`, `/api/jogo`): o caminho da URL nunca vira caminho de arquivo; o resto é 404.
+- Parâmetros em lista fechada e validados (tamanho, caracteres de controle, `Q…`, `CUSA…`, limite 1–200); repetidos/desconhecidos → 400. Consultas nunca viram comandos.
+- CSP restritiva (`default-src 'none'`, sem script inline nem externo), `nosniff`, `no-referrer`, `no-store`; a interface monta o conteúdo com `textContent` (nomes do índice não executam HTML) e só abre links `https://`.
+- Não resolve links nem baixa nada; CUSA não indica PKG/download.
+
+## Limites
+Só busca e consulta de versões (os dados são os da 5B: 3 registros de Batman: Arkham Knight, todos "citado"). Não integra downloads, SSPI nem o resolvedor.

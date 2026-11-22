@@ -24,4 +24,4 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 
 [tool.setuptools.package-data]
-ps4store = ["web_assets/*.html"]
+ps4store = ["web_assets/*.html", "painel_assets/*"]

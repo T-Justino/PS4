@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS4 Store BR · Jogos</title>
+<link rel="stylesheet" href="/estilo.css">
+</head>
+<body>
+<header>
+  <h1>PS4 Store BR</h1>
+  <p class="sub">Jogos e versões CUSA · só metadados, sem downloads · <span id="estado">carregando…</span></p>
+</header>
+<main>
+    <details id="filtros">
+      <summary>Filtros das versões (opcionais)</summary>
+      <div class="grade">
+        <label>CUSA<input id="f-cusa" maxlength="9" placeholder="CUSA00133" autocapitalize="characters"></label>
+        <label>Região
+          <select id="f-regiao">
+            <option value="">Todas</option><option>US</option><option>EU</option><option>JP</option><option>ASIA</option><option>KR</option>
+          </select>
+        </label>
+        <label>Idioma<input id="f-idioma" maxlength="30" placeholder="ex.: Korean"></label>
+      </div>
+      <p class="dica">Os filtros valem para as versões de um jogo. Campo desconhecido não casa com filtro (não é presumido).</p>
+    </details>
+  <section id="vista-lista">
+    <form id="form-busca" autocomplete="off">
+      <label for="q" class="rotulo">Nome do jogo (parte do nome)</label>
+      <div class="linha">
+        <input id="q" name="q" type="search" maxlength="100" placeholder="ex.: batman" enterkeyhint="search" autocapitalize="off" spellcheck="false">
+        <button type="submit" class="primario">Buscar</button>
+      </div>
+      <button type="button" id="so-versoes" class="secundario">Mostrar só jogos com versões cadastradas</button>
+    </form>
+    <p id="msg-lista" class="msg" role="status"></p>
+    <ul id="lista" class="cards"></ul>
+  </section>
+
+  <section id="vista-jogo" hidden>
+    <button type="button" id="voltar" class="secundario">← Voltar à lista</button>
+    <div id="jogo"></div>
+  </section>
+</main>
+<footer>CUSA identifica o título; não é link e não indica que exista PKG ou download. Servidor local somente leitura.</footer>
+<script src="/app.js"></script>
+</body>
+</html>
