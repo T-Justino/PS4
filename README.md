@@ -2,7 +2,7 @@
 
 Catálogo pesquisável para o SSPI (PS4), com prioridade para PT-BR. Gera arquivos `.gssource` a partir de um catálogo canônico versionado. **Não hospeda nem baixa jogos.**
 
-**Status:** Gate 1 auditado (`docs/AUDITORIA_GATE1.md`). Gate 2 concluído no console (SSPI 5.11.7 Final): `NPXS`/`APOL` recusados como chave; chaves `CUSA` sintéticas (T4, T5, T6): **fontes importadas** no console; instalação de PKG sob chave sintética **não provada** (`docs/TESTE_PS4.md`, `docs/CHAVES_SINTETICAS.md`). Próximo: T7, instalação do PKG (`docs/TESTE_T7.md`).
+**Status:** Gate 1 auditado (`docs/AUDITORIA_GATE1.md`). Gate 2 concluído no console (SSPI 5.11.7 Final): `NPXS`/`APOL` recusados como chave; chaves `CUSA` sintéticas (T4–T7): fonte importada, mas **instalação recusada** (T7) (`docs/TESTE_PS4.md`, `docs/CHAVES_SINTETICAS.md`). **T7: instalação recusada** (`expected CUSA90004 got NPXS39041`): chaves sintéticas abandonadas. Próximo: validação ponta a ponta com PKG de identidade compatível (`docs/VALIDACAO_E2E.md`).
 
 ## Uso
 
@@ -20,7 +20,7 @@ O `build` valida o canônico, compila, roda o `check` e só grava se tudo passar
 
 ## Regras do canônico (`data/*.json`, schema `ps4storebr.catalog/v1`)
 
-- `titleId` no padrão `AAAA00000` (sem `PPSA`), com `identityEvidence`. Prefixos `NPXS` e `APOL` são bloqueados (recusados pelo console). Placeholders (`*99999`, `*00000`) só com `"catalogKey": true`; nesse caso use `check --allow-placeholder`.
+- `titleId` = **ID real do pacote** (`AAAA00000`, sem `PPSA`), com `identityEvidence`. `NPXS`/`APOL` são bloqueados (o console recusa a importação). Chaves sintéticas e placeholders são bloqueados (T7: a instalação é recusada). Se o pacote declara `contentId`, ele deve embutir o mesmo `titleId`.
 - Pacote sem `authorization.evidence` **não é publicado**. Título sem pacote publicável fica fora do `.gssource` e aparece no relatório.
 - `languages.audioPtBr` / `subtitlesPtBr` ∈ `yes|no|unknown`. `yes` exige `evidence` e adiciona termos de busca `ptbr dublado/legendado`.
 - URLs somente `https://`, sem credenciais, sem IP literal nem host local.
@@ -35,7 +35,7 @@ src/ps4store/build.py    compilador determinístico + ZIP reproduzível
 src/ps4store/cli.py      build / check
 data/fixtures/           fontes de teste reais (T2, T3)
 tests/fixtures/          .gssource aceito pelo console (contrato de formato; ID fictício, não reutilizar)
-dist/                    .gssource gerados (T2, T3) para o Gate 2
+dist/probes/             sondas históricas T4–T7 (não são produção)
 docs/                    REVIEW, SDD_REVISADO, AUDITORIA_GATE1, TESTE_PS4
 ```
 

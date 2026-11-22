@@ -50,6 +50,7 @@ CONSOLE_REJECTED_PREFIXES: tuple[str, ...] = ("NPXS", "APOL")
 
 # Faixa reservada do projeto para chaves SINTÉTICAS de catálogo (assumida livre de IDs oficiais; não verificável).
 SYNTHETIC_KEY_RE = re.compile(r"^CUSA9[0-8][0-9]{3}$")
+CONTENT_ID_RE = re.compile(r"^[A-Z]{2}[0-9]{4}-([A-Z]{4}[0-9]{5})_[0-9]{2}-[A-Z0-9_-]{16}$")
 REAL_ID_RE = re.compile(r"^[A-Z]{4}[0-9]{5}$")
 
 _BAD_PATH_CHARS = re.compile(r"[\\:\x00-\x1f\x7f]")

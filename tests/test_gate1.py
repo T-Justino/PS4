@@ -11,7 +11,7 @@ from ps4store.cli import main
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGINAL = ROOT / "tests/fixtures/sspi_compat_5117_original.gssource"
-FIXTURES = sorted((ROOT / "data/fixtures").glob("*.json"))
+FIXTURES = sorted((ROOT / "data/fixtures/probes").glob("*.json"))   # sondas históricas T4–T7
 
 
 def base_doc(**title_over):
@@ -31,7 +31,7 @@ def base_doc(**title_over):
 
 
 def build_bytes(doc):
-    files, rep = compile_catalog(parse(doc))
+    files, rep = compile_catalog(parse(doc, allow_synthetic=True))
     return files, rep, zip_files(files)
 
 
@@ -252,7 +252,8 @@ def test_check_rejects_garbage():
 def test_cli_build_and_check(tmp_path):
     out = tmp_path / "x.gssource"
     rep = tmp_path / "x.report.json"
-    assert main(["build", str(FIXTURES[0]), "-o", str(out), "--report", str(rep)]) == 0
+    assert main(["build", str(FIXTURES[0]), "-o", str(out), "--report", str(rep),
+                 "--allow-synthetic-probe"]) == 0
     assert main(["check", str(out), "--allow-placeholder"]) == 0
     r = json.loads(rep.read_text())
     assert r["consoleCompatibility"].startswith("NAO_TESTADO")
@@ -299,7 +300,7 @@ def test_prefixes_rejected_by_console_fail_build(fx, tmp_path):
 import io as _io
 import zipfile as _zf
 
-DATA = Path(__file__).parent.parent / "data" / "fixtures"
+DATA = Path(__file__).parent.parent / "data" / "fixtures" / "probes"
 
 
 def _gss(name):
@@ -365,21 +366,21 @@ def test_production_fixtures_do_not_use_99999():
 ])
 def test_catalog_key_rules(over, msg):
     with pytest.raises(CatalogError, match=msg):
-        parse(_key_doc(**over))
+        parse(_key_doc(**over), allow_synthetic=True)
 
 
 def test_real_identity_requires_catalog_key_and_is_unique():
     with pytest.raises(CatalogError, match="só é usado"):
-        parse(_key_doc(catalogKey=False, titleId="TEST12345"))
+        parse(_key_doc(catalogKey=False, titleId="TEST12345"), allow_synthetic=True)
     d = _key_doc()
     t2 = copy.deepcopy(d["titles"][0]); t2["titleId"] = "CUSA90002"
     d["titles"].append(t2)
     with pytest.raises(CatalogError, match="duplicaria"):
-        parse(d)
+        parse(d, allow_synthetic=True)
 
 
 def test_probe_allows_99999_only_for_probe():
-    parse(_key_doc(titleId="CUSA99999", probe=True))
+    parse(_key_doc(titleId="CUSA99999", probe=True), allow_synthetic=True)
 
 
 def test_t7_store_pkg_unmodified_under_distinct_synthetic_key():
@@ -396,3 +397,29 @@ def test_t7_store_pkg_unmodified_under_distinct_synthetic_key():
     assert rep.to_dict()["identityMap"][0] == {"catalogKey": "CUSA90004", "realTitleId": "NPXS39041",
                                                "realContentId": None, "probe": False}
     assert sspi.check_archive(data).ok
+
+
+# ---------- T7 (22/11/2026): SSPI recusou a instalação: "expected CUSA90004 got NPXS39041"
+
+@pytest.mark.parametrize("fx", FIXTURES, ids=lambda p: p.stem)
+def test_synthetic_keys_blocked_by_default(fx, tmp_path):
+    out = tmp_path / "x.gssource"
+    assert main(["build", str(fx), "-o", str(out)]) == 1
+    assert not out.exists()
+    with pytest.raises(CatalogError, match="abandonad"):
+        parse(json.loads(fx.read_text(encoding="utf-8")))
+
+
+def test_content_id_must_match_title_id():
+    ok = base_doc()
+    ok["titles"][0]["titleId"] = "CUSA12345"
+    ok["titles"][0]["packages"][0]["contentId"] = "UP0000-CUSA12345_00-ABCDEFGHIJKLMNOP"
+    parse(ok)
+    bad = copy.deepcopy(ok)
+    bad["titles"][0]["packages"][0]["contentId"] = "UP0000-CUSA54321_00-ABCDEFGHIJKLMNOP"
+    with pytest.raises(CatalogError, match="não a CUSA12345"):
+        parse(bad)
+    worse = copy.deepcopy(ok)
+    worse["titles"][0]["packages"][0]["contentId"] = "lixo"
+    with pytest.raises(CatalogError, match="fora do formato"):
+        parse(worse)

@@ -65,3 +65,8 @@ Os hashes de conteúdo de T2/T3 acima valem só como histórico.
 ## Gate 2b: T4 instalado (22/11/2026)
 
 Relato do usuário: T4 foi "instalado". **Correção:** era a instalação da *fonte* (botão Install da lista USB). Comprovado: importação aceita com chave `CUSA`. Instalação do PKG: não provada.
+
+## T7 (22/11/2026)
+
+Instalação recusada: `Base game package · expected CUSA90004 got NPXS39041` (fonte, pesquisa e download OK). Chaves sintéticas abandonadas;
+detalhes e regras vigentes em `docs/CHAVES_SINTETICAS.md` e `docs/SDD_REVISADO.md` §12.

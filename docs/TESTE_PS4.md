@@ -1,3 +1,5 @@
+> **Histórico.** T4–T7 usaram chaves sintéticas, hoje abandonadas: a instalação foi recusada no T7 (`docs/TESTE_T7.md`). Arquivos em `dist/probes/`.
+
 # Gate 2 — Testes manuais no PS4 Pro 9.00 / GoldHEN / SSPI 5.11.7
 
 ## Resultado do Gate 2 (22/11/2026, foto do usuário)

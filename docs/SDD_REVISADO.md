@@ -1,11 +1,13 @@
 # SDD — PS4 Store BR: catálogo automatizado para SSPI
 
-**Versão:** 1.1 — 21/11/2026 · **Status:** revisado (ver `docs/REVIEW.md`) · **Substitui:** v1.0
+**Versão:** 1.2 — 22/11/2026 · **Status:** revisado após Gates 1–2 e T7 (ver `docs/REVIEW.md`, `docs/CHAVES_SINTETICAS.md`) · **Substitui:** v1.1
 **Alvo:** PS4 Pro, FW 9.00, GoldHEN, SSPI 5.11.7 (`0eb783eca1f3`) · **Idioma:** PT-BR
 
 ## 1. Visão
 
 Uma loja de PS4 pesquisável, com prioridade para conteúdo em PT-BR. O serviço descobre, valida e publica um **catálogo**, e o PS4 baixa direto da origem via SSPI. A arquitetura é **agnóstica ao tipo de jogo**: homebrew, demo, gratuito ou comercial são tratados da mesma forma. O que decide se um item é instalável é a **autorização de distribuição do link**, não o tipo do jogo.
+
+**Premissa corrigida (v1.2):** importar uma fonte com sucesso **não** garante que o pacote seja instalável. O SSPI valida o catálogo na importação e valida a identidade do PKG na instalação (§12).
 
 **Separação central:** *catálogo* (identidade, metadados, idiomas) ≠ *disponibilidade* (links autorizados). Um título pode existir no catálogo sem nenhum link publicável.
 
@@ -105,7 +107,7 @@ python -m ps4store check dist/X.gssource
 |---|---|---|
 | 0 | REVIEW + SDD 1.1 | aprovado pelo usuário ✅ |
 | 1 | gerador, validador, CLI, testes, fixtures T2/T3 | `pytest` verde; build reproduzível; `check` OK |
-| 2 | teste no PS4 (`docs/TESTE_PS4.md`) | fonte importada; busca por nome e por ID mostra o item correto; **sem instalar**; relato ou foto |
+| 2 | teste no PS4 (`docs/TESTE_PS4.md`, T7) | importação e busca comprovadas; **instalação com identidade compatível ainda pendente** (`docs/VALIDACAO_E2E.md`) |
 | 3 | 1 adaptador autorizado + links + relatório | entrada nova sem mudar código; link inválido não publicado |
 | 4 | Actions + hospedagem + rollback | HTTPS comprovado no SSPI ou USB oficial |
 | 5 | RAR multipartes | ciclo comprovado com fixture pequena |
@@ -125,3 +127,31 @@ python -m ps4store check dist/X.gssource
 | PT-BR incorreto | Evidência obrigatória; `unknown` por padrão |
 | Termos do pkg-zone | Revisar antes do Gate 3 |
 | Artefato ruim publicado | `check` bloqueante e artefato anterior mantido |
+
+## 12. Identidade e instalabilidade (v1.2, após o T7)
+
+**Evidências no console (SSPI 5.11.7 Final; rodapé `BETA 5.11 / 0eb783eca1f3`; PS4 Pro 9.00):**
+
+| Teste | Resultado |
+|---|---|
+| T1 (fixture original) | Fonte com `CUSA99999` importada e pesquisada |
+| T2/T3 | `NPXS39041` e `APOL00004` como chave: **importação recusada** (`Unsupported catalog title identifier`) |
+| T4/T5/T6 | Chaves `CUSA` sintéticas: **fonte importada** |
+| T7 | `CUSA90004` → Store-R2 (`NPXS39041`): fonte, pesquisa e download OK; **instalação recusada** (`expected CUSA90004 got NPXS39041`) |
+
+**Arquitetura corrigida:**
+
+```text
+catálogo (data/*.json) ─ titleId = ID REAL do pacote (CUSA…) ─ build ─ [contentId do PKG deve embutir o mesmo titleId] ─ .gssource
+homebrew com ID que o parser recusa (NPXS, APOL…) ─► fora do catálogo ─► download direto (alternativa, comprovada para o Store-R2)
+```
+
+**Regras:**
+1. O `titleId` do `.gssource` é sempre o ID real do pacote. Sem chaves sintéticas em produção (bloqueadas no `build`).
+2. A identidade do PKG é verificada contra o catálogo antes de publicar (hoje: `contentId` declarado; Gate 3: leitura do cabeçalho do PKG).
+3. Aceite de um item exige **as cinco etapas** no console: fonte importada → item encontrado → download concluído → PKG aceito → instalação concluída.
+4. Cobertura é limitada a pacotes legalmente distribuídos cujo ID real é aceito pelo parser (`CUSA`). Homebrews `NPXS`/`APOL`: só download direto.
+5. Updates e DLC: **não testados**; não prometer.
+
+**Gate 2 (reaberto/encerrado):** importação e pesquisa comprovadas; instalação **só** comprovada para pacote com identidade compatível,
+e esse caso ainda **não foi testado** (ver `docs/VALIDACAO_E2E.md`, pré-requisito do Gate 3).

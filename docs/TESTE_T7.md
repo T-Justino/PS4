@@ -1,11 +1,26 @@
-# T7 — Instalação do PKG sob chave sintética (PS4 Pro 9.00 / GoldHEN / SSPI 5.11.7)
+> ## RESULTADO (22/11/2026, relato do usuário; PS4 Pro 9.00, SSPI 5.11.7 Final, rodapé `BETA 5.11 / 0eb783eca1f3`)
+>
+> | Etapa | Resultado |
+> |---|---|
+> | Fonte importada | **sim** |
+> | Item encontrado na pesquisa | **sim** |
+> | Download | **concluído** (24,8 MB / 24,8 MB) |
+> | PKG aceito pela instalação | **RECUSADO**: `Base game package · expected CUSA90004 got NPXS39041` |
+> | Instalação concluída | **não** (bloqueada antes de concluir) |
+>
+> A linha "Installed" exibida embaixo é a instalação anterior do Store-R2.pkg por link direto, **não** o T7.
+> **Conclusão: falha de compatibilidade de identidade** (não é erro de download nem de "já instalado"). O SSPI compara a chave
+> do catálogo com o ID interno do PKG na instalação. **Chaves sintéticas `CUSA` não instalam pacotes de ID diferente.**
+> Estratégia abandonada em produção; ver `docs/SDD_REVISADO.md` §12.
+
+# T7 — Instalação do PKG sob chave sintética (teste histórico) (PS4 Pro 9.00 / GoldHEN / SSPI 5.11.7)
 
 **Pergunta:** o SSPI instala um PKG cujo ID interno (`NPXS39041`) é diferente da chave de catálogo (`CUSA90004`)?
 Os testes T4/T5/T6 provaram só a importação da fonte. **Este é o primeiro teste de instalação de PKG.**
 
 | Item | Valor |
 |---|---|
-| Arquivo | `dist/ps4storebr-t7-cusa90004.gssource` |
+| Arquivo | `dist/probes/ps4storebr-t7-cusa90004.gssource` |
 | contentSha256 | `52c24cbee26789a10c509cab80fca3ced33c53e1f2e8bae1c8b72c46afce3d5f` (o hash do ZIP pode variar; ver `AUDITORIA_GATE1.md`) |
 | Chave de catálogo | `CUSA90004` (sintética, experimental) |
 | Pacote | Store-R2.pkg oficial do PKG-Zone, URL `https://pkg-zone.com/update/Store-R2.pkg`, **sem modificação**; ID interno real `NPXS39041` |

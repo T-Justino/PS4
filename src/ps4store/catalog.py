@@ -93,7 +93,7 @@ def _req_str(obj: dict, key: str, where: str, errs: list[str]) -> str:
     return v
 
 
-def parse(doc: dict) -> Catalog:
+def parse(doc: dict, *, allow_synthetic: bool = False) -> Catalog:
     errs: list[str] = []
     if doc.get("schema") != SCHEMA:
         errs.append(f"schema deve ser {SCHEMA}")
@@ -140,6 +140,9 @@ def parse(doc: dict) -> Catalog:
                 errs.append(f"{where}: CUSA99999 não é identidade de produção")
         elif real:
             errs.append(f"{where}: realIdentity só é usado com catalogKey=true")
+        if not allow_synthetic and any(k in t for k in ("catalogKey", "probe", "realIdentity")):
+            errs.append(f"{where}: chave sintética de catálogo abandonada em produção (T7: o SSPI recusa a "
+                        "instalação com 'expected CUSA… got …'). Use o ID real do pacote verificado")
         tname = _req_str(t, "name", where, errs)
         aliases = t.get("aliases") or []
         if not all(isinstance(a, str) for a in aliases):
@@ -183,6 +186,14 @@ def parse(doc: dict) -> Catalog:
                 errs.append(f"{pw}: sha256 inválido")
             if "size" in extra and (not isinstance(extra["size"], int) or extra["size"] < 0):
                 errs.append(f"{pw}: size inválido")
+            cid = extra.get("contentId")
+            if cid is not None and t.get("catalogKey") is not True and tid:
+                m = sspi.CONTENT_ID_RE.match(str(cid))
+                if not m:
+                    errs.append(f"{pw}: contentId fora do formato XX0000-AAAA00000_00-LABEL")
+                elif m.group(1) != tid:
+                    errs.append(f"{pw}: contentId pertence a {m.group(1)}, não a {tid}: "
+                                "o SSPI recusa o pacote ('expected … got …')")
             pkgs.append(Package(
                 id=pid, kind=kind, access_type=access, url=p.get("url", ""),
                 hoster=p.get("hoster") or "", label=p.get("label") or "",
@@ -201,11 +212,11 @@ def parse(doc: dict) -> Catalog:
     return Catalog(sid, name, description, version, titles)
 
 
-def load(path: str | Path) -> Catalog:
+def load(path: str | Path, *, allow_synthetic: bool = False) -> Catalog:
     try:
         doc = json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         raise CatalogError([f"não foi possível ler {path}: {e}"]) from e
     if not isinstance(doc, dict):
         raise CatalogError(["raiz do catálogo deve ser objeto"])
-    return parse(doc)
+    return parse(doc, allow_synthetic=allow_synthetic)

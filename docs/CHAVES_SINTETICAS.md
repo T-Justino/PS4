@@ -1,32 +1,32 @@
-# Chaves sintéticas de catálogo — investigação (Gate 2, antes do Gate 3)
+# Chaves sintéticas de catálogo — ABANDONADAS (decisão de 22/11/2026)
 
-**Escopo da evidência.** T4 (`CUSA99999` + Store-R2.pkg, real `NPXS39041`) teve a **fonte importada** no SSPI 5.11.7; T5 e T6 (chaves `CUSA9xxxx`) também.
-**A instalação do PKG sob chave sintética nunca foi testada.** Vale só para a importação e essa versão. Nenhuma generalização para outros PKGs, jogos, updates ou DLCs.
+**Resultado que decidiu (T7).** Com a fonte importada, o item pesquisado e o download concluído (24,8 MB), a instalação foi
+bloqueada: `Base game package · expected CUSA90004 got NPXS39041`. O SSPI 5.11.7 confere a chave do catálogo com o ID interno do PKG.
 
-**Fonte desta análise.** Código público `xyhlo/SSPI` (`main`): `PkgValidator.cs`, `PkgInstaller.cs`, `InstalledTitleScan.cs`.
-O commit do binário (`0eb783eca1f3`) não está acessível, então o `main` pode divergir. É **leitura de código, não teste**.
-Tudo abaixo é hipótese a confirmar no console.
+## Linha do tempo (o que cada teste provou)
 
-## Regra de projeto
-
-- **Chave de catálogo** (`titleId` no `.gssource`, `CUSA90000–98999`) é só um índice de busca. É sintética.
-- **Identidade real** (`realIdentity.titleId`/`contentId`) fica no canônico e no relatório (`identityMap`). Nunca vira `titleId`
-  do `.gssource` (`NPXS`/`APOL` são recusados) e **não** é gravada nas linhas de pacote nesta fase.
-- `CUSA99999` só existe como sonda (`probe: true`), nunca como identidade de produção.
-- A faixa reservada é suposição (não dá para provar que nenhum jogo oficial a usa).
-
-## Efeitos possíveis (hipóteses)
-
-| Área | O que o código público indica | Risco | Como verificar |
+| Teste | Chave → PKG | Provou | Não provou |
 |---|---|---|---|
-| Instalação (base) | `CheckRequestedIdentity` compara a chave com o content ID do PKG (`Package does not belong to …`). Ainda não testado com PKG; maior risco | Outro PKG pode ser recusado | Teste de instalação (T7) por PKG |
-| Biblioteca / botão Open | Homebrew é identificado pelo próprio ID instalado (`IsHomebrew`: não-CUSA). Uma chave `CUSA` não casa com `NPXS39041` instalado | Item pode aparecer como `Install` mesmo instalado | T5, passo 4 |
-| Atualizações | Update exige base instalada sob a chave (`sceAppInstUtilAppExists(titleId)`) e compara content ID com o `param.sfo` instalado | Update de homebrew sob chave sintética tende a falhar (`requires installed base game`) | Fora do escopo do T5/T6; testar antes de prometer updates |
-| DLC | `GameAcceptsAddon` lê `appmeta/<CUSA>/param.sfo` do jogo instalado | Chave sintética nunca tem `param.sfo`: DLC não associa | Testar com DLC autorizado antes de suportar |
-| Jogos instalados | Chave `CUSA` real colidiria com um jogo instalado | Falsa associação | Faixa `9xxxx` reservada + chave única por título |
-| Duplicação | Mesmo pacote sob duas chaves = duas entradas | Lista duplicada | O build recusa a mesma `realIdentity` em duas chaves na mesma fonte; T6 passo 5 mede entre fontes |
+| T2/T3 | `NPXS39041` / `APOL00004` como chave | **Importação recusada** (`Unsupported catalog title identifier`) | — |
+| T4/T5/T6 | `CUSA99999`, `CUSA90001`, `CUSA90002/3` | **Importação** de fontes com chave `CUSA` | Instalação (o "Install" visto era o da fonte) |
+| T7 | `CUSA90004` → Store-R2 (`NPXS39041`) | Fonte, pesquisa e download OK; **instalação recusada por identidade** | — |
 
-## Decisão pendente (após T5/T6)
+**Importar uma fonte com sucesso NÃO garante que o pacote seja instalável.** Aceitação do catálogo e aceitação do pacote são
+verificações diferentes, feitas em momentos diferentes.
 
-Escolher a estratégia definitiva de identificação (chave sintética estável por pacote x outra) com os resultados do console.
-Não implementar descoberta automática até lá.
+## Regras vigentes
+
+1. O `titleId` do catálogo deve ser o **ID real do pacote**, com prefixo aceito pelo parser (comprovado: `CUSA`; recusados: `NPXS`, `APOL`).
+2. Se o pacote declara `contentId`, o `build` exige que o ID embutido nele seja igual ao `titleId` (o SSPI faria a mesma conferência).
+3. Chaves sintéticas (`catalogKey`, `probe`, `realIdentity`) são **bloqueadas** no `build`; só `--allow-synthetic-probe`
+   reproduz as sondas históricas T4–T7 (`data/fixtures/probes/`, `dist/probes/`), que **não** são produção.
+4. **Homebrews cujos IDs o parser recusa** (`NPXS`, `APOL`, …) **ficam fora do catálogo**. Alternativa: download direto
+   (link na documentação, instalação pelo SSPI/gerenciador de downloads), como já foi feito com o Store-R2.
+5. Não alterar o PKG nem seu ID interno.
+
+## Hipóteses do código público que o T7 confirmou ou deixou abertas
+
+- **Confirmado:** a conferência chave × ID do PKG existe na instalação (`TitleMismatch: expected … got …`).
+- **Aberto (sem teste):** atualizações e DLC. O código público exige base instalada sob a chave e o `param.sfo` do jogo para DLC; com IDs reais
+  de jogos oficiais isso é plausível, mas precisa de teste próprio.
+- **Aberto:** botão Open/Install para itens já instalados com ID real; duplicação entre fontes.

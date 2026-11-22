@@ -20,7 +20,7 @@ def _print(res: sspi.CheckResult) -> None:
 
 def cmd_build(a) -> int:
     try:
-        cat = load(a.input)
+        cat = load(a.input, allow_synthetic=a.allow_synthetic_probe)
         files, rep = compile_catalog(cat)
     except CatalogError as e:
         for msg in e.errors:
@@ -76,6 +76,8 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("input")
     b.add_argument("-o", "--output", required=True)
     b.add_argument("--report", help="grava relatório JSON do build")
+    b.add_argument("--allow-synthetic-probe", action="store_true",
+                   help="só para reproduzir sondas históricas T4–T7; chaves sintéticas não são produção")
     b.set_defaults(func=cmd_build)
     c = sub.add_parser("check", help="valida um .gssource contra as regras conhecidas do SSPI")
     c.add_argument("file")
