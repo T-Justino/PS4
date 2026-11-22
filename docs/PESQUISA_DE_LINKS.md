@@ -49,7 +49,7 @@ PYTHONPATH=src python3 -m ps4store run --refresh-links 10   # descobre → valid
 | Compatíveis com o importador de catálogo (ID `CUSA`, base) | 22, dos quais **1 publicável** (app próprio); 19 são `RETAIL_STYLE_ID` (bloqueados) |
 | IDs que o catálogo não importa (`NPXS`, `APOL` recusados; demais não comprovados) | 163: fora do catálogo, **na pesquisa** |
 | Restritos (aparência comercial: Content ID `UP/EP…` ou categoria `media/game/mod/dev menu`) | 99: só metadados, em nenhuma lista de download |
-| **Lista pessoal** (para colar no SSPI) | 26 itens: homebrew/utilitários/emuladores, sem aparência comercial e sem host de TLS falho |
+| **Lista pessoal** (para colar no SSPI), após excluir `github.com` | 16 itens (15 do PKG-Zone + o app próprio): homebrew/utilitários/emuladores, sem aparência comercial; cresce com `--refresh-links` |
 
 **Comportamento medido por tipo de link:**
 
