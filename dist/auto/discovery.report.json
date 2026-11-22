@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-11-22T13:49:17Z",
+  "dryRun": false,
+  "note": "Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.",
+  "sources": [
+    {
+      "source": "own-releases",
+      "repo": "T-Justino/PS4",
+      "status": "ok",
+      "discovered": 0
+    },
+    {
+      "source": "apollo-releases",
+      "repo": "bucanero/apollo-ps4",
+      "status": "erro",
+      "error": "HTTP 403 em api.github.com"
+    }
+  ],
+  "counts": {
+    "descobertos": 0,
+    "acessiveis": 0,
+    "pkgVerificados": 0,
+    "compativeisSspi": 0,
+    "publicados": 0,
+    "novos": 0,
+    "rejeitados": 0,
+    "motivos": {}
+  },
+  "catalogUpdated": false,
+  "catalogError": null,
+  "entries": []
+}

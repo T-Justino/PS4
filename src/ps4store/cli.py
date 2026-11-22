@@ -69,7 +69,38 @@ def cmd_check(a) -> int:
     return 0 if res.ok else 1
 
 
-def main(argv: list[str] | None = None) -> int:
+def cmd_run(a, net=None) -> int:
+    """Descoberta → verificação → catálogo → .gssource, em um comando."""
+    import os
+    from .discover import ConfigError, load_config, run
+    from .net import UrllibNet
+    try:
+        cfg = load_config(a.config)
+    except ConfigError as e:
+        for msg in str(e).splitlines():
+            print(f"ERRO  {msg}", file=sys.stderr)
+        return 1
+    net = net or UrllibNet(token=os.environ.get("GITHUB_TOKEN"))
+    out_dir = Path(a.out_dir)
+    res = run(cfg, net, out_gssource=out_dir / "ps4storebr-auto.gssource",
+              out_canonical=Path(a.canonical), out_report=out_dir / "discovery.report.json",
+              state_path=Path(a.state), dry_run=a.dry_run)
+    c = res.report["counts"]
+    for s in res.report["sources"]:
+        print(f"fonte {s['source']} ({s['repo']}): {s['status']}" + (f" — {s['error']}" if s.get("error") else ""))
+    print(f"descobertos={c['descobertos']} acessíveis={c['acessiveis']} pkg_verificados={c['pkgVerificados']} "
+          f"compatíveis={c['compativeisSspi']} publicados={c['publicados']} novos={c['novos']} rejeitados={c['rejeitados']}")
+    for e in res.report["entries"]:
+        print(f"  {'NOVO ' if e['isNew'] else '     '}{e['stage']:<16} {e['asset']} ({e['release']})"
+              + (f" → rejeitado {e['reason']}: {e['detail']}" if e["rejected"] else f" → {e['titleId']}"))
+    if res.wrote_catalog:
+        print(f"catálogo atualizado: {res.report['artifact']['path']} v{res.report['artifact']['version']}" + (" [dry-run: nada foi gravado]" if a.dry_run else ""))
+    else:
+        print("catálogo NÃO atualizado" + (f": {res.report['catalogError']}" if res.report["catalogError"] else ": nenhuma entrada publicável (artefato anterior mantido)"))
+    return 0
+
+
+def main(argv: list[str] | None = None, *, net=None) -> int:
     ap = argparse.ArgumentParser(prog="ps4store", description="PS4 Store BR — gerador .gssource")
     sub = ap.add_subparsers(dest="cmd", required=True)
     b = sub.add_parser("build", help="gera .gssource a partir de catálogo canônico JSON")
@@ -84,5 +115,12 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--allow-placeholder", action="store_true",
                    help="aceita IDs fictícios (só para inspecionar fixtures antigos)")
     c.set_defaults(func=cmd_check)
+    r = sub.add_parser("run", help="Gate 3: descobre, verifica links e gera o .gssource (um comando)")
+    r.add_argument("--config", default="config/sources.json")
+    r.add_argument("--out-dir", default="dist/auto")
+    r.add_argument("--canonical", default="data/generated/auto-catalog.json")
+    r.add_argument("--state", default="data/state/discovery-state.json")
+    r.add_argument("--dry-run", action="store_true", help="não grava nada (estado, catálogo, relatório)")
+    r.set_defaults(func=lambda a: cmd_run(a, net))
     a = ap.parse_args(argv)
     return a.func(a)

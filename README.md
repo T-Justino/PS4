@@ -4,6 +4,13 @@ Catálogo pesquisável para o SSPI (PS4), com prioridade para PT-BR. Gera arquiv
 
 **Status:** Gate 1 auditado (`docs/AUDITORIA_GATE1.md`). Gate 2 concluído no console (SSPI 5.11.7 Final): `NPXS`/`APOL` recusados como chave; chaves `CUSA` sintéticas (T4–T7): fonte importada, mas **instalação recusada** (T7) (`docs/TESTE_PS4.md`, `docs/CHAVES_SINTETICAS.md`). **T7: instalação recusada** (`expected CUSA90004 got NPXS39041`): chaves sintéticas abandonadas. Próximo: **T8**, app próprio `CUSA95417` com identidade compatível (`docs/TESTE_T8.md`; ainda não testado no console).
 
+## Gate 3 (MVP): descoberta automática
+
+```bash
+PYTHONPATH=src python3 -m ps4store run     # descobre → verifica links (Range) → gera dist/auto/ps4storebr-auto.gssource + relatório
+```
+Detalhes, fonte escolhida e evidências em `docs/GATE3.md`.
+
 ## Uso
 
 Python ≥ 3.11, sem dependências de runtime.

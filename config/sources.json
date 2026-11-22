@@ -1,0 +1,40 @@
+{
+  "schema": "ps4storebr.sources/v1",
+  "catalog": {
+    "id": "ps4storebr.auto",
+    "name": "PS4 Store BR (automático)",
+    "description": "Catalogo gerado automaticamente a partir de fontes autorizadas. Cada pacote foi verificado (identidade lida do proprio PKG) antes de entrar."
+  },
+  "tls": {
+    "enforce": true,
+    "known_bad_hosts": {
+      "github.com": "download falhou com TLS 0x8095F00C no SSPI 5.11.7 (relato do usuario, 21/11/2026)"
+    }
+  },
+  "sources": [
+    {
+      "id": "own-releases",
+      "type": "github-releases",
+      "repo": "T-Justino/PS4",
+      "enabled": true,
+      "include_prereleases": false,
+      "max_releases": 20,
+      "authorization": {
+        "basis": "license",
+        "evidence": "Releases do proprio repositorio do projeto (software do autor do projeto)."
+      }
+    },
+    {
+      "id": "apollo-releases",
+      "type": "github-releases",
+      "repo": "bucanero/apollo-ps4",
+      "enabled": true,
+      "include_prereleases": false,
+      "max_releases": 5,
+      "authorization": {
+        "basis": "official-developer-release",
+        "evidence": "Releases publicas do autor (bucanero/apollo-ps4, GPL-3.0). Listar o link oficial; nenhum arquivo e hospedado aqui."
+      }
+    }
+  ]
+}
