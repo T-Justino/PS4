@@ -137,6 +137,44 @@ def search_rows(rows: list[dict], terms: list[str], *, ftype: str | None = None,
     return out
 
 
+def cmd_resume_check(a, net=None) -> int:
+    """Checagem leve de prontidão para retomada/arquivos grandes (até 3 requisições de 64 KiB por título; limite de títulos)."""
+    from .net import UrllibNet
+    from .validation import resume_check
+    try:
+        doc = json.loads(Path(a.research).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        print(f"ERRO  catálogo de pesquisa não encontrado em {a.research}: rode `ps4store run` primeiro", file=sys.stderr)
+        return 1
+    want = {t.upper() for t in a.title}
+
+    def eligible(r) -> bool:
+        if r["fileType"] not in ("pkg", "rar-multiparte") or not r.get("sizeBytes") or r.get("sourceActive") is False:
+            return False                      # releases inativas: o servidor as recusa (403), não são candidatas
+        if a.source and r.get("source") != a.source:
+            return False
+        if a.source and not want:
+            return True
+        if want:
+            return (r["titleId"] or "").upper() in want
+        return bool(r.get("directInstallAvailable")) and r["sizeBytes"] >= a.min_mb * 1e6
+
+    rows = [r for r in doc["entries"] if eligible(r)]
+    rows.sort(key=lambda r: -r["sizeBytes"])
+    rows = rows[:max(1, min(a.limit, 10))]
+    net = net or UrllibNet()
+    for r in rows:
+        res = resume_check(r["url"], r["sizeBytes"], net)
+        print(f"{(r['name'] or r['url'].rsplit('/', 1)[-1])[:34]:34} v{str(r.get('version'))[:6]:6} {r['sizeBytes'] / 1e6:8.1f}MB  range={'ok' if res['rangeHonored'] else 'NAO'} "
+              f"tamanho={'estável' if res['totalStable'] else 'INSTÁVEL'} validador={res['validators']}{'' if res['etagStable'] else ' (ETag MUDA)'} "
+              f"=> {'PRONTO' if res['ready'] else 'ATENÇÃO'}")
+        for n in res["notes"]:
+            print(f"    - {n}")
+    if not rows:
+        print("nenhum título elegível (use --title ID ou diminua --min-mb)")
+    return 0
+
+
 def cmd_search(a) -> int:
     try:
         doc = json.loads(Path(a.research).read_text(encoding="utf-8"))
@@ -145,6 +183,10 @@ def cmd_search(a) -> int:
         return 1
     rows = search_rows(doc["entries"], a.terms, ftype=a.type, source=a.source, only=a.only,
                        known_license=None if a.license is None else a.license == "known")
+    rows = [r for r in rows if (a.min_mb is None or (r.get("sizeBytes") or 0) >= a.min_mb * 1e6)
+            and (a.max_mb is None or (r.get("sizeBytes") or 0) <= a.max_mb * 1e6)]
+    if a.sort == "size":
+        rows.sort(key=lambda r: -(r.get("sizeBytes") or 0))
     for r in rows[:a.limit]:
         mb = f"{(r['sizeBytes'] or 0) / 1e6:.1f}MB"
         st = r["status"]
@@ -197,7 +239,17 @@ def main(argv: list[str] | None = None, *, net=None) -> int:
     q.add_argument("--license", choices=["known", "unknown"])
     q.add_argument("--research", default="local/research.json")
     q.add_argument("--limit", type=int, default=40)
+    q.add_argument("--min-mb", type=float)
+    q.add_argument("--max-mb", type=float)
+    q.add_argument("--sort", choices=["size"], help="ordena do maior para o menor")
     q.add_argument("--urls", action="store_true", help="mostra também a URL")
     q.set_defaults(func=cmd_search)
+    rc = sub.add_parser("resume-check", help="prontidão para retomada/arquivos grandes: Range em offsets, tamanho e ETag estáveis (≤3 requisições de 64 KiB por título)")
+    rc.add_argument("--title", action="append", default=[], metavar="ID", help="título (repetível); sem isto, os maiores instaláveis")
+    rc.add_argument("--source", help="só esta fonte (ex.: own-rar para checar todos os volumes de um RAR dividido)")
+    rc.add_argument("--min-mb", type=float, default=100)
+    rc.add_argument("--limit", type=int, default=5, help="máximo de títulos (teto 10)")
+    rc.add_argument("--research", default="local/research.json")
+    rc.set_defaults(func=lambda a: cmd_resume_check(a, net))
     a = ap.parse_args(argv)
     return a.func(a)

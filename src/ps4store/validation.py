@@ -103,3 +103,38 @@ def mark_duplicates(entries: list[Entry]) -> None:
                 e.duplicate_of = seen[k]
             else:
                 seen[k] = e.found.key
+
+
+def resume_check(url: str, size: int, net, points=(0.25, 0.5, 0.9), window: int = 65536) -> dict:
+    """Prontidão para RETOMADA (e para faixas paralelas): o servidor honra `Range` em offsets arbitrários, o tamanho total é estável e
+    os validadores (ETag/Last-Modified) não mudam entre requisições, mesmo quando cada uma passa por um novo redirect.
+    No máximo len(points) requisições de `window` bytes; nunca o arquivo."""
+    out: list[dict] = []
+    etags, mods, totals = set(), set(), set()
+    for p in points:
+        off = (int(size * p) // 4096) * 4096
+        pr = net.probe(url, window, off)
+        want = min(window, size - off)
+        honored = bool(pr.ok and pr.status == 206 and pr.range_start == off and len(pr.head) == want)
+        out.append({"offset": off, "status": pr.status, "honored": honored, "total": pr.total_size, "etag": pr.etag,
+                    "lastModified": pr.last_modified, "finalHost": (pr.chain or [None])[-1], "ttlSeconds": pr.expires_in,
+                    "error": pr.error})
+        if pr.ok:
+            etags.add(pr.etag)
+            mods.add(pr.last_modified)
+            totals.add(pr.total_size)
+    notes: list[str] = []
+    honored = all(x["honored"] for x in out)
+    total_ok = totals == {size}
+    etag_ok = len(etags) <= 1
+    if not honored:
+        notes.append("o servidor não honrou Range em algum offset: o SSPI cai para uma conexão só e não retoma de forma confiável")
+    if not total_ok:
+        notes.append(f"tamanho total instável ou diferente do catálogo ({sorted(totals, key=str)} vs {size})")
+    if not etag_ok:
+        notes.append("ETag muda entre requisições (réplicas diferentes?): o SSPI pode reiniciar/falhar a retomada ('another replica may tag the bytes differently')")
+    if etags == {None} and mods == {None}:
+        notes.append("sem ETag nem Last-Modified: o SSPI só prova a representação pelo tamanho total")
+    return {"points": out, "rangeHonored": honored, "totalStable": total_ok, "etagStable": etag_ok,
+            "validators": "etag" if etags - {None} else ("last-modified" if mods - {None} else "nenhum"),
+            "ready": honored and total_ok and etag_ok, "notes": notes}

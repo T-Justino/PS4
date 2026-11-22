@@ -20,7 +20,7 @@ PYTHONPATH=src python3 -m ps4store run --refresh-links 10   # descobre → valid
 `direto` · `redirect` (+ `temporaryRedirect` se a URL final é assinada/expira) · `pagina-intermediaria` (HTML: não automatizamos) · `exige-autenticacao` (401) · `acesso-negado` (403: o servidor recusa; **não tentamos contornar** nem presumimos o motivo) ·
 `expirado` (403 numa URL assinada) · `removido` (404/410) · `erro-de-rede`/`erro-http`. Também `rangeOk`, `fileType` (`pkg`, `rar-multiparte`), tamanho verificado, ID e Content ID lidos **do próprio PKG**, `duplicateOf` (mesmo Content ID+versão+tamanho em outro lugar) e `sspiDownloadable`.
 
-## Como o SSPI usa uma URL (lido no código público `transfer/gs_http.c`, `gs_xfer.c`; **ainda sem prova no console para redirects**)
+## Como o SSPI usa uma URL (código público `transfer/gs_http.c`, `gs_xfer.c`; **redirect assinado + `Range` + ID não-`CUSA` confirmados no console com o OpenTyrian, 22/11/2026**)
 - Segue redirects sozinho (só HTTPS→HTTPS). Se a URL final **assinada expirar** (401/403/404/410/5xx), **refaz o redirect pela URL original**. Por isso guardamos sempre a URL **estável**, nunca a assinada.
 - Baixa em **faixas `Range` paralelas** quando recebe 206 com `Content-Range` e total; sem `Range`, baixa numa conexão só. Exige `Content-Encoding` identity.
 - **Colar link direto (PKG/RAR)** na aba Downloads **não passa pelo importador de catálogo**: o ID do pacote (`NPXS`, `APOL`, `BREW`…) não é barrado aqui. É a rota para o homebrew que o catálogo não carrega.
@@ -56,13 +56,13 @@ PYTHONPATH=src python3 -m ps4store run --refresh-links 10   # descobre → valid
 | Origem | Link | Redirect | Temporário | `Range` | Observação |
 |---|---|---|---|---|---|
 | `raw.githubusercontent.com` | direto | não | não | 206 | **comprovado no console** (T8b/T9) |
-| PKG-Zone `/download/ps4/{id}/{versão}` | estável | 302 → `api.pkg-zone.com` (assinada) | **sim** (≈6 h) | 206 | catálogo guarda a URL estável; SSPI refaz o redirect se expirar (código); **sem prova no console** |
+| PKG-Zone `/download/ps4/{id}/{versão}` | estável | 302 → `api.pkg-zone.com` (assinada) | **sim** (≈6 h) | 206 | catálogo guarda a URL estável; **comprovado no console (OpenTyrian, link colado)**; a renovação após expirar ainda não foi exercitada |
 | GitHub Releases | `github.com/.../releases/download/...` | 302 → `release-assets.githubusercontent.com` (assinada) | sim | 206 | **o 1º salto é `github.com`, onde o TLS do SSPI falhou**: fica fora das listas |
 
 ## Obstáculos que impedem os demais downloads
 1. **Catálogo só aceita `CUSA`:** 163 itens não podem ir por catálogo. Solução tecnicamente viável: **colar o link** (caminho B), a testar no console (T10).
 2. **Restritos (99):** excluídos por política; não vou listá-los para download.
-3. **Redirect assinado do PKG-Zone:** previsto como compatível, **não testado no SSPI** (T10, parte B).
+3. ~~Redirect assinado do PKG-Zone não testado~~ **comprovado** (OpenTyrian). Falta exercitar a renovação do link com download longo/interrompido (Teste 3).
 4. **Identidade fora da janela de 64 KiB:** resolvido: o robô faz **uma 2ª faixa pequena** só do `param.sfo` (feito; 4 → 2 pendentes ao reprocessar; restam os 7 PS5, fora do alvo).
 5. **Cobertura de medição:** 22 de 191 links do PKG-Zone com dados completos (33 de 202 no total); o resto sobe pelo `--refresh-links` (ou `--recheck`, que é sondagem em massa: evitei).
 6. **GitHub Releases de terceiros** (Apollo, Store): descobertos e verificados, mas baixam via `github.com` (TLS falho no seu console): não entram nas listas até um teste mostrar o contrário.

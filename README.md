@@ -20,11 +20,12 @@ Robô que **descobre pacotes em fontes autorizadas, verifica os links e gera aut
 ```bash
 PYTHONPATH=src python3 -m ps4store run              # descobre → verifica → gera dist/auto/ps4storebr-auto.gssource
 PYTHONPATH=src python3 -m ps4store run --dry-run    # sem gravar nada
-PYTHONPATH=src python3 -m pytest -q                 # 145 testes (Python ≥ 3.11, sem dependências de runtime)
+PYTHONPATH=src python3 -m pytest -q                 # 149 testes (Python ≥ 3.11, sem dependências de runtime)
 ```
 No PS4 (sem PC): cole `https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/auto/ps4storebr-auto.gssource` na página do celular do SSPI (aba *Sources*). Passo a passo: `docs/USO_NO_PS4.md`.
 
-## Testes reais de jogos no PS4 (próximo passo)
+## Testes reais de jogos no PS4
+✅ **OpenTyrian** (jogo completo, 19,8 MB, link estável com redirect assinado, ID não-`CUSA`): baixado, instalado e executado pelo download direto do SSPI (22/11/2026). Próximos: arquivo grande (≈1 GB), retomada e RAR dividido.
 `docs/TESTES_DE_JOGOS.md`: candidatos validados pelo robô (jogo completo pequeno, ≈1 GB com retomada, RAR dividido de 11 volumes), procedimento e ficha de registro.
 
 ## Descoberta × validação × publicação
@@ -46,7 +47,7 @@ data/                 canônico gerado, estado do robô, fixtures históricas
 dist/                 artefatos (ver dist/README.md)
 .github/workflows/    catalogo.yml (agendado a cada 6 h)
 docs/                 índice em docs/README.md
-tests/                145 testes
+tests/                149 testes
 ```
 
 ## Regras do catálogo instalável

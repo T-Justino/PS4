@@ -6,6 +6,20 @@ Todos os candidatos foram **descobertos e validados pelo robô** (`ps4store run 
 **Origem e legitimidade (sem maquiar):** nenhuma fonte publica licença por item. Escolhi projetos de código aberto ou originais do autor, distribuídos pelo próprio autor no PKG-Zone. A licença exata **não está verificada**; o uso é pessoal e a decisão final é sua.
 Não incluí jogos comerciais, portes/mods de jogos comerciais nem repackagens (o robô mantém esses itens na pesquisa como metadados, fora das listas).
 
+## RESULTADO: Teste 1 (OpenTyrian) APROVADO (22/11/2026, relato do usuário; PS4 Pro 9.00, GoldHEN, SSPI 5.11.7)
+
+Link usado: `https://pkg-zone.com/download/ps4/OPEN00001/1.01` na função de **download direto** do SSPI (sem catálogo, sem PC, sem VPS).
+
+| Etapa | Resultado |
+|---|---|
+| Download | **concluído**, 19,8 MB (= 19.791.872 B previstos pelo robô) |
+| Pacote identificado | **`OPEN00001`** (= identidade lida pelo robô: `IV0001-OPEN00001_00-OPEN000010000000`) |
+| Instalação | concluída, status **Installed** |
+| Execução | o jogo **abriu** e exibiu o menu principal |
+
+**O que isto comprova (e só isto):** um jogo homebrew completo obtido por **URL estável que redireciona para uma URL assinada temporária** (`pkg-zone.com` → `api.pkg-zone.com`), com `Range`, e com **ID que o importador de catálogo recusaria** (`OPEN00001` não é `CUSA`): o caminho de download direto do SSPI o baixa, identifica, instala e executa.
+As hipóteses do robô sobre o baixador do SSPI (redirect, URL assinada, `Range`, identidade) **foram confirmadas para este item**. **Não comprova** arquivos grandes, retomada, RAR dividido, os demais itens do PKG-Zone, jogos comerciais nem outros hosts. Os Testes 2 a 5 continuam pendentes.
+
 ## Lista curta de candidatos
 
 | # | Candidato | Tamanho | Formato / caminho | Origem | O que demonstra |
@@ -41,7 +55,7 @@ Não incluí jogos comerciais, portes/mods de jogos comerciais nem repackagens (
 
 **Antes de cada teste:** *Settings → Storage*: anote **espaço livre** (interno e USB) e o **Staging location**. Para o 3/4/5 prefira **USB exFAT** como staging. Mantenha o PS4 fora do modo repouso; ative *Stats for nerds* (velocidade/tamanho).
 
-**Teste 1 (jogo completo, redirect):** cole o link do OpenTyrian → baixar → instalar → **abrir e jogar 1 min**. Fotografe: tamanho exibido (esperado 19,8 MB), conclusão, "Installed", tela do jogo.
+**Teste 1 (jogo completo, redirect): ✅ APROVADO, não repetir.** cole o link do OpenTyrian → baixar → instalar → **abrir e jogar 1 min**. Fotografe: tamanho exibido (esperado 19,8 MB), conclusão, "Installed", tela do jogo.
 **Teste 2 (opcional):** idem com FNF (≈172 MiB).
 **Teste 3 (grande + retomada + espaço):** cole o link do Live Die Repeat. Anote espaço livre no início, **com ~50 %**, no fim do download e após instalar. Retomada, em ordem:
  1. com ~30 %, **corte a rede 30–40 s** (cabo/Wi-Fi) e restaure → continua de onde parou? (anote % antes/depois e se a velocidade recomeça);
@@ -62,3 +76,18 @@ retomada: corte 30 s [retomou/reiniciou/falhou] · corte 4 min [retomou/renovou/
 ## Critério de sucesso
 **Um jogo completo baixado direto no PS4, instalado e executado, com evidência de cada etapa.** O mínimo é o **Teste 1**; os testes 3 e 5 respondem às perguntas de arquivo grande, retomada, espaço e RAR.
 Nada aqui garante jogos comerciais nem outros hosts. Nenhum identificador interno de PKG, firmware ou proteção é alterado.
+
+## Prontidão para retomada, medida pelo robô antes do teste (22/11/2026)
+
+Novo comando: `ps4store resume-check [--title ID ...] [--source ID]`. Para cada arquivo faz **3 requisições `Range` de 64 KiB** (25 %, 50 %, 90 %): confere se o servidor honra `Range` em offsets arbitrários, se o **tamanho total** e o **ETag** ficam estáveis mesmo passando por um novo redirect a cada requisição (o SSPI desconfia de réplicas que etiquetam os mesmos bytes de forma diferente) e mede quanto tempo vive a URL assinada. Nunca baixa o arquivo.
+
+| Candidato | Tamanho | `Range` em offsets | Tamanho | Validador | Veredito |
+|---|---|---|---|---|---|
+| Kill'em All. (`BBFF12362/1.00`) | 1.423,5 MB | ok | estável | ETag | **PRONTO** |
+| Live Die Repeat (`LAPY10024/1.01`) | 948,8 MB | ok | estável | ETag | **PRONTO** |
+| PS Scene The Quiz Game (`LAPY10010/1.01`) | 261,7 MB | ok | estável | ETag | **PRONTO** |
+| RAR dividido próprio (volumes 01–10 de 11; o 11 fica fora do teto de 10 por comando) | 0,6 MB cada | ok | estável | ETag | **PRONTO** |
+
+Releases **inativas** (versões antigas, p.ex. `Live Die Repeat` 947,9 MB) respondem 403 no link estável e **não são candidatas**; o comando as ignora.
+"PRONTO" significa que o servidor oferece o que o SSPI precisa para retomar e baixar em faixas; **só o teste no console prova** que a retomada funciona (Teste 3).
+Como o link estável gera uma URL assinada nova a cada requisição, o robô confirma que isso **não troca o ETag nem o tamanho**: é a condição para a retomada do SSPI aceitar a renovação.

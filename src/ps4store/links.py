@@ -76,8 +76,11 @@ def classify_link(pr) -> dict:
         notes.append("servidor ignora Range: o SSPI baixa em uma conexão só, sem faixas paralelas")
     if pr.redirects and pr.signed:
         notes.append("redireciona para URL assinada que expira: o SSPI refaz o redirect pela URL estável se ela expirar")
+    if pr.expires_in is not None:
+        notes.append(f"URL assinada expira em ≈{max(pr.expires_in, 0) // 60} min (a estável gera outra)")
     if pr.total_size is None:
         notes.append("tamanho total desconhecido")
     return {"kind": "redirect" if pr.redirects else "direto", "status": pr.status, "redirects": pr.redirects,
             "chain": pr.chain, "temporaryFinalUrl": pr.signed, "rangeOk": pr.range_ok, "singleLane": single,
-            "etag": bool(pr.etag), "sspiUsable": usable, "notes": notes}
+            "etag": bool(pr.etag), "etagStrong": bool(pr.etag) and not pr.etag.startswith("W/"),
+            "lastModified": bool(pr.last_modified), "ttlSeconds": pr.expires_in, "sspiUsable": usable, "notes": notes}

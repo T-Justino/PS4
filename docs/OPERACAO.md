@@ -66,7 +66,7 @@ Política de TLS: `tls.known_bad_hosts` (bloqueia a publicação, ex. `github.co
 6. **Desativar/remover:** `"enabled": false` (o item some do catálogo na próxima execução; o relatório mantém o histórico no estado).
 
 ## 3. Testes
-`PYTHONPATH=src python3 -m pytest -q` → **145 testes**, sem rede (Python 3.11, 3.12 no Actions e 3.13). Cobrem: formato `.gssource` e validador, regras do canônico, leitura de PKG, conectores
+`PYTHONPATH=src python3 -m pytest -q` → **149 testes**, sem rede (Python 3.11, 3.12 no Actions e 3.13). Cobrem: formato `.gssource` e validador, regras do canônico, leitura de PKG, conectores
 (Releases, Contents, PKG-Zone), fases e rejeições, autorização por item, cache e teto de sondagens, uma versão por ID, fonte crítica, rede segura (servidor local com Range/redirect) e os artefatos do T8.
 **Não substituem o teste no console**: o que foi comprovado no PS4 está em `docs/TESTE_*.md`.
 
@@ -76,5 +76,6 @@ Política de TLS: `tls.known_bad_hosts` (bloqueia a publicação, ex. `github.co
 | Descobrir, verificar, publicar sem cadastrar URL | sim | sim (GitHub Contents/Releases, PKG-Zone) | — |
 | Fonte importada por URL e atualizada (1.0.3→1.0.4) | sim | sim (workflow) | **sim (T9)** |
 | Baixar, instalar e abrir um app do catálogo | — | — | **sim (T8b, v1.00, app próprio)** |
+| **Jogo completo por link estável com redirect assinado (OpenTyrian)** | sim | sim | **sim (22/11/2026)** |
 | Instalar a v1.02 (atualização do app) | — | — | **não testado** |
 | Agendamento por `cron` | — | **não observado** | — |

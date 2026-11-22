@@ -9,15 +9,22 @@ import ipaddress
 import json
 import re
 import socket
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
 UA = "ps4store-discovery/0.1"
+_EXP_RE = re.compile(r"[?&](?:exp|expires)=(\d{9,11})(?:&|$)", re.I)
 SIGNED_RE = re.compile(r"[?&](exp|expires|expiry|sig|signature|token|x-amz-signature|x-goog-signature|se)=", re.I)
 MAX_JSON = 2 * 1024 * 1024
 MAX_REDIRECTS = 5
+
+
+def _expires_in(url: str) -> int | None:
+    m = _EXP_RE.search(url)
+    return int(m.group(1)) - int(time.time()) if m else None
 
 
 class NetError(Exception):
@@ -40,6 +47,9 @@ class Probe:
     last_modified: str | None = None
     chain: list = field(default_factory=list)   # hosts percorridos (origem → ... → final)
     signed: bool = False                # URL final com assinatura/expiração (temporária)
+    range_start: int | None = None      # Content-Range: início devolvido (conferir se o servidor honrou o offset pedido)
+    range_end: int | None = None
+    expires_in: int | None = None       # segundos até a URL assinada expirar (parâmetro exp/expires numérico), se houver
 
 
 def _host_blocked(host: str) -> str | None:
@@ -123,16 +133,18 @@ class UrllibNet:
                 head = r.read(nbytes)                        # no máximo nbytes; o resto nunca é lido
                 total = None
                 cr = r.headers.get("Content-Range")
-                m = re.match(r"bytes \d+-\d+/(\d+)$", cr or "")
+                m = re.match(r"bytes (\d+)-(\d+)/(\d+)$", cr or "")
+                rs = re_ = None
                 if m:
-                    total = int(m.group(1))
+                    rs, re_, total = int(m.group(1)), int(m.group(2)), int(m.group(3))
                 elif status == 200 and (r.headers.get("Content-Length") or "").isdigit():
                     total = int(r.headers["Content-Length"])
                 return Probe(status in (200, 206), status, None if status in (200, 206) else f"HTTP {status}",
                              total, head, r.geturl(), r.headers.get_content_type(), redirects.count,
                              range_ok=status == 206 and bool(m), content_encoding=r.headers.get("Content-Encoding"),
                              etag=r.headers.get("ETag"), last_modified=r.headers.get("Last-Modified"),
-                             chain=list(redirects.hosts), signed=bool(SIGNED_RE.search(r.geturl())))
+                             chain=list(redirects.hosts), signed=bool(SIGNED_RE.search(r.geturl())),
+                             range_start=rs, range_end=re_, expires_in=_expires_in(r.geturl()))
         except urllib.error.HTTPError as e:
             return Probe(False, e.code, f"HTTP {e.code}", redirects=redirects.count, chain=list(redirects.hosts),
                          final_url=getattr(e, "url", "") or "", signed=bool(SIGNED_RE.search(getattr(e, "url", "") or "")))

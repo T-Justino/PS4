@@ -14,7 +14,7 @@ O MVP prova o **mecanismo** (descobrir → verificar → publicar → importar �
 7. **Só pacotes "base"** (`gd`/`gde`). **Atualizações e DLC não foram testados**; pelo código público do SSPI dependem do jogo base instalado e do `param.sfo` sob o ID `CUSA`. Um app `CUSA` não é substituído automaticamente (precisa de *Reinstall* ou excluir antes).
 
 ## C. Hospedagem e tamanho
-8. **O catálogo só aponta links:** alguém precisa hospedar os PKGs em HTTPS direto, sem login/CAPTCHA. Hosts comprovados no seu console: `raw.githubusercontent.com` (PKG de 6,6 MB) e `pkg-zone.com` (Store). **`github.com` falha com TLS.** O redirect assinado do PKG-Zone (`api.pkg-zone.com`) **não foi testado**.
+8. **O catálogo só aponta links:** alguém precisa hospedar os PKGs em HTTPS direto, sem login/CAPTCHA. Hosts comprovados no seu console: `raw.githubusercontent.com` (PKG de 6,6 MB) e `pkg-zone.com` (Store). **`github.com` falha com TLS.** O redirect assinado do PKG-Zone (`api.pkg-zone.com`) **foi comprovado** com o OpenTyrian (download direto, 19,8 MB); arquivos grandes e retomada ainda não.
 9. **Jogos reais têm de 1 a 100 GB**, e hospedar no GitHub não é viável (limite de 100 MB por arquivo no repositório; uso como CDN de jogos viola os termos). **RAR/partes múltiplas não estão implementados** (Gate 5).
 10. **Sem VPS e sem PC** (requisito) significa depender de hosts gratuitos de terceiros com limite de banda/arquivo.
 
