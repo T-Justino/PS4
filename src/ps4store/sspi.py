@@ -44,6 +44,9 @@ ACCESS_TYPES = ("Direct", "HosterLanding")
 # Prefixos com aceitação observada no SSPI 5.11.7 do usuário (atualizar após o Gate 2).
 # CUSA: fixture aceito (CUSA99999, importação + busca). APOL: rejeitado em catálogo antigo.
 CONSOLE_PROVEN_PREFIXES: tuple[str, ...] = ("CUSA",)
+# Rejeitados pelo SSPI BETA 5.11 / 0eb783eca1f3 na importação (Gate 2, 22/11/2026, foto do usuário):
+# "Source couldn't be added — Static catalog: Unsupported catalog title identifier".
+CONSOLE_REJECTED_PREFIXES: tuple[str, ...] = ("NPXS", "APOL")
 
 _BAD_PATH_CHARS = re.compile(r"[\\:\x00-\x1f\x7f]")
 
@@ -233,6 +236,9 @@ def check_files(files: dict[str, bytes], *, archive_size: int | None = None,
             if not isinstance(tid, str) or not TITLE_ID_RE.match(tid):
                 res.errors.append(f"{where}: Unsupported catalog title identifier")
                 continue
+            if tid.startswith(CONSOLE_REJECTED_PREFIXES):
+                res.errors.append(f"{where}: Unsupported catalog title identifier "
+                                  f"(prefixo {tid[:4]} rejeitado pelo SSPI 5.11 no console)")
             if is_placeholder_id(tid) and not allow_placeholder_ids:
                 res.errors.append(f"{where}: ID fictício/placeholder proibido")
             if tid in indexed:

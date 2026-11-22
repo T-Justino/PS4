@@ -30,7 +30,7 @@ def cmd_build(a) -> int:
         print(f"ERRO  {e}", file=sys.stderr)
         return 1
     data = zip_files(files)
-    res = sspi.check_archive(data)
+    res = sspi.check_archive(data, allow_placeholder_ids=any(t.catalog_key for t in cat.titles))
     _print(res)
     if not res.ok:
         print("build abortado: artefato não passou no check; nada foi escrito", file=sys.stderr)

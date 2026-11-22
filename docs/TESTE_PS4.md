@@ -1,48 +1,44 @@
-# Gate 2 — Teste manual no PS4 Pro 9.00 / GoldHEN / SSPI 5.11.7
+# Gate 2b — Teste manual no PS4 Pro 9.00 / GoldHEN / SSPI
 
-**Objetivo:** provar importação, busca e detalhes com **IDs reais**. **Não instalar nada.** Duração: ~5 min.
+## Resultado do Gate 2 (22/11/2026, foto do usuário)
 
-## Arquivos (pasta `dist/`)
+T2 (`NPXS39041`) e T3 (`APOL00004`): **ambos recusados na importação** com
+`Source couldn't be added — Static catalog: Unsupported catalog title identifier`.
+Versão exibida na tela: **BETA 5.11 / 0eb783eca1f3** (não é a 5.11.7 Final).
+Conclusão: o binário é mais restrito que o código público (que aceitaria os dois). Só `CUSA` está comprovado
+(fixture original `CUSA99999`). Os arquivos T2/T3 foram movidos para `dist/rejected/` e o `build` agora os bloqueia.
 
-| Arquivo | ID | contentSha256 (início) | Observação |
-|---|---|---|---|
-| `ps4storebr-t2-npxs39041.gssource` | `NPXS39041` | `e574eddb…` | Prefixo NPXS. Já instalado no console: **não reinstalar** |
-| `ps4storebr-t3-apol00004.gssource` | `APOL00004` | `e3537c5c…` | ID que o console rejeitou antes. Download falha TLS: **não instalar** |
+## Hipótese e teste
 
-Se o hash do ZIP for diferente de um ambiente para outro, é normal (ver `AUDITORIA_GATE1.md`). Vale o conteúdo.
-São duas fontes separadas de propósito: a rejeição de uma não esconde o resultado da outra.
+O `titleId` do catálogo é só uma chave de busca; o fixture que funcionou usava `CUSA99999` (fictício) com o PKG do Apollo.
+Teste T4 = o mesmo PKG do Store (download comprovado, 24,8 MB) sob a chave `CUSA99999`.
 
-## Preparação (1 vez)
+| Arquivo | Chave | contentSha256 (início) |
+|---|---|---|
+| `dist/ps4storebr-t4-cusa99999.gssource` | `CUSA99999` (fictícia, marcada `catalogKey`) | `24b41a5d…` |
 
-1. Baixe os dois `.gssource` do GitHub (pasta `dist/`, botão Download raw) no PC.
-2. Copie para a **raiz** de um pendrive FAT32 ou exFAT. Não renomeie, não descompacte.
-3. Pendrive no PS4, GoldHEN carregado, abra o SSPI.
+## Passos
 
-## Passos — T2 primeiro, depois T3 (repita tudo)
+1. Baixe `dist/ps4storebr-t4-cusa99999.gssource` e copie para a raiz do pendrive (FAT32/exFAT).
+2. SSPI → adicionar fonte → arquivo USB → selecione o arquivo.
+3. Busque `store`, depois `CUSA99999`. Abra os detalhes (confira nome, tipo `base`, hoster PKG-Zone).
+4. **Parte A (obrigatória): não instale.** Pare aqui.
+5. **Parte B (opcional, só se A deu certo):** toque em Instalar. O Store já está instalado; reinstalar o mesmo PKG
+   é o procedimento normal de atualização. Anote se o download inicia e se o SSPI reclama de ID incompatível.
 
-1. SSPI → adicionar fonte → arquivo USB → selecione o arquivo.
-2. Anote: **importou?** Se falhar, fotografe a mensagem exata.
-3. Busque pelo **nome**: `store` (T2) ou `apollo` (T3).
-4. Busque pelo **ID**: `NPXS39041` (T2) ou `APOL00004` (T3).
-5. Abra os detalhes. Confira ID, nome, tipo `base` e hoster.
-6. **Não** toque em instalar/baixar. Volte e, se quiser, remova a fonte.
-
-## O que me enviar (copie e preencha)
+## O que me enviar
 
 ```text
-T2: importou [sim/não + erro] | busca nome [ok/vazio] | busca ID [ok/vazio] | ID exibido: ____
-T3: importou [sim/não + erro] | busca nome [ok/vazio] | busca ID [ok/vazio] | ID exibido: ____
+T4: importou [sim/não + erro] | busca nome [ok/vazio] | busca CUSA99999 [ok/vazio] | detalhes [ok/erro]
+Parte B: instalar [não testei / baixou e instalou / erro: ____]
 ```
-Fotos da tela de erro ou de detalhes, se houver. Se algo falhar, diga também a hora aproximada.
 
-## Interpretação e próximo passo
+## Interpretação
 
 | Resultado | Conclusão | Próximo passo |
 |---|---|---|
-| T2 ok, T3 ok | NPXS e APOL aceitos; a rejeição antiga teve outra causa | Gate 1 aceito; seguir ao Gate 3 |
-| T2 ok, T3 erro de ID | Binário restringe prefixos; APOL fora | Registrar prefixos permitidos no validador |
-| T2 erro de ID | Binário mais restrito que o código público | Testar homebrew com ID `CUSA` real e autorizado |
-| Erro que não é de ID (ex.: formato/campo) | Divergência de schema | Gerar variante com `version` nas linhas de pacote e repetir |
-| Importou mas busca vazia | Problema de indexação/normalização | Enviar o termo exato digitado; investigar `searchText` |
-
-Compatibilidade só será registrada depois do seu relato.
+| Importa e busca ok | Chave `CUSA` funciona como chave de catálogo | Adotar chave sintética `CUSA` + `contentId` real; seguir ao Gate 3 |
+| Importa, mas busca vazia | Problema de normalização/`searchText` | Enviar o termo exato digitado |
+| Erro de ID de novo | `CUSA99999` específico ou regra mais estrita | Testar `CUSA` com dígitos não-placeholder |
+| Erro de outro tipo (formato) | Falta de `version` na linha do pacote | Gerar variante com `version` preenchida |
+| B: erro de ID/conteúdo incompatível | O SSPI confere o ID do PKG com a chave | Só `CUSA` reais servem; rever o escopo |

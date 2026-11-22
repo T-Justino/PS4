@@ -1,0 +1,30 @@
+{
+  "sourceId": "ps4storebr.gate2.t4.cusa99999",
+  "version": "0.1.0",
+  "publishedTitles": [
+    "CUSA99999"
+  ],
+  "excluded": [],
+  "files": {
+    "source.json": {
+      "size": 845,
+      "sha256": "24b41a5d6dad6c29f626612881b0fab5894522c5238fec8f216ab50fb1109bff"
+    },
+    "catalog.json": {
+      "size": 261,
+      "sha256": "4338580f8bece80abce076cf07048199e428d098cb89c29169b498b6f13bd287"
+    },
+    "index/titles.json": {
+      "size": 188,
+      "sha256": "ac8764976de7d0a5666d96f09faeaf3fccf19d860a8d2c96f036348bea099c65"
+    },
+    "packages/items.json": {
+      "size": 267,
+      "sha256": "59422010f9c7bab3e981a9a59036c7e6d154d8805bf7834cc1fd115e67f992a2"
+    }
+  },
+  "artifactSha256": "a4eaca2fdcf47bc41ab4d4d0fee0a286437c724d8ae968762d3821c0d70a0cf0",
+  "contentSha256": "24b41a5d6dad6c29f626612881b0fab5894522c5238fec8f216ab50fb1109bff",
+  "warnings": [],
+  "consoleCompatibility": "NAO_TESTADO — requer teste manual no PS4 (Gate 2)"
+}

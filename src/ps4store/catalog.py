@@ -48,6 +48,7 @@ class Title:
     aliases: list[str]
     audio_pt_br: str
     subtitles_pt_br: str
+    catalog_key: bool = False   # titleId é chave de catálogo (não ID real do pacote)
     packages: list[Package] = field(default_factory=list)
 
 
@@ -113,7 +114,7 @@ def parse(doc: dict) -> Catalog:
         if tid:
             if not sspi.TITLE_ID_RE.match(tid):
                 errs.append(f"{where}: titleId fora do padrão AAAA00000 (PPSA não suportado)")
-            elif sspi.is_placeholder_id(tid):
+            elif sspi.is_placeholder_id(tid) and t.get("catalogKey") is not True:
                 errs.append(f"{where}: titleId fictício/placeholder proibido")
             if tid in seen:
                 errs.append(f"{where}: titleId duplicado (edições/regiões distintas exigem decisão explícita)")
@@ -167,7 +168,8 @@ def parse(doc: dict) -> Catalog:
                 hoster=p.get("hoster") or "", label=p.get("label") or "",
                 source_page_url=spu, version=p.get("version"), extra=extra,
                 authorized=authorized))
-        titles.append(Title(tid, tname, t.get("region"), aliases, audio, subs, pkgs))
+        titles.append(Title(tid, tname, t.get("region"), aliases, audio, subs,
+                            catalog_key=t.get("catalogKey") is True, packages=pkgs))
 
     if errs:
         raise CatalogError(errs)

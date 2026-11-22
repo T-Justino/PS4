@@ -1,0 +1,44 @@
+{
+  "schema": "ps4storebr.catalog/v1",
+  "source": {
+    "id": "ps4storebr.gate2.t4.cusa99999",
+    "name": "PS4 Store BR - Gate 2 T4 (CUSA99999)",
+    "description": "Teste de catalogo do PS4 Store BR. Item: PKG-Zone Store (Store-R2.pkg) sob chave de catalogo CUSA99999 (ficticia; o PKG real e NPXS39041, rejeitado pelo SSPI 5.11 beta). Ja instalado no console de teste.",
+    "version": "0.1.0"
+  },
+  "titles": [
+    {
+      "titleId": "CUSA99999",
+      "identityEvidence": "Chave de catalogo FICTICIA (mesma do fixture aceito pelo SSPI 5.11). Identidade real do PKG: NPXS39041, rejeitado como titleId no console (Gate 2, 22/11/2026).",
+      "name": "PKG-Zone Store",
+      "region": null,
+      "aliases": [
+        "Store R2",
+        "pkg zone",
+        "loja homebrew"
+      ],
+      "languages": {
+        "audioPtBr": "unknown",
+        "subtitlesPtBr": "unknown",
+        "evidence": null
+      },
+      "packages": [
+        {
+          "id": "pkgzone-store-r2",
+          "kind": "base",
+          "accessType": "Direct",
+          "url": "https://pkg-zone.com/update/Store-R2.pkg",
+          "hoster": "PKG-Zone",
+          "label": "Store-R2 - pacote publico do PKG-Zone",
+          "sourcePageUrl": "https://pkg-zone.com/",
+          "version": null,
+          "authorization": {
+            "basis": "official-developer-release",
+            "evidence": "Endpoint publico de atualizacao do proprio PKG-Zone; download direto observado no SSPI (24,8 MB). Termos de listagem por terceiros: revisar antes do Gate 3."
+          }
+        }
+      ],
+      "catalogKey": true
+    }
+  ]
+}

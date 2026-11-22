@@ -2,7 +2,7 @@
 
 Catálogo pesquisável para o SSPI (PS4), com prioridade para PT-BR. Gera arquivos `.gssource` a partir de um catálogo canônico versionado. **Não hospeda nem baixa jogos.**
 
-**Status:** Gate 1 auditado (`docs/AUDITORIA_GATE1.md`). Próximo: Gate 2, teste manual no PS4 (`docs/TESTE_PS4.md`). Compatibilidade com o console: **não testada**.
+**Status:** Gate 1 auditado (`docs/AUDITORIA_GATE1.md`). Gate 2: NPXS e APOL **recusados** pelo SSPI BETA 5.11; próximo é o teste T4 com chave `CUSA` (`docs/TESTE_PS4.md`).
 
 ## Uso
 
@@ -20,7 +20,7 @@ O `build` valida o canônico, compila, roda o `check` e só grava se tudo passar
 
 ## Regras do canônico (`data/*.json`, schema `ps4storebr.catalog/v1`)
 
-- `titleId` real (`AAAA00000`, sem `PPSA`), com `identityEvidence`. Placeholders (`*99999`, `*00000`) são bloqueados.
+- `titleId` no padrão `AAAA00000` (sem `PPSA`), com `identityEvidence`. Prefixos `NPXS` e `APOL` são bloqueados (recusados pelo console). Placeholders (`*99999`, `*00000`) só com `"catalogKey": true`; nesse caso use `check --allow-placeholder`.
 - Pacote sem `authorization.evidence` **não é publicado**. Título sem pacote publicável fica fora do `.gssource` e aparece no relatório.
 - `languages.audioPtBr` / `subtitlesPtBr` ∈ `yes|no|unknown`. `yes` exige `evidence` e adiciona termos de busca `ptbr dublado/legendado`.
 - URLs somente `https://`, sem credenciais, sem IP literal nem host local.
