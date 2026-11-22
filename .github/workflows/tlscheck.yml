@@ -1,0 +1,23 @@
+# Diagnóstico manual (não agendado): cadeias de certificado dos hosts de download vs âncoras do SSPI. Somente leitura.
+name: tlscheck
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  chains:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cadeias de certificado
+        run: python tools/tls_chain.py | tee chains.md
+      - name: jsDelivr serve os volumes RAR? (cabeçalhos; 1 KiB)
+        run: |
+          SHA="$(git rev-parse HEAD)"
+          for u in "https://cdn.jsdelivr.net/gh/T-Justino/PS4@${SHA}/rartest/PS4StoreBRTest_v1.02_rar.part01.rar" \
+                   "https://raw.githubusercontent.com/T-Justino/PS4/${SHA}/rartest/PS4StoreBRTest_v1.02_rar.part01.rar"; do
+            echo "== $u"; curl -sS -r 0-1023 -D - -o /dev/null "$u" | grep -i -E "^HTTP|content-range|content-type|etag|cache-control|accept-ranges|server|x-served-by|via" || true
+          done
+      - name: Resumo
+        run: cat chains.md >> "$GITHUB_STEP_SUMMARY"
