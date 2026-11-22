@@ -55,6 +55,7 @@ jobs:
           git add dist/auto/ps4storebr-auto.gssource data/generated data/state   # o relatório vai só no resumo do job (evita commit a cada execução)
           if git diff --cached --quiet; then echo "sem mudanças"; else
             git commit -m "catalogo: atualizacao automatica"
+            git pull --rebase origin "${GITHUB_REF_NAME}"   # a branch pode ter avançado durante a execução
             git push
           fi
       - name: Falhar se uma fonte crítica caiu
