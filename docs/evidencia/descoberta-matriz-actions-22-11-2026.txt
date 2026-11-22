@@ -1,0 +1,14 @@
+Saída do job (GitHub Actions run 45041059933, disparo manual) após separar DISCOVERY / LINK_VALIDATION / PUBLICATION.
+As fontes do GitHub de terceiros só respondem no Actions (a sessão de desenvolvimento não as enxerga).
+
+fonte own-releases (T-Justino/PS4): ok
+fonte own-contents (T-Justino/PS4): ok
+fonte apollo-releases (bucanero/apollo-ps4): ok
+fonte pkg-zone (): ok
+fonte lightningmods-ps4-store (LightningMods/PS4-Store): ok
+fonte own-rar (T-Justino/PS4): ok
+fonte gh-search (): ok
+descobertos=401 acessíveis=257 pkg_verificados=222 compatíveis=22 publicados=1 novos=51 rejeitados=400
+matriz (sim/não/não avaliado): encontrados=401 | link acessível 111/15/275 | arquivo identificado 222/0/179 | SSPI compatível 22/200/179 | catálogo 1/221/179 | link direto 29/193/179 | licença desconhecida=346 conhecida=55
+links: sspi_baixáveis=111 redirect_temporário=97 restritos=102 duplicados=11 lista_pessoal=27
+fases: DESCOBERTO=179 · VERIFICADO=221 · PUBLICAVEL=1

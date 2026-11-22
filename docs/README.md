@@ -10,6 +10,7 @@
 | `PESQUISA_DE_LINKS.md` | descoberta ampliada, classificação de links, lista pessoal, resultados reais e teste T10 |
 | `TESTES_DE_JOGOS.md` | candidatos de jogos completos, RAR dividido, retomada e espaço: procedimento de teste real |
 | `LIMITACOES.md` | por que o catálogo ainda não oferece variedade real de jogos |
+| `SEPARACAO_DESCOBERTA.md` | **descoberta × validação de link × publicação**, as cinco perguntas, busca genérica e `ps4store search` |
 | `GATE3.md` | descoberta automática: fontes, resultados reais, PKG-Zone |
 | `SDD_REVISADO.md` | arquitetura e regras (v1.2) |
 | `AUTOMACAO_E_ATUALIZACAO.md` | workflow e como o SSPI atualiza fontes |
