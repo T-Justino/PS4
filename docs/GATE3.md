@@ -1,4 +1,28 @@
-# Gate 3 — descoberta automática de links (MVP) — fonte real: PKG-Zone
+# Gate 3 — descoberta automática de links — fonte real: PKG-Zone
+
+> **Registro:** a descoberta real no PKG-Zone (191 releases descobertas, 184 links acessíveis, 180 PKGs lidos) é **prova de descoberta automatizada**.
+> **Não é o MVP concluído.** O critério do MVP é: *um pacote autorizado, descoberto automaticamente, publicado no catálogo e instalado no PS4, sem cadastrar o link*.
+> Os resultados do PKG-Zone ficam preservados (`docs/evidencia/`, estado e cache em `data/state/`); nada foi publicado sem autorização.
+
+## Ciclo real: descoberta → validação → catálogo (feito) → instalação (pendente de T8/T9)
+
+| Etapa | Estado |
+|---|---|
+| Descoberta sem cadastrar a URL | **Feito, ao vivo:** conector `github-contents` listou `dist/t8/` pela **API real do GitHub** e achou o PKG do T8 |
+| Link e identidade validados | **Feito:** `Range` de 64 KiB no `raw.githubusercontent.com`; Content ID = `TITLE_ID` = `CUSA95417`; tamanho do servidor (6.619.136 B) = tamanho da API |
+| Autorização | Fonte própria (`license`, software do autor do projeto) |
+| Catálogo gerado do resultado real | **Feito:** `dist/auto/ps4storebr-auto.gssource` v1.0.1 (`check` OK); `data/generated/auto-catalog.json` |
+| Instalação no PS4 | **Pendente:** T8 (você) e depois T9 (`docs/TESTE_T9.md`) |
+| "Release nova" descoberta sozinha | **Provado em teste** (4 casos); **falta provar ao vivo** com um arquivo/versão novo real: precisa da sua aprovação (abaixo) |
+
+**Por que `github-contents` e não Releases:** o seu SSPI falhou com TLS em `github.com`, que serve os downloads de Releases, então uma Release nunca fecharia o ciclo de instalação
+(o robô a descobriria e a marcaria `TLS_HOST_BLOCKED`). O `raw.githubusercontent.com` é **outro host**, já em teste no T8. O conector de Releases continua pronto e testado.
+Uma "release nova" aqui é um arquivo novo ou alterado na pasta autorizada (a chave inclui o `sha` do arquivo no Git).
+
+**Alternativa de hospedagem se o T8 falhar por TLS** (sem contornar certificados): o que se sabe é que `pkg-zone.com` baixa e `github.com` não. Não sei qual CA o PS4 9.00 aceita
+(hipótese: raízes antigas). O mais simples é repetir o T8 com o **mesmo PKG** em **um** host estático gratuito (Cloudflare Pages/R2 público; o PKG de 6,6 MB cabe) e adotar o primeiro que baixar;
+o robô só precisa de um conector da API desse host ou de um índice JSON. Não implementei nada disso antes do resultado do T8.
+
 
 **Um comando:** `PYTHONPATH=src python3 -m ps4store run`. Descobre → verifica → classifica em fases → gera o `.gssource` só com o que é PUBLICÁVEL.
 

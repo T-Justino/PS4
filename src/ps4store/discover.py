@@ -53,6 +53,8 @@ class Source:
     recheck_hours: float = 0.0     # 0 = sem cache; reaproveita a verificação por este tempo (evita repetir downloads parciais)
 
     authorized_titles: dict = field(default_factory=dict)   # titleId -> {basis, evidence}: autorização POR ITEM
+    path: str = ""                 # github-contents: pasta do repositório com os .pkg
+    ref: str = ""                  # github-contents: branch/tag (vazio = padrão do repositório)
 
     def auth_for(self, title_id: str | None) -> tuple[str, str] | None:
         """Autorização que vale para este título: a do item (se houver) ou a da fonte inteira. Nunca presumida."""
@@ -76,6 +78,7 @@ class Config:
     tls_enforce: bool
     tls_known_bad: dict
     sources: list[Source]
+    tls_untested: dict = field(default_factory=dict)   # host -> nota; só gera aviso (não bloqueia)
 
 
 def load_config(path: str | Path) -> Config:
@@ -100,9 +103,11 @@ def load_config(path: str | Path) -> Config:
             errs.append(f"{w}: id inválido ou duplicado")
         seen.add(sid)
         typ = s.get("type")
-        if typ not in ("github-releases", "pkg-zone-catalog"):
-            errs.append(f"{w}: type deve ser github-releases ou pkg-zone-catalog")
-        if typ == "github-releases" and not REPO_RE.match(s.get("repo") or ""):
+        if typ not in ("github-releases", "github-contents", "pkg-zone-catalog"):
+            errs.append(f"{w}: type deve ser github-releases, github-contents ou pkg-zone-catalog")
+        if typ == "github-contents" and not re.match(r"^[A-Za-z0-9_./-]{1,200}$", s.get("path") or "") :
+            errs.append(f"{w}: github-contents exige path (pasta do repositório)")
+        if typ in ("github-releases", "github-contents") and not REPO_RE.match(s.get("repo") or ""):
             errs.append(f"{w}: repo deve ser dono/nome")
         base = s.get("base_url") or ""
         if typ == "pkg-zone-catalog" and not re.match(r"^https://[a-z0-9.-]+$", base):
@@ -122,13 +127,13 @@ def load_config(path: str | Path) -> Config:
                            s.get("include_prereleases") is True, int(s.get("max_releases", 20)),
                            a.get("basis", ""), a.get("evidence", ""), s.get("api_base", "https://api.github.com"),
                            base, float(s.get("delay_seconds", 0)), int(s.get("max_probes", 250)),
-                           float(s.get("recheck_hours", 0)), at))
+                           float(s.get("recheck_hours", 0)), at, s.get("path", ""), s.get("ref", "")))
     if not srcs:
         errs.append("nenhuma fonte configurada")
     if errs:
         raise ConfigError("\n".join(errs))
     return Config(cat["id"], cat["name"], cat.get("description", ""), tls.get("enforce", True) is True,
-                  dict(tls.get("known_bad_hosts") or {}), srcs)
+                  dict(tls.get("known_bad_hosts") or {}), srcs, dict(tls.get("untested_hosts") or {}))
 
 
 # --------------------------------------------------------------------------- descoberta (conector)
@@ -179,6 +184,31 @@ def discover_pkgzone(src: Source, net) -> list[Found]:
                 skip_reason=None if console == "ps4" else "NOT_PS4",
                 meta={"catalogTitleId": tid, "console": console, "author": it.get("author"),
                       "category": it.get("category"), "firmware": r.get("pv")}))
+    return found
+
+
+def discover_contents(src: Source, net) -> list[Found]:
+    """Lista os .pkg de uma PASTA de um repositório autorizado (API Contents do GitHub) e usa o link `download_url` (raw).
+
+    "Release nova" = arquivo novo ou alterado na pasta: a chave inclui o sha do blob, então qualquer mudança é detectada.
+    Útil quando o host de Releases (github.com) não é baixável pelo console; o raw.githubusercontent.com é outro host.
+    """
+    q = f"?ref={quote(src.ref, safe='')}" if src.ref else ""
+    items = net.get_json(f"{src.api_base}/repos/{src.repo}/contents/{quote(src.path.strip('/'))}{q}")
+    if not isinstance(items, list):
+        raise ValueError("resposta inesperada da API de contents (a pasta existe e é um diretório?)")
+    found: list[Found] = []
+    for it in items:
+        if not isinstance(it, dict) or it.get("type") != "file":
+            continue
+        name, url, sha = it.get("name"), it.get("download_url"), it.get("sha")
+        if not (isinstance(name, str) and name.lower().endswith(".pkg") and isinstance(url, str) and isinstance(sha, str)):
+            continue
+        size = it.get("size")
+        found.append(Found(f"{src.id}#{sha}", src, sha[:7], str(it.get("html_url") or ""), "", name, url,
+                           size if isinstance(size, int) and not isinstance(size, bool) else None))
+        if len(found) >= MAX_ASSETS_PER_SOURCE:
+            break
     return found
 
 
@@ -294,7 +324,7 @@ def verify(found: Found, net, cfg: Config) -> Entry:
         head = parse_head(pr.head)
     except PkgError as ex:
         return e.reject(ex.code, str(ex))
-    e.content_id, e.name, e.kind = head.content_id, found.name_hint or head.sfo.get("TITLE"), head.kind
+    e.content_id, e.name, e.kind = head.content_id, found.name_hint or (head.sfo.get("TITLE") or "").strip() or None, head.kind
     e.version = head.sfo.get("APP_VER") or head.sfo.get("VERSION")
     if head.sfo.get("TITLE_ID") != head.title_id:
         return e.reject("IDENTITY_MISMATCH", f"param.sfo TITLE_ID={head.sfo.get('TITLE_ID')} ≠ Content ID ({head.title_id})")
@@ -323,6 +353,8 @@ def verify(found: Found, net, cfg: Config) -> Entry:
     host = urlsplit(found.url).hostname or ""
     if cfg.tls_enforce and host in cfg.tls_known_bad:
         return e.reject("TLS_HOST_BLOCKED", f"{host}: {cfg.tls_known_bad[host]}")
+    if host in cfg.tls_untested:
+        e.warnings.append(f"{host}: TLS não confirmado no SSPI ({cfg.tls_untested[host]})")
     # 5) autorização: só a da fonte (allowlist); sem ela o item fica VERIFICADO, nunca PUBLICAVEL
     if found.source.auth_for(e.title_id) is None:
         return e.reject("NO_AUTHORIZATION", f"nem a fonte '{found.source.id}' nem o título {e.title_id} têm autorização de listagem registrada (config/sources.json)")
@@ -390,7 +422,7 @@ def _age_hours(a: str, b: str) -> float:
     return (datetime.strptime(b, fmt) - datetime.strptime(a, fmt)).total_seconds() / 3600
 
 
-CONNECTORS = {"github-releases": discover_github, "pkg-zone-catalog": discover_pkgzone}
+CONNECTORS = {"github-releases": discover_github, "github-contents": discover_contents, "pkg-zone-catalog": discover_pkgzone}
 
 
 def run(cfg: Config, net, *, out_gssource: Path, out_canonical: Path, out_report: Path, state_path: Path,

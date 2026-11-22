@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-22T14:12:39Z",
+  "generatedAt": "2026-11-22T14:36:05Z",
   "dryRun": false,
   "note": "Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.",
   "sources": [
@@ -8,6 +8,12 @@
       "repo": "T-Justino/PS4",
       "status": "ok",
       "discovered": 0
+    },
+    {
+      "source": "own-contents",
+      "repo": "T-Justino/PS4",
+      "status": "ok",
+      "discovered": 1
     },
     {
       "source": "apollo-releases",
@@ -23,15 +29,15 @@
     }
   ],
   "counts": {
-    "descobertos": 191,
-    "acessiveis": 184,
-    "pkgVerificados": 180,
-    "compativeisSspi": 19,
-    "publicados": 0,
+    "descobertos": 192,
+    "acessiveis": 185,
+    "pkgVerificados": 181,
+    "compativeisSspi": 20,
+    "publicados": 1,
     "fases": {
       "DESCOBERTO": 11,
       "VERIFICADO": 180,
-      "PUBLICAVEL": 0
+      "PUBLICAVEL": 1
     },
     "novos": 1,
     "rejeitados": 191,
@@ -45,9 +51,35 @@
       "KIND_UNTESTED": 4
     }
   },
-  "catalogUpdated": false,
+  "catalogUpdated": true,
   "catalogError": null,
   "entries": [
+    {
+      "key": "own-contents#47211795f25e46073e255b846e446d43ff761970",
+      "fase": "PUBLICAVEL",
+      "source": "own-contents",
+      "release": "4721179",
+      "asset": "IV0000-CUSA95417_00-PS4STOREBRTEST00.pkg",
+      "url": "https://raw.githubusercontent.com/T-Justino/PS4/ccr-8aace08a-bzwy8i/dist/t8/IV0000-CUSA95417_00-PS4STOREBRTEST00.pkg",
+      "sizeFeed": 6619136,
+      "stage": "publicado",
+      "rejected": false,
+      "reason": null,
+      "detail": "",
+      "titleId": "CUSA95417",
+      "contentId": "IV0000-CUSA95417_00-PS4STOREBRTEST00",
+      "name": "PS4 Store BR Test",
+      "kind": "base",
+      "version": "1.00",
+      "sizeVerified": 6619136,
+      "downloadHost": "raw.githubusercontent.com",
+      "finalHost": "raw.githubusercontent.com",
+      "isNew": true,
+      "meta": {},
+      "warnings": [
+        "raw.githubusercontent.com: TLS não confirmado no SSPI (download em teste no T8 (22/11/2026); resultado pendente)"
+      ]
+    },
     {
       "key": "pkg-zone#MOZI00001#ps4#1.0.0#2026-11-21T19:40:45.765Z",
       "fase": "VERIFICADO",
@@ -68,7 +100,7 @@
       "sizeVerified": 13893632,
       "downloadHost": "pkg-zone.com",
       "finalHost": "api.pkg-zone.com",
-      "isNew": true,
+      "isNew": false,
       "meta": {
         "catalogTitleId": "MOZI00001",
         "console": "ps4",
@@ -77,7 +109,8 @@
         "firmware": "11.00"
       },
       "warnings": [
-        "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado"
+        "o link redireciona para api.pkg-zone.com (URL assinada que expira): comportamento do SSPI nesse redirect não testado",
+        "resultado reaproveitado do cache (não sondado nesta execução)"
       ]
     },
     {
@@ -6343,5 +6376,14 @@
         "resultado reaproveitado do cache (não sondado nesta execução)"
       ]
     }
-  ]
+  ],
+  "artifact": {
+    "path": "dist/auto/ps4storebr-auto.gssource",
+    "version": "1.0.1",
+    "sha256": "232f8aae4e2fd404e5a552c4bf844edaf3b6d453c16c0f6da0f69f2bf1a0b650",
+    "contentSha256": "b364e4a8d93190291a2c55a9ddb31c15172f1e6ab4e5ee32194c1861fac5d875",
+    "titles": [
+      "CUSA95417"
+    ]
+  }
 }

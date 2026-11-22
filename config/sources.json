@@ -9,6 +9,9 @@
     "enforce": true,
     "known_bad_hosts": {
       "github.com": "download falhou com TLS 0x8095F00C no SSPI 5.11.7 (relato do usuario, 21/11/2026)"
+    },
+    "untested_hosts": {
+      "raw.githubusercontent.com": "download em teste no T8 (22/11/2026); resultado pendente"
     }
   },
   "sources": [
@@ -22,6 +25,17 @@
       "authorization": {
         "basis": "license",
         "evidence": "Releases do proprio repositorio do projeto (software do autor do projeto)."
+      }
+    },
+    {
+      "id": "own-contents",
+      "type": "github-contents",
+      "repo": "T-Justino/PS4",
+      "path": "dist/t8",
+      "enabled": true,
+      "authorization": {
+        "basis": "license",
+        "evidence": "Software do proprio autor do projeto (app PS4 Store BR Test; codigo em app/ps4storebr-test/)."
       }
     },
     {

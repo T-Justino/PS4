@@ -1,23 +1,26 @@
-# Relatório de descoberta — 2026-11-22T14:12:39Z
+# Relatório de descoberta — 2026-11-22T14:36:05Z
 
 > Compatibilidade de instalação NÃO comprovada no console (T8 pendente): 'compativel_sspi' = regras conhecidas.
 
 | Descobertos | Acessíveis | PKG verificado | Compatíveis (regras) | Publicados | Novos | Rejeitados |
 |---|---|---|---|---|---|---|
-| 191 | 184 | 180 | 19 | 0 | 1 | 191 |
+| 192 | 185 | 181 | 20 | 1 | 1 | 191 |
 
 ## Fontes
 - `own-releases` (T-Justino/PS4): ok, 0 .pkg
+- `own-contents` (T-Justino/PS4): ok, 1 .pkg
 - `apollo-releases` (bucanero/apollo-ps4): erro — HTTP 403 em api.github.com
 - `pkg-zone` (): ok, 191 .pkg
 
-Catálogo atualizado: **não**
+Catálogo atualizado: **sim**
+Artefato: `dist/auto/ps4storebr-auto.gssource` v1.0.1 · títulos: CUSA95417 · contentSha256 `b364e4a8d9319029…`
 
 ## Entradas
 
 | Novo | Fase | Estágio | Resultado | Título | Arquivo | Detalhe |
 |---|---|---|---|---|---|---|
-| sim | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | MOZI00001 | MOZI00001_ps4_v1.0.0.pkg (1.0.0) | prefixo MOZI não comprovado no console |
+| sim | PUBLICAVEL | publicado | **publicado** | CUSA95417 | IV0000-CUSA95417_00-PS4STOREBRTEST00.pkg (4721179) |  |
+|  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | MOZI00001 | MOZI00001_ps4_v1.0.0.pkg (1.0.0) | prefixo MOZI não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | PLTB00000 | PLTB00000_ps4_v1.2.0.pkg (1.2.0) | prefixo PLTB não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | AMIN00048 | AMIN00048_ps4_v1.00.pkg (1.00) | prefixo AMIN não comprovado no console |
 |  | VERIFICADO | pkg_verificado | rejeitado: `PREFIX_UNPROVEN` | NUEX00001 | NUEX00001_ps4_v3.0.pkg (3.0) | prefixo NUEX não comprovado no console |
