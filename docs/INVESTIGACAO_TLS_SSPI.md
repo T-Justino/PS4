@@ -1,7 +1,9 @@
 # Investigação: erro TLS `0x8095F00C` no SSPI (RAR dividido e Live Die Repeat)
 
 **Escopo:** transporte do SSPI. O robô de descoberta/validação **não foi alterado**. Nenhuma verificação TLS foi desativada; nenhuma mudança de firmware é proposta.
-**Fonte do código:** `xyhlo/SSPI` público (`main`, commit `1295abb`), que pode diferir do binário instalado; os `.pem` não estão no repositório.
+**Fonte do código:** `xyhlo/SSPI` público (`main`, commit `1295abb`, 23/10/2026), que **difere do binário instalado** (`package=20261003155605`, build `0eb783eca1f3`; ver §8); os `.pem` não estão no repositório.
+
+> **ESTADO ATUAL (seções 8 e 9):** com os logs reais do PS4, a hipótese de cadeia de certificados (H1 abaixo) **deixou de ser a principal**. A mesma cadeia do `raw` foi aceita 6 vezes e depois recusada no mesmo processo; reiniciar o SSPI destravou o download. A causa mais provável é **estado/esgotamento do TLS no processo**, ainda **não provada**. As seções 0 a 7 ficam como histórico.
 
 ## 0. Correção da hipótese anterior (retirada)
 A versão anterior deste documento dizia que o RAR era baixado pelo **worker residente** (que não fixa o certificado do GitHub). **A foto do 5A mostrava "In-app · keep SSPI open · Downloading" e isso refuta aquela explicação.** Reli o código:
@@ -79,3 +81,28 @@ Critério: a cadeia termina em raiz **carregada** pelo SSPI e o **intermediário
 
 ## 7. Limites
 Não vi a cadeia que o **seu** console recebe (outra região/borda pode diferir); o repositório público pode não ser o build instalado; o firmware pode ter raízes próprias. `0x8095F00C` pelo SSPI: a recusa vem da `libSceSsl`. Nada aqui altera o robô nem desativa TLS.
+
+## 8. Evidência real do PS4 (logs `combined/network/download.log`, 22/11/2026; **confirmado** = está no log)
+
+**Confirmado**
+- Build: `0eb783eca1f3`, `package=20261003155605` (3/10/2026). `pid=120`, iniciado 14:07:18 BRT, **sem reinício** entre os testes raw (14:13) e jsDelivr (14:40).
+- `native_http ready=True … sceHttpsLoadCert=0 PEM_roots=25; native_gen_y=2; native_gen_y_intermediates=4; native_torbox_intermediate=1; native_godaddy_intermediate=1`; **não há** `native_github_intermediates`. Conta: 25 − 2 − 4 − 1 − 1 = 17 raízes do bundle (o código público de 23/10 tem 19 marcadores): este build é anterior aos pins/raízes da GitHub (**inferência aritmética**, não vi os `.pem`).
+- **Raw, pid 120:** handles 1 a 6 completaram (614.400 B cada, `complete-structure-verified`, ≈ 0,5 s cada, `host=raw.githubusercontent.com`); o handle 7 falhou na 1ª sondagem com `hex=0x8095F00C ssl=0x8095F00A verify=0x20`. **A mesma cadeia foi aceita 6 vezes e depois recusada no mesmo processo.** Isso refuta "âncora/intermediária ausente" para o `raw`.
+- **Depois da 1ª falha, nenhum host funcionou no pid 120** (263 eventos TLS, todos com falha: raw, cdn.jsdelivr.net, orbispatches.com, amptis.com). O teste do jsDelivr foi feito em processo já comprometido e **não diz nada sobre o certificado do jsDelivr** (experimento confundido). Os "3,7 MB" do 2º teste eram da tarefa antiga; o jsDelivr teve `done=0`.
+- **`ssl-out-of-memory` real:** `0x809517D5` (tratado pelo SSPI como falta de memória do `libSceSsl`, `NativeHttp.cs:699-720`) aparece 24 vezes nos logs e no mesmo segundo/host em que aparece `0x8095F00C … verify=0x20` (pid 93, `api.pkg-zone.com`, 5603–5604 s). Também há OOM em `orbispatches.com` aos 342 s do pid 120, **antes** do download.
+- **Reiniciar o SSPI destravou o download:** após fechar e abrir de novo, o **Retry** na tarefa original do raw foi até o fim (relato do usuário, 22/11/2026).
+- Os "sucessos" `ssl=0x0 verify=0x0` nos logs de `stream-retry` são, na verdade, `hex=0x809517D5` (OOM), não handshakes bem-sucedidos.
+- Relógio do console: no pid 72 (sessão anterior) o `unix` recuou ≈ 5.049 s sem reinício do processo (`mono_ms` contínuo). Não afeta o pid 120 (inicia coerente com o relato).
+- `github.com` falha em todos os pids (esperado neste build: sem âncora E46/USERTrust ECC). Não é a causa do multipart.
+
+## 9. Hipóteses revistas (após os logs; **não provadas**)
+| | Hipótese | Evidência a favor | Contra / lacuna |
+|---|---|---|---|
+| **H-A (principal)** | Esgotamento ou estado comprometido do TLS do processo (pool `sceSslInit` de 16 MiB compartilhado com `sceHttpInit` de 32 MiB, 25 lanes, polling periódico); `verify=0x20` é sintoma de falha de alocação na montagem da cadeia | 6 OK, depois falha persistente em todos os hosts; OOM e `0x20` no mesmo instante; reinício restaura | Não provei vazamento; não há contador de pool no log |
+| H-B | Cadeia ausente/instável por host | `github.com` (build sem âncoras); jsDelivr indeterminado (R46/DV R36 podem faltar neste build) | O `raw` foi aceito 6 vezes na mesma cadeia |
+| H-C | Relógio do console | pid 72 mostra salto do `unix` | `verify` seria 0x08/0x10, não 0x20 |
+| H-D | `orbispatches.com` com problema próprio de cadeia | falha logo após o início no pid 99, enquanto `api.pkg-zone.com` funcionou | não separável nos logs |
+
+**Retirado:** a recomendação do §6 (jsDelivr como solução). O jsDelivr não foi testado em processo saudável; não há evidência de que ajude ou prejudique.
+
+**Menor estabilização (proposta; hipótese):** (1) operacional: reiniciar o SSPI antes de cada multipart; (2) ao mantenedor: reutilizar a conexão TLS entre volumes da mesma origem, e recriar o contexto SSL/HTTP depois de `0x809517D5`/`0x20` seguidos quando não houver handle aberto; (3) registrar o uso do pool SSL a cada falha. Nenhuma verificação TLS é enfraquecida.

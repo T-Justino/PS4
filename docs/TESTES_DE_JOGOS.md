@@ -102,7 +102,29 @@ Nada aqui garante jogos comerciais nem outros hosts. Nenhum identificador intern
 - O download começou e **chegou ao volume 7/11 (≈ 3,7–4 MB; 6 volumes × 614.400 B = 3,69 MB)** e **falhou**: `Provider TLS certificate not trusted on fresh probe sessions for two minutes with no useful progress (0x8095F00C)`, no painel do celular.
 - Hospedagem: `raw.githubusercontent.com`. **Extração, instalação e execução não foram alcançadas.** 5B e 5C pendentes.
 - **Modo confirmado: In-app** (foto: "In-app · keep SSPI open · Downloading"); **Retry repetiu o erro**. Mesmo código TLS do Live Die Repeat (PKG-Zone).
-- **Investigação revista** (a hipótese do worker residente foi **retirada**): `docs/INVESTIGACAO_TLS_SSPI.md`. Causa mais provável, não confirmada: o firmware antigo falha de forma intermitente ao construir a cadeia de hierarquias novas (Let's Encrypt Gen Y no `raw`; GTS WE1 no PKG-Zone). **Próximo teste: 5A com os mesmos 11 volumes servidos pelo jsDelivr** (`rartest/links-jsdelivr-ordem.txt`; cadeia Sectigo R36 fixada pelo SSPI) + coleta dos logs. Teste 5 **reprovado por transporte, não por descoberta**.
+- **Investigação revista** (a hipótese do worker residente foi **retirada**): `docs/INVESTIGACAO_TLS_SSPI.md`. **[REVISTO em 22/11/2026: a hipótese de cadeia de certificados foi enfraquecida; o 5A pelo jsDelivr também falhou, em processo já comprometido; reiniciar o SSPI destravou. Ver a continuação abaixo e `INVESTIGACAO_TLS_SSPI.md` §8-9.]** (texto original: Causa mais provável, não confirmada: o firmware antigo falha de forma intermitente ao construir a cadeia de hierarquias novas (Let's Encrypt Gen Y no `raw`; GTS WE1 no PKG-Zone). *(o 5A pelo jsDelivr também falhou, em processo já comprometido; ver a continuação abaixo)* ~~Próximo teste: 5A pelo jsDelivr~~ ** (`rartest/links-jsdelivr-ordem.txt`; cadeia Sectigo R36 fixada pelo SSPI) + coleta dos logs. Teste 5 **reprovado por transporte, não por descoberta**.)
+
+## RESULTADO: Teste 5A (continuação): **mecanismo RAR multipartes concluído**; instalação sobre a v1.00 **não confirmada** (22/11/2026, relato do usuário + código/arquivos)
+
+**Confirmado (relato do usuário no PS4)**
+- Falhas TLS `0x8095F00C` no raw e no jsDelivr; depois de **fechar e abrir o SSPI** e apertar **Retry** na tarefa original do raw, o download **prosseguiu**, o RAR foi processado e a tarefa chegou à instalação ("19.9 MB / 19.9 MB", "3/3 files", 3 itens "Game": 2 "Installed · 6 MB" e 1 com *"PS4 reports existing content, but this installation is not confirmed"*).
+- O app `PS4 Store BR Test` abre; em OPTIONS → Informações: `CUSA95417`, **versão 1.00**, 6,90 MB. **A v1.02 NÃO substituiu a v1.00.**
+
+**Confirmado (arquivos do repositório, verificado agora)**
+- O RAR tem **1 única entrada**: `PS4StoreBRTest_CUSA95417_v1.02.pkg` (6.619.136 B); `rar t` nos 11 volumes: *All OK*; o PKG extraído tem `sha256 0d42cbfb…` = `pkgs/…v1.02.pkg`.
+- PKG v1.02: `CATEGORY=gd` (jogo base), `TITLE_ID=CUSA95417`, `CONTENT_ID=IV0000-CUSA95417_00-PS4STOREBRTEST00` (**o mesmo das v1.00 e v1.01**), `VERSION=1.02`, `APP_VER=1.02` (os dois campos coerentes). Não é patch (`gp`).
+
+**Os 3 itens "Game": não são 3 arquivos do RAR (código)**
+- `BuildDownloadGroups` (`SearchWindow.cs:2409`) agrupa **por `TitleId`**; `DownloadGroupCounter` (`DownloadDrawer.cs:291`) conta as linhas do grupo: "3/3 files" = **3 linhas com `CUSA95417`**, não 3 entradas de RAR.
+- A extração cria **1 filho por entrada** do RAR (`DownloadManager.Archive.cs:742-772`); com 1 PKG, 1 filho. Não encontrei no código reprocessamento da mesma entrada; duplicata do destino é barrada (`"Extraction target is already queued"`, Archive.cs:~840).
+- 3 × 6,62 MB = 19,9 MB: as outras duas linhas são **provavelmente históricas** (instalações anteriores do mesmo TitleId nos testes T8b/T9, "Installed"), mas **isso é inferência**: o log desta rodada não foi enviado. Para confirmar sem teste novo: abrir cada linha e ver o nome do arquivo (o filho novo mostra `PS4StoreBRTest_CUSA95417_v1.02.pkg`).
+
+**Por que o 3º item não instala (código; hipótese até ver o log)**
+- Essa mensagem sai quando o BGFT do PS4 devolve `0x80990088` (`BgftSameApplicationInstalled`, `PkgInstaller.cs:172, 1318, 1534`): o PS4 recusa registrar um **jogo base com o mesmo Content ID** já instalado. É política do PS4, **não falha do RAR**. O doc `TESTE_T8B.md` já previa: *"sem substituição automática"*.
+- Para confirmar: no `download.log`, procurar `install … 0x80990088` no horário do Retry.
+- **Não é preciso desinstalar a v1.00 agora.** A v1.02 só seria instalada com *Reinstall*/exclusão, ou como **patch (`gp`) com `APP_VER` maior** (feature nova, fora do escopo).
+
+**Conclusão do 5A:** download multipartes (11 volumes), agrupamento, extração e identificação do PKG **funcionaram** quando o TLS não estava comprometido. A instalação de "mesmo Content ID, versão maior" **não foi comprovada** (recusada pelo PS4). **Execução da v1.02 não comprovada.** 5B/5C pendentes. Problema aberto: TLS do SSPI após falhas, ver `INVESTIGACAO_TLS_SSPI.md` §8 e §9.
 
 ## Teste 5 (RAR dividido): preparação (resultado do 5A acima)
 
