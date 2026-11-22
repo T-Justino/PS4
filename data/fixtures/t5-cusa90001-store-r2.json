@@ -1,0 +1,50 @@
+{
+  "schema": "ps4storebr.catalog/v1",
+  "source": {
+    "id": "ps4storebr.gate2.t5.cusa90001",
+    "name": "PS4 Store BR - Gate 2 T5 (CUSA90001)",
+    "description": "Teste T5: chave sintetica CUSA90001 para PKG-Zone Store. Somente importar, pesquisar e ver detalhes: NAO instalar.",
+    "version": "0.1.0"
+  },
+  "titles": [
+    {
+      "titleId": "CUSA90001",
+      "catalogKey": true,
+      "realIdentity": {
+        "titleId": "NPXS39041",
+        "contentId": null,
+        "evidence": "SSPI exibiu NPXS39041 ao instalar Store-R2.pkg no PS4 Pro 9.00 do usuario (relato 21/11/2026)."
+      },
+      "identityEvidence": "Chave de catalogo SINTETICA (faixa reservada do projeto). Identidade real do PKG em realIdentity.",
+      "name": "PKG-Zone Store",
+      "region": null,
+      "aliases": [
+        "Store R2",
+        "pkg zone",
+        "loja homebrew",
+        "teste t5"
+      ],
+      "languages": {
+        "audioPtBr": "unknown",
+        "subtitlesPtBr": "unknown",
+        "evidence": null
+      },
+      "packages": [
+        {
+          "id": "pkgzone-store-r2",
+          "kind": "base",
+          "accessType": "Direct",
+          "url": "https://pkg-zone.com/update/Store-R2.pkg",
+          "hoster": "PKG-Zone",
+          "label": "Store-R2 - pacote publico do PKG-Zone",
+          "sourcePageUrl": "https://pkg-zone.com/",
+          "version": null,
+          "authorization": {
+            "basis": "official-developer-release",
+            "evidence": "Endpoint publico de atualizacao do proprio PKG-Zone; download direto observado no SSPI (24,8 MB). Termos de listagem por terceiros: revisar antes do Gate 3."
+          }
+        }
+      ]
+    }
+  ]
+}

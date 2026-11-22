@@ -55,8 +55,9 @@ o conteúdo é o mesmo.
 
 ## Atualização — resultado do Gate 2 (22/11/2026)
 
-O console recusou T2 (NPXS) e T3 (APOL) na importação: `Unsupported catalog title identifier`. A tela indica
-**BETA 5.11 / 0eb783eca1f3**. O commit não é público (404), então a regra real não foi lida no código.
+O console recusou T2 (NPXS) e T3 (APOL) na importação: `Unsupported catalog title identifier`. O rodapé
+`BETA 5.11 / 0eb783eca1f3` é o rodapé do pacote público **5.11.7 Final** (correção do usuário). O commit `0eb783eca1f3` não está acessível
+no GitHub (404) e o `main` público pode divergir do binário; por isso a regra real não pôde ser lida no código.
 Mudanças: `NPXS`/`APOL` viram **erro** no `check`; fixtures movidas para `data/fixtures/rejected/`; novo campo
 opcional `catalogKey: true` permite a chave fictícia `CUSA99999` (comprovada) como chave de catálogo; T4 gerado.
 Os hashes de conteúdo de T2/T3 acima valem só como histórico.

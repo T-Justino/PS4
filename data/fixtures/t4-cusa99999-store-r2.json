@@ -38,7 +38,13 @@
           }
         }
       ],
-      "catalogKey": true
+      "catalogKey": true,
+      "probe": true,
+      "realIdentity": {
+        "titleId": "NPXS39041",
+        "contentId": null,
+        "evidence": "SSPI exibiu NPXS39041 ao instalar Store-R2.pkg no PS4 Pro 9.00 do usuario (relato 21/11/2026)."
+      }
     }
   ]
 }

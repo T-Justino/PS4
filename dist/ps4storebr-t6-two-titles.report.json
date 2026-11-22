@@ -1,0 +1,45 @@
+{
+  "sourceId": "ps4storebr.gate2.t6.two",
+  "version": "0.1.0",
+  "publishedTitles": [
+    "CUSA90002",
+    "CUSA90003"
+  ],
+  "excluded": [],
+  "files": {
+    "source.json": {
+      "size": 785,
+      "sha256": "8598a27c45718fd1e4d22172cfd4dea65c781d6c5bc3316607ad1c278c332785"
+    },
+    "catalog.json": {
+      "size": 261,
+      "sha256": "a9254a1c7279abbaeb2f237387e3db0a3d2a05ae1a5cae8820d1521c0f4f1607"
+    },
+    "index/titles.json": {
+      "size": 375,
+      "sha256": "b0f64f09624a1758b05a26f515df297d2e032bc092b7392c2816ee27d5f4b01e"
+    },
+    "packages/items.json": {
+      "size": 654,
+      "sha256": "c1c4a2b68d805fc517820c3041e712db8bc3b81aaa1b8c080c9597b5389ce5ba"
+    }
+  },
+  "artifactSha256": "c3928bcafbcac63091f8624db33d60c64539024ad5f0fe191f3c45b398724c82",
+  "contentSha256": "8598a27c45718fd1e4d22172cfd4dea65c781d6c5bc3316607ad1c278c332785",
+  "warnings": [],
+  "identityMap": [
+    {
+      "catalogKey": "CUSA90002",
+      "realTitleId": "NPXS39041",
+      "realContentId": null,
+      "probe": false
+    },
+    {
+      "catalogKey": "CUSA90003",
+      "realTitleId": "APOL00004",
+      "realContentId": "IV0000-APOL00004_00-APOLLO0000000PS4",
+      "probe": false
+    }
+  ],
+  "consoleCompatibility": "NAO_TESTADO — requer teste manual no PS4 (Gate 2)"
+}

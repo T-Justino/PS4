@@ -26,5 +26,13 @@
   "artifactSha256": "a4eaca2fdcf47bc41ab4d4d0fee0a286437c724d8ae968762d3821c0d70a0cf0",
   "contentSha256": "24b41a5d6dad6c29f626612881b0fab5894522c5238fec8f216ab50fb1109bff",
   "warnings": [],
+  "identityMap": [
+    {
+      "catalogKey": "CUSA99999",
+      "realTitleId": "NPXS39041",
+      "realContentId": null,
+      "probe": true
+    }
+  ],
   "consoleCompatibility": "NAO_TESTADO — requer teste manual no PS4 (Gate 2)"
 }

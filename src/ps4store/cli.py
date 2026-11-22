@@ -30,7 +30,7 @@ def cmd_build(a) -> int:
         print(f"ERRO  {e}", file=sys.stderr)
         return 1
     data = zip_files(files)
-    res = sspi.check_archive(data, allow_placeholder_ids=any(t.catalog_key for t in cat.titles))
+    res = sspi.check_archive(data, allow_placeholder_ids=any(t.probe for t in cat.titles))
     _print(res)
     if not res.ok:
         print("build abortado: artefato não passou no check; nada foi escrito", file=sys.stderr)
@@ -48,6 +48,8 @@ def cmd_build(a) -> int:
     print(f"   títulos publicados: {', '.join(rep.published_titles)}")
     for ex in rep.excluded:
         print(f"   excluído: {ex['titleId']} {ex['packageId'] or ''} → {ex['reason']}")
+    for m in rep.identity_map:
+        print(f"   chave {m['catalogKey']} → identidade real {m['realTitleId']}" + (" [PROBE]" if m["probe"] else ""))
     print("   compatibilidade com o console: NÃO TESTADA (Gate 2)")
     return 0
 

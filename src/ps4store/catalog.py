@@ -48,7 +48,11 @@ class Title:
     aliases: list[str]
     audio_pt_br: str
     subtitles_pt_br: str
-    catalog_key: bool = False   # titleId é chave de catálogo (não ID real do pacote)
+    catalog_key: bool = False   # titleId é chave sintética de catálogo (não é o ID real do pacote)
+    probe: bool = False         # chave descartável de teste (única forma de usar CUSA99999)
+    real_title_id: str | None = None    # identidade real do pacote, separada da chave
+    real_content_id: str | None = None
+    real_evidence: str | None = None
     packages: list[Package] = field(default_factory=list)
 
 
@@ -114,12 +118,28 @@ def parse(doc: dict) -> Catalog:
         if tid:
             if not sspi.TITLE_ID_RE.match(tid):
                 errs.append(f"{where}: titleId fora do padrão AAAA00000 (PPSA não suportado)")
-            elif sspi.is_placeholder_id(tid) and t.get("catalogKey") is not True:
-                errs.append(f"{where}: titleId fictício/placeholder proibido")
+            elif sspi.is_placeholder_id(tid) and not (t.get("catalogKey") is True and t.get("probe") is True):
+                errs.append(f"{where}: titleId fictício/placeholder proibido (só com catalogKey+probe, em teste)")
             if tid in seen:
                 errs.append(f"{where}: titleId duplicado (edições/regiões distintas exigem decisão explícita)")
             seen.add(tid)
         _req_str(t, "identityEvidence", where, errs)
+        real = t.get("realIdentity") if isinstance(t.get("realIdentity"), dict) else {}
+        if t.get("catalogKey") is True:
+            if tid and not (sspi.SYNTHETIC_KEY_RE.match(tid) or (t.get("probe") is True and tid == "CUSA99999")):
+                errs.append(f"{where}: chave sintética deve estar em CUSA90000–CUSA98999 "
+                            "(CUSA99999 só com probe=true)")
+            rid = real.get("titleId")
+            if not isinstance(rid, str) or not sspi.REAL_ID_RE.match(rid):
+                errs.append(f"{where}: catalogKey exige realIdentity.titleId (AAAA00000)")
+            elif rid == tid:
+                errs.append(f"{where}: realIdentity.titleId não pode ser igual à chave")
+            if not real.get("evidence"):
+                errs.append(f"{where}: catalogKey exige realIdentity.evidence")
+            if t.get("probe") is not True and tid == "CUSA99999":
+                errs.append(f"{where}: CUSA99999 não é identidade de produção")
+        elif real:
+            errs.append(f"{where}: realIdentity só é usado com catalogKey=true")
         tname = _req_str(t, "name", where, errs)
         aliases = t.get("aliases") or []
         if not all(isinstance(a, str) for a in aliases):
@@ -169,8 +189,13 @@ def parse(doc: dict) -> Catalog:
                 source_page_url=spu, version=p.get("version"), extra=extra,
                 authorized=authorized))
         titles.append(Title(tid, tname, t.get("region"), aliases, audio, subs,
-                            catalog_key=t.get("catalogKey") is True, packages=pkgs))
+                            catalog_key=t.get("catalogKey") is True, probe=t.get("probe") is True,
+                            real_title_id=real.get("titleId"), real_content_id=real.get("contentId"),
+                            real_evidence=real.get("evidence"), packages=pkgs))
 
+    reals = [t.real_title_id for t in titles if t.real_title_id]
+    for r in {x for x in reals if reals.count(x) > 1}:
+        errs.append(f"realIdentity {r} aparece em mais de uma chave: duplicaria o item na biblioteca")
     if errs:
         raise CatalogError(errs)
     return Catalog(sid, name, description, version, titles)

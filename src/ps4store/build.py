@@ -26,6 +26,7 @@ class BuildReport:
     artifact_sha256: str = ""
     content_sha256: str = ""
     warnings: list[str] = field(default_factory=list)
+    identity_map: list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {"sourceId": self.source_id, "version": self.version,
@@ -33,6 +34,7 @@ class BuildReport:
                 "files": self.files, "artifactSha256": self.artifact_sha256,
                 "contentSha256": self.content_sha256,
                 "warnings": self.warnings,
+                "identityMap": self.identity_map,
                 "consoleCompatibility": "NAO_TESTADO — requer teste manual no PS4 (Gate 2)"}
 
 
@@ -82,6 +84,9 @@ def _names(prefix: str, base: str, n: int) -> list[str]:
 
 def compile_catalog(cat: Catalog) -> tuple[dict[str, bytes], BuildReport]:
     rep = BuildReport(cat.source_id, cat.source_version)
+    rep.identity_map = [{"catalogKey": t.title_id, "realTitleId": t.real_title_id,
+                         "realContentId": t.real_content_id, "probe": t.probe}
+                        for t in cat.titles if t.catalog_key]
     ready: list[tuple[Title, list[dict]]] = []
     for t in sorted(cat.titles, key=lambda x: x.title_id):
         rows = []

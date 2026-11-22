@@ -288,7 +288,95 @@ REJECTED = sorted((Path(__file__).parent.parent / "data" / "fixtures" / "rejecte
 
 @pytest.mark.parametrize("fx", REJECTED, ids=lambda p: p.stem)
 def test_prefixes_rejected_by_console_fail_build(fx, tmp_path):
-    """Gate 2 (22/11/2026): SSPI 5.11 beta recusou NPXS e APOL na importação."""
+    """Gate 2 (22/11/2026): SSPI 5.11.7 recusou NPXS e APOL na importação."""
     out = tmp_path / "x.gssource"
     assert main(["build", str(fx), "-o", str(out)]) == 1
     assert not out.exists()
+
+
+# ---------- Gate 2: chaves sintéticas T5/T6 (identidade real separada da chave)
+
+import io as _io
+import zipfile as _zf
+
+DATA = Path(__file__).parent.parent / "data" / "fixtures"
+
+
+def _gss(name):
+    doc = json.loads((DATA / name).read_text(encoding="utf-8"))
+    files, rep, data = build_bytes(doc)
+    return doc, {k: json.loads(v) for k, v in files.items()}, rep, data
+
+
+def _key_doc(**over):
+    t = {"titleId": "CUSA90001", "catalogKey": True,
+         "realIdentity": {"titleId": "NPXS39041", "contentId": None, "evidence": "x"},
+         "identityEvidence": "chave sintética", "name": "Loja",
+         "packages": [{"id": "p", "kind": "base", "accessType": "Direct", "url": "https://example.com/a.pkg",
+                       "authorization": {"basis": "license", "evidence": "x"}}]}
+    t.update(over)
+    return {"schema": "ps4storebr.catalog/v1",
+            "source": {"id": "s.k", "name": "K", "description": "", "version": "1.0.0"}, "titles": [t]}
+
+
+def test_t5_uses_distinct_non_probe_cusa_key():
+    doc, f, rep, data = _gss("t5-cusa90001-store-r2.json")
+    [row] = f["index/titles.json"]["titles"]
+    assert row["titleId"] == "CUSA90001" and row["titleId"] != "CUSA99999"
+    assert "CUSA90001" in row["searchText"] and "store" in row["searchText"]
+    assert sspi.check_archive(data).ok          # sem --allow-placeholder
+
+
+def test_t6_two_titles_distinct_keys_no_conflict():
+    doc, f, rep, data = _gss("t6-two-titles.json")
+    rows = f["index/titles.json"]["titles"]
+    keys = [r["titleId"] for r in rows]
+    assert sorted(keys) == ["CUSA90002", "CUSA90003"] and len(set(keys)) == 2
+    assert f["catalog.json"]["counts"]["titles"] == 2
+    shard = f["packages/items.json"]["titles"]
+    assert set(shard) == set(keys)
+    for k in keys:                              # cada chave tem sua linha e não cruza com a outra
+        assert [r["titleId"] for r in shard[k]] == [k]
+    assert sspi.check_archive(data).ok
+    assert [m["realTitleId"] for m in rep.to_dict()["identityMap"]] == ["NPXS39041", "APOL00004"]
+
+
+@pytest.mark.parametrize("fx", ["t5-cusa90001-store-r2.json", "t6-two-titles.json"])
+def test_real_identity_never_leaks_into_gssource(fx):
+    _, f, _, data = _gss(fx)
+    blob = b"".join(_zf.ZipFile(_io.BytesIO(data)).read(n) for n in _zf.ZipFile(_io.BytesIO(data)).namelist())
+    for real in (b'"titleId":"NPXS', b'"titleId":"APOL'):
+        assert real not in blob
+    for rows in f["packages/items.json"]["titles"].values():
+        assert all("contentId" not in r for r in rows)   # sem variável extra no teste de console
+
+
+def test_production_fixtures_do_not_use_99999():
+    for p in DATA.glob("t[56]*.json"):
+        assert "CUSA99999" not in p.read_text(encoding="utf-8").replace("CUSA99999 não", "")
+
+
+@pytest.mark.parametrize("over,msg", [
+    ({"titleId": "CUSA12345"}, "CUSA90000"),                       # fora da faixa reservada
+    ({"titleId": "CUSA99999"}, "placeholder"),                     # 99999 sem probe
+    ({"realIdentity": {"titleId": "NPXS39041"}}, "evidence"),
+    ({"realIdentity": {"titleId": "CUSA90001", "evidence": "x"}}, "igual à chave"),
+    ({"realIdentity": {"titleId": "xx", "evidence": "x"}}, "realIdentity.titleId"),
+])
+def test_catalog_key_rules(over, msg):
+    with pytest.raises(CatalogError, match=msg):
+        parse(_key_doc(**over))
+
+
+def test_real_identity_requires_catalog_key_and_is_unique():
+    with pytest.raises(CatalogError, match="só é usado"):
+        parse(_key_doc(catalogKey=False, titleId="TEST12345"))
+    d = _key_doc()
+    t2 = copy.deepcopy(d["titles"][0]); t2["titleId"] = "CUSA90002"
+    d["titles"].append(t2)
+    with pytest.raises(CatalogError, match="duplicaria"):
+        parse(d)
+
+
+def test_probe_allows_99999_only_for_probe():
+    parse(_key_doc(titleId="CUSA99999", probe=True))
