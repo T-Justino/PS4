@@ -293,6 +293,10 @@ def _s(v) -> str:
 
 
 def main(argv: list[str] | None = None, *, net=None) -> int:
+    raw = sys.argv[1:] if argv is None else list(argv)
+    if raw and raw[0] == "resolve":                      # módulo independente: tem a própria CLI (argparse não repassa opções iniciais)
+        from .resolver import main as resolve_main
+        return resolve_main(raw[1:])
     ap = argparse.ArgumentParser(prog="ps4store", description="PS4 Store BR — gerador .gssource")
     sub = ap.add_subparsers(dest="cmd", required=True)
     b = sub.add_parser("build", help="gera .gssource a partir de catálogo canônico JSON")
@@ -349,6 +353,9 @@ def main(argv: list[str] | None = None, *, net=None) -> int:
                    help="publico: só embute URL de item autorizado para listagem; pessoal: também os de link direto validado")
     w.add_argument("--proven", default="config/ps4-proven.json", help="instalações comprovadas no PS4 (relato do usuário)")
     w.set_defaults(func=cmd_web)
+    rs = sub.add_parser("resolve", help="resolve URLs até o arquivo final (sem baixar) e agrupa volumes RAR; ver docs/RESOLVEDOR.md", add_help=False)
+    rs.add_argument("args", nargs=argparse.REMAINDER)
+    rs.set_defaults(func=lambda a: 0)
     rc = sub.add_parser("resume-check", help="prontidão para retomada/arquivos grandes: Range em offsets, tamanho e ETag estáveis (≤3 requisições de 64 KiB por título)")
     rc.add_argument("--title", action="append", default=[], metavar="ID", help="título (repetível); sem isto, os maiores instaláveis")
     rc.add_argument("--source", help="só esta fonte (ex.: own-rar para checar todos os volumes de um RAR dividido)")

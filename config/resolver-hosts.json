@@ -1,0 +1,5 @@
+{
+  "_nota": "Hosts de ENTRADA que o resolvedor aceita (fontes que o projeto já usa). Redirects para outros hosts HTTPS públicos são seguidos como o SSPI faz e ficam registrados na cadeia. Para um host novo use --permitir host na linha de comando.",
+  "hosts": ["raw.githubusercontent.com", "github.com", "objects.githubusercontent.com", "release-assets.githubusercontent.com",
+            "pkg-zone.com", "api.pkg-zone.com", "cdn.jsdelivr.net", "archive.org"]
+}
