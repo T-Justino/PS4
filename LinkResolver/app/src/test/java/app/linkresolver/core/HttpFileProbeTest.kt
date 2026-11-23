@@ -10,25 +10,34 @@ import java.net.InetSocketAddress
 
 class HttpFileProbeTest {
     private lateinit var server: HttpServer
-    private val methods = mutableListOf<String>()
-    private val ranges = mutableListOf<String?>()
+    private val methods = java.util.Collections.synchronizedList(mutableListOf<String>())
+    private val agents = java.util.Collections.synchronizedList(mutableListOf<String>())
+    private val ranges = java.util.Collections.synchronizedList(mutableListOf<String?>())
     private var port = 0
     private val trusted = setOf("127.0.0.1")
+    private val wvUa = "Mozilla/5.0 (Linux; Android 14; Pixel 8 Build/AP1A; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.0.0 Mobile Safari/537.36"
 
-    private fun probe(resolver: (String) -> List<InetAddress> = { listOf(InetAddress.getByName("8.8.8.8")) }) =
-        HttpFileProbe("test-agent", 3000, 5, { UrlSafety.Verdict.Ok }, resolver)
+    private fun probe(ua: String = wvUa, lookup: (String) -> List<InetAddress> = { listOf(InetAddress.getByName("127.0.0.1")) },
+                      blocked: (InetAddress) -> Boolean = { false }) =
+        HttpFileProbe(ua, 2000, 15_000, 5, { UrlSafety.Verdict.Ok }, lookup, blocked)
 
     @Before fun up() {
         server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
         port = server.address.port
         server.createContext("/") { ex ->
             methods += ex.requestMethod; ranges += ex.requestHeaders.getFirst("Range")
+            val ua = ex.requestHeaders.getFirst("User-Agent") ?: ""; agents += ua
             when (ex.requestURI.path) {
                 "/file.bin" -> {
                     ex.responseHeaders.add("Content-Type", "application/octet-stream")
                     ex.responseHeaders.add("Accept-Ranges", "bytes")
                     if (ex.requestMethod == "HEAD") { ex.responseHeaders.add("Content-Length", "104857600"); ex.sendResponseHeaders(200, -1) }
-                    else ex.sendResponseHeaders(200, 0).also { ex.responseBody.close() }
+                    else { ex.sendResponseHeaders(206, 1); ex.responseBody.write(0); ex.responseBody.close() }
+                }
+                // Hipótese do bug real: servidor fecha sem responder para UA de WebView ("; wv").
+                "/ua-sensitive.bin" -> if (ua.contains("; wv")) ex.close() else {
+                    ex.responseHeaders.add("Content-Type", "application/octet-stream")
+                    ex.responseHeaders.add("Content-Length", "104857600"); ex.sendResponseHeaders(200, -1)
                 }
                 "/nohead.bin" -> if (ex.requestMethod == "HEAD") ex.sendResponseHeaders(405, -1) else {
                     ex.responseHeaders.add("Content-Type", "application/zip")
@@ -51,48 +60,86 @@ class HttpFileProbeTest {
 
     private fun url(p: String) = "http://127.0.0.1:$port$p"
 
-    @Test fun headConfirmsFile() {
-        val r = probe().probe(url("/file.bin"), trusted) as ProbeResult.File
+    @Test fun headConfirmsFileAndReportsDiagnostics() {
+        val rep = probe().probe(url("/file.bin"), trusted)
+        val r = rep.result as ProbeResult.File
         assertEquals("HEAD", r.method); assertEquals(104_857_600L, r.contentLength)
         assertEquals("application/octet-stream", r.mimeType)
         assertEquals(listOf("HEAD"), methods)
+        assertTrue(rep.diagnostics.joinToString(), rep.diagnostics.any { it.contains("conexão ok") })
+        assertTrue(rep.diagnostics.any { it.contains("HTTP 200") })
     }
 
     @Test fun fallsBackToRangeGetWhenHeadNotAllowed() {
-        val r = probe().probe(url("/nohead.bin"), trusted) as ProbeResult.File
+        val r = probe().probe(url("/nohead.bin"), trusted).result as ProbeResult.File
         assertEquals("GET", r.method); assertEquals(5000L, r.contentLength)
         assertEquals(listOf("HEAD", "GET"), methods); assertEquals("bytes=0-0", ranges.last())
     }
 
-    @Test fun htmlIsPage() = assertTrue(probe().probe(url("/page"), trusted) is ProbeResult.Page)
-
-    @Test fun emptyResponseIsNetworkError() {
-        val r = probe().probe(url("/empty"), trusted)
-        assertTrue(r.toString(), r is ProbeResult.NetworkError)
-        assertTrue("GET" in methods)                          // tentou o fallback (o JDK ainda repete cada requisição)
+    @Test fun serverRejectingWebViewUserAgentIsRecoveredWithChromeLikeProfile() {
+        val rep = probe().probe(url("/ua-sensitive.bin"), trusted)
+        assertTrue(rep.result.toString(), rep.result is ProbeResult.File)
+        assertFalse(agents.last().contains("; wv"))
+        assertFalse(agents.last().contains("Version/4.0"))
     }
 
-    @Test fun forbiddenIsHttpError() = assertEquals(403, (probe().probe(url("/forbidden"), trusted) as ProbeResult.HttpError).status)
-
-    @Test fun redirectToUntrustedDomainIsInconclusiveAndNotFollowed() {
-        val r = probe().probe(url("/redir"), trusted)
-        assertTrue(r.toString(), r is ProbeResult.Inconclusive)
-        assertEquals(listOf("HEAD"), methods)               // não fez requisição ao domínio não confiável
+    @Test fun chromeLikeUserAgentStripsWebViewMarkers() {
+        val c = UserAgents.chromeLike(wvUa)
+        assertFalse(c.contains("wv")); assertFalse(c.contains("Version/4.0")); assertTrue(c.contains("Chrome/130"))
     }
 
-    @Test fun relativeRedirectIsFollowed() = assertTrue(probe().probe(url("/redir-ok"), trusted) is ProbeResult.File)
+    @Test fun htmlIsPage() = assertTrue(probe().probe(url("/page"), trusted).result is ProbeResult.Page)
 
-    @Test fun hostResolvingToPrivateAddressIsBlocked() {
-        val r = probe { listOf(InetAddress.getByName("10.0.0.5")) }.probe(url("/file.bin"), trusted)
-        assertTrue(r is ProbeResult.Blocked); assertTrue(methods.isEmpty())
+    @Test fun emptyResponseIsClassifiedAndDiagnosed() {
+        val rep = probe().probe(url("/empty"), trusted)
+        val r = rep.result as ProbeResult.NetworkError
+        assertEquals(rep.diagnostics.joinToString(), "RESPOSTA_VAZIA", r.category)
+        assertTrue("GET" in methods)
+        assertTrue(rep.diagnostics.any { it.contains("FALHA RESPOSTA_VAZIA") })
+        assertTrue(rep.diagnostics.any { it.contains("chrome-h1") })      // tentou os outros perfis
+    }
+
+    @Test fun forbiddenIsHttpError() = assertEquals(403, (probe().probe(url("/forbidden"), trusted).result as ProbeResult.HttpError).status)
+
+    @Test fun redirectToUntrustedDomainAsksForDomainAndIsNotFollowed() {
+        val rep = probe().probe(url("/redir"), trusted)
+        val r = rep.result
+        assertTrue(r.toString(), r is ProbeResult.NeedsDomain)
+        assertEquals("localhost", (r as ProbeResult.NeedsDomain).host)
+        assertEquals(listOf("HEAD"), methods)               // nenhuma requisição ao domínio não confiável
+        assertTrue(rep.diagnostics.any { it.contains("redirecionamento 302") })
+    }
+
+    @Test fun relativeRedirectIsFollowed() = assertTrue(probe().probe(url("/redir-ok"), trusted).result is ProbeResult.File)
+
+    @Test fun hostResolvingToPrivateAddressIsBlockedBeforeConnecting() {
+        val p = probe(lookup = { listOf(InetAddress.getByName("10.0.0.5")) }, blocked = { UrlSafety.isPrivateAddress(it) })
+        // nome (não IP literal): o DNS do próprio cliente é que decide — não há janela entre checar e conectar
+        val r = p.probe("http://cdn.rebind.example:$port/file.bin", setOf("rebind.example")).result
+        assertTrue(r.toString(), r is ProbeResult.Blocked); assertTrue(methods.isEmpty())
     }
 
     @Test fun unsafeUrlIsBlockedByDefaultChecks() {
-        val p = HttpFileProbe("ua")
-        assertTrue(p.probe("http://example.com/a.bin", setOf("example.com")) is ProbeResult.Blocked)
-        assertTrue(p.probe("https://127.0.0.1/a.bin", setOf("127.0.0.1")) is ProbeResult.Blocked)
+        val p = HttpFileProbe(wvUa)
+        assertTrue(p.probe("http://example.com/a.bin", setOf("example.com")).result is ProbeResult.Blocked)
+        assertTrue(p.probe("https://127.0.0.1/a.bin", setOf("127.0.0.1")).result is ProbeResult.Blocked)
         assertTrue(UrlSafety.isPrivateAddress(InetAddress.getByName("192.168.1.1")))
         assertTrue(UrlSafety.isPrivateAddress(InetAddress.getByName("fd00::1")))
         assertFalse(UrlSafety.isPrivateAddress(InetAddress.getByName("8.8.8.8")))
+    }
+
+    @Test fun diagnosticsNeverLeakQueryTokens() {
+        val rep = probe().probe(url("/empty?token=SEGREDO&sig=XYZ"), trusted)
+        assertFalse(rep.diagnostics.joinToString().contains("SEGREDO"))
+        assertFalse(rep.diagnostics.joinToString().contains("XYZ"))
+        assertFalse((rep.result as ProbeResult.NetworkError).message.contains("SEGREDO"))
+    }
+
+    @Test fun classifyCoversCategories() {
+        assertEquals("DNS", HttpFileProbe.classify(java.net.UnknownHostException("x")))
+        assertEquals("TLS", HttpFileProbe.classify(javax.net.ssl.SSLHandshakeException("x")))
+        assertEquals("TIMEOUT", HttpFileProbe.classify(java.net.SocketTimeoutException("timeout")))
+        assertEquals("CONEXAO", HttpFileProbe.classify(java.net.ConnectException("refused")))
+        assertEquals("RESPOSTA_VAZIA", HttpFileProbe.classify(java.io.IOException("unexpected end of stream on x")))
     }
 }

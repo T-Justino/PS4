@@ -39,32 +39,39 @@ class RegressionHetznerTest {
         assertEquals(70, r.candidateScore)
     }
 
-    @Test fun networkErrorEndsStepKeepsCandidateAndIgnoresErrorPage() {
+    @Test fun inconclusiveProbeNeverNavigatesToBinaryAndKeepsLink() {
         val f = Fake(); val e = setup(f)
-        e.onProbeResult(f100, ProbeResult.NetworkError("EOFException: unexpected end of stream"))
-        assertEquals(f100, f.navigated.last())      // fallback seguro: tenta pelo WebView
+        e.onProbeResult(f100, ProbeResult.NetworkError("EOFException: unexpected end of stream", "RESPOSTA_VAZIA"),
+            listOf("[chrome-h2 HEAD] FALHA RESPOSTA_VAZIA: EOFException: unexpected end of stream"))
+        val r = f.result!!
+        assertEquals(ResultState.UNVERIFIED_CANDIDATE, r.state)
+        assertEquals(1, f.navigated.size)                 // NÃO navegou até o .bin
+        assertEquals(f100, r.url)                         // link preservado (copiável)
+        assertEquals(70, r.candidateScore)
+        assertTrue(r.message.contains("NÃO verificado"))
+        assertTrue(r.errorInfo!!.startsWith("RESPOSTA_VAZIA"))
+        assertTrue(r.diagnostics.any { it.contains("chrome-h2 HEAD") })
+        assertEquals(3, r.candidates.size)
+        assertTrue(r.candidates.first().status.startsWith("não verificado"))
+        assertEquals(EngineState.FINISHED, e.state)
+    }
+
+    @Test fun mainFrameErrorOnPageEndsStepKeepsCandidateAndIgnoresErrorPage() {
+        val f = Fake(); val e = ResolverEngine(Limits(), { now }, f)
+        e.start(site)
+        e.onScan(PageScan(site, "Hetzner", listOf(RawCandidate("https://fsn1-speed.hetzner.com/files/", "Download files", "a", "href", false, "", "", null, true)), null, null))
+        assertEquals("https://fsn1-speed.hetzner.com/files/", f.navigated.last())
         val rescansBefore = f.rescans
-        e.onPageStarted(f100)
-        e.onMainFrameError(f100, -6, "net::ERR_EMPTY_RESPONSE")
-        // o WebView ainda dispara onPageFinished para a página de erro: não é sucesso
+        e.onPageStarted("https://fsn1-speed.hetzner.com/files/")
+        e.onMainFrameError("https://fsn1-speed.hetzner.com/files/", -6, "net::ERR_EMPTY_RESPONSE")
         e.onPageStarted("chrome-error://chromewebdata/")
         e.onPageFinished("chrome-error://chromewebdata/")
         e.onScan(PageScan("chrome-error://chromewebdata/", "", emptyList(), null, null))
-
         val r = f.result!!
         assertEquals(ResultState.NETWORK_ERROR, r.state)
-        assertEquals(f100, r.url)                    // candidato preservado
-        assertEquals(70, r.candidateScore)
+        assertEquals("https://fsn1-speed.hetzner.com/files/", r.url)
         assertTrue(r.errorInfo!!.contains("ERR_EMPTY_RESPONSE"))
-        assertTrue(r.diagnostics.any { it.contains("ERR_EMPTY_RESPONSE") })
-        assertTrue(r.diagnostics.any { it.contains("Sondagem") })
-        assertEquals(3, r.candidates.size)
-        assertTrue(r.candidates.first().status.startsWith("erro de rede"))
-        assertTrue(r.steps.isNotEmpty())
-        assertEquals(rescansBefore, f.rescans)       // nenhuma varredura nova
-        assertEquals(EngineState.FINISHED, e.state)
-        assertEquals(2, f.navigated.size)            // não tentou irmãos 1GB/10GB
-        assertTrue(r.steps.none { it.kind == StepKind.SCAN && it.note.contains("candidato(s)") && it.url?.startsWith("chrome-error") == true })
+        assertEquals(rescansBefore, f.rescans)
     }
 
     @Test fun errorPageIsNeverScannedNorCountedAsSuccess() {
@@ -91,7 +98,8 @@ class RegressionHetznerTest {
 
     @Test fun downloadListenerIsAdditionalEvidenceAfterInconclusiveProbe() {
         val f = Fake(); val e = setup(f)
-        e.onProbeResult(f100, ProbeResult.Inconclusive("redirecionamento para domínio não confiável: cdn.x.net"))
+        e.onProbeResult(f100, ProbeResult.Inconclusive("resposta incompleta"))
+        assertEquals(ResultState.UNVERIFIED_CANDIDATE, f.result?.state)
         e.onDownload(DownloadInfo(f100, "application/octet-stream", null, 104_857_600))
         val r = f.result!!
         assertEquals(ResultState.VERIFIED_FILE, r.state)
@@ -103,7 +111,6 @@ class RegressionHetznerTest {
         val f = Fake(); val e = ResolverEngine(Limits(maxStepMs = 5_000), { now }, f)
         e.start(site); e.onScan(listing())
         e.onProbeResult(f100, ProbeResult.Inconclusive("x"))
-        now = 6_000; e.tick()
         assertEquals(ResultState.UNVERIFIED_CANDIDATE, f.result?.state)
         e.onDownload(DownloadInfo("https://fsn1-speed.hetzner.com/OUTRO.bin", "application/octet-stream", null, 10))
         assertEquals(ResultState.UNVERIFIED_CANDIDATE, f.result?.state)   // download não solicitado: ignorado
@@ -116,6 +123,34 @@ class RegressionHetznerTest {
         e.onProbeResult(f100, ProbeResult.Blocked("fsn1-speed.hetzner.com resolve para endereço interno"))
         assertEquals(ResultState.BLOCKED, f.result?.state)
         assertEquals(1, f.navigated.size)
+    }
+
+    @Test fun httpForbiddenOnFileIsRequiresSessionWithoutNavigating() {
+        val f = Fake(); val e = setup(f)
+        e.onProbeResult(f100, ProbeResult.HttpError(f100, 403))
+        assertEquals(ResultState.REQUIRES_SESSION, f.result?.state)
+        assertEquals(f100, f.result?.url); assertEquals(1, f.navigated.size)
+    }
+
+    @Test fun redirectToNewDomainAsksThenReprobesOriginal() {
+        val f = Fake(); val e = setup(f)
+        e.onProbeResult(f100, ProbeResult.NeedsDomain("cdn.exemplo.net", "https://cdn.exemplo.net/x.bin?t=1"))
+        assertEquals(listOf("cdn.exemplo.net"), f.asked)
+        assertEquals(EngineState.WAITING_CONFIRMATION, e.state)
+        e.answerDomain(true, false)                         // só desta vez: não vira domínio confiável
+        assertEquals(listOf(f100, f100), f.probes)
+        assertFalse(e.policy.isTrusted("cdn.exemplo.net"))
+        e.onProbeResult(f100, ProbeResult.File("https://cdn.exemplo.net/x.bin", 200, "application/octet-stream", 5, null, "HEAD", true))
+        assertEquals(ResultState.VERIFIED_FILE, f.result?.state)
+        assertEquals(1, f.navigated.size)
+    }
+
+    @Test fun deniedRedirectDomainKeepsUnverifiedLink() {
+        val f = Fake(); val e = setup(f)
+        e.onProbeResult(f100, ProbeResult.NeedsDomain("cdn.exemplo.net", "https://cdn.exemplo.net/x.bin"))
+        e.answerDomain(false, false)
+        assertEquals(ResultState.UNVERIFIED_CANDIDATE, f.result?.state)
+        assertEquals(f100, f.result?.url)
     }
 
     @Test fun pageProbeNavigatesNormally() {
@@ -138,9 +173,10 @@ class RegressionHetznerTest {
 
     @Test fun secretsNeverAppearInResultDiagnostics() {
         val f = Fake(); val e = setup(f)
-        e.onProbeResult(f100, ProbeResult.NetworkError("EOFException: unexpected end of stream on https://h.com/a.bin?token=SEGREDO123"))
-        e.onMainFrameError(f100, -6, "net::ERR_EMPTY_RESPONSE https://h.com/a.bin?sig=ABC")
-        val all = f.result!!.diagnostics.joinToString() + f.result!!.steps.joinToString { it.note + it.url }
+        e.onProbeResult(f100, ProbeResult.NetworkError("EOFException on https://h.com/a.bin?token=SEGREDO123", "RESPOSTA_VAZIA"),
+            listOf("[x] FALHA: https://h.com/a.bin?sig=ABC"))
+        val r = f.result!!
+        val all = r.diagnostics.joinToString() + r.steps.joinToString { it.note + it.url } + r.errorInfo + r.message
         assertFalse(all.contains("SEGREDO123")); assertFalse(all.contains("sig=ABC"))
     }
 }

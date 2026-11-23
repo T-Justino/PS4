@@ -14,6 +14,7 @@
     <string name="no_candidates">Nenhum candidato ainda. A varredura roda após cada página carregar.</string>
     <string name="no_result">Sem resultado ainda.</string>
     <string name="btn_copy">Copiar URL</string>
+    <string name="btn_copy_link">Copiar</string>
     <string name="btn_new">Nova análise</string>
     <string name="btn_follow">Seguir</string>
     <string name="btn_click">Clicar</string>

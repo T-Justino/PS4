@@ -7,13 +7,24 @@ import app.linkresolver.core.ScoredCandidate
 import app.linkresolver.core.UrlSafety
 import app.linkresolver.databinding.ItemCandidateBinding
 
-class CandidateAdapter(private val onAction: (ScoredCandidate) -> Unit) :
+class CandidateAdapter(
+    private val onAction: (ScoredCandidate) -> Unit,
+    private val onCopy: (ScoredCandidate) -> Unit,
+) :
     RecyclerView.Adapter<CandidateAdapter.VH>() {
 
     private var items: List<ScoredCandidate> = emptyList()
+    private var statuses: List<String> = emptyList()
 
     fun submit(list: List<ScoredCandidate>) {
         items = list
+        statuses = emptyList()
+        notifyDataSetChanged()
+    }
+
+    /** Status por candidato (mesma ordem de [submit]) após a análise terminar. */
+    fun setStatuses(s: List<String>) {
+        statuses = s
         notifyDataSetChanged()
     }
 
@@ -34,7 +45,10 @@ class CandidateAdapter(private val onAction: (ScoredCandidate) -> Unit) :
         }
         h.b.candTitle.text = "[${c.score}] ${c.raw.text.ifBlank { "(sem texto)" }}  · $badge"
         h.b.candUrl.text = c.url?.let { UrlSafety.redact(it) } ?: "(sem URL — botão de script, ${c.raw.tag})"
-        h.b.candReasons.text = c.reasons.joinToString(" • ").ifEmpty { "sem sinais" }
+        val status = statuses.getOrNull(position) ?: "não verificado"
+        h.b.candReasons.text = "Status: $status\n" + c.reasons.joinToString(" • ").ifEmpty { "sem sinais" }
+        h.b.candCopy.isEnabled = c.url != null && c.safe && !c.ad
+        h.b.candCopy.setOnClickListener { onCopy(c) }
         val actionable = !c.ad && (c.url == null || c.safe) && (c.url != null || c.raw.elementId != null)
         h.b.candAction.isEnabled = actionable
         h.b.candAction.setText(if (c.url != null) R.string.btn_follow else R.string.btn_click)

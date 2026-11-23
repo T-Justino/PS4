@@ -30,10 +30,10 @@ class ResolverEngine(
         fun requestProbe(url: String, trustedDomains: Set<String>)
     }
 
-    private enum class PendingSource { AUTO, NAVIGATION }
+    private enum class PendingSource { AUTO, NAVIGATION, PROBE }
     private data class Pending(
         val url: String, val host: String, val source: PendingSource, val redirect: Boolean,
-        val candidate: ScoredCandidate?,
+        val candidate: ScoredCandidate?, val origin: String? = null,
     )
 
     var state = EngineState.IDLE
@@ -68,6 +68,7 @@ class ResolverEngine(
     private var networkFailure: String? = null
     private var failedUrl: String? = null
     private var lastResult: ResolveResult? = null
+    private val probeExtra = mutableSetOf<String>()
     private var finishedAt = 0L
 
     val isActive: Boolean get() = state != EngineState.IDLE && state != EngineState.FINISHED
@@ -77,6 +78,7 @@ class ResolverEngine(
         fun isErrorUrl(url: String?): Boolean =
             url != null && (url.startsWith("chrome-error:") || url.startsWith("about:neterror") || url.startsWith("data:text/html,chromewebdata"))
         private const val LATE_DOWNLOAD_WINDOW_MS = 30_000L
+        const val UNVERIFIED = "Link NÃO verificado — copie e teste manualmente."
     }
 
     // ------------------------------------------------------------------ início/fim
@@ -117,7 +119,7 @@ class ResolverEngine(
         humanAuthHappened = false; sawHttpAuthError = false
         startUrl = null; followedUrl = null; probingUrl = null; probingCandidate = null
         mainFrameError = false; networkFailure = null; failedUrl = null
-        lastResult = null; finishedAt = 0
+        lastResult = null; finishedAt = 0; probeExtra.clear()
     }
 
     // ------------------------------------------------------------------ eventos de navegação
@@ -254,12 +256,13 @@ class ResolverEngine(
     }
 
     /** Resposta da sondagem pedida via [Listener.requestProbe]. */
-    fun onProbeResult(url: String, r: ProbeResult) {
+    fun onProbeResult(url: String, r: ProbeResult, diag: List<String> = emptyList()) {
         val pu = probingUrl
         if (!isActive || pu == null || UrlSafety.loopKey(url) != UrlSafety.loopKey(pu)) return
         probingUrl = null
-        val c = probingCandidate; probingCandidate = null
+        val cand = probingCandidate; probingCandidate = null
         val key = UrlSafety.loopKey(url)
+        diag.take(60).forEach { diagnostics += UrlSafety.scrubText(it) }
         when (r) {
             is ProbeResult.File -> {
                 val line = "${r.method} ${r.status}: mime=${r.mimeType ?: "?"} tamanho=${DownloadHeuristics.formatSize(r.contentLength)}" +
@@ -268,8 +271,8 @@ class ResolverEngine(
                 evidence += line
                 candidateStatus[key] = "arquivo confirmado"
                 confirmFile(
-                    r.finalUrl, r.mimeType, DownloadHeuristics.estimateFileName(r.finalUrl, r.contentDisposition)
-                        ?: DownloadHeuristics.estimateFileName(url, null),
+                    r.finalUrl, r.mimeType,
+                    DownloadHeuristics.estimateFileName(r.finalUrl, r.contentDisposition) ?: DownloadHeuristics.estimateFileName(url, null),
                     r.contentLength, "Metadados confirmados por ${r.method} (sem baixar o corpo).",
                 )
             }
@@ -283,23 +286,40 @@ class ResolverEngine(
                 step(StepKind.SCAN, url, "sondagem: é uma página (${r.mimeType ?: "?"}), seguindo no navegador")
                 navigateAfterProbe(url)
             }
+            is ProbeResult.NeedsDomain -> {
+                if (policy.domains.size + probeExtra.size >= limits.maxDomains) {
+                    candidateStatus[key] = "não verificado (limite de domínios)"
+                    finish(ResultState.UNVERIFIED_CANDIDATE, url, "$UNVERIFIED Redirecionamento para ${r.host} excede o limite de domínios.")
+                } else {
+                    probingCandidate = cand
+                    ask(Pending(r.nextUrl, r.host, PendingSource.PROBE, false, cand, origin = url), "redirecionamento do arquivo candidato")
+                }
+            }
             is ProbeResult.HttpError -> {
-                if (r.status == 401 || r.status == 403) sawHttpAuthError = true
                 val d = "Sondagem HTTP ${r.status}"
                 diagnostics += d
-                step(StepKind.ERROR, url, "$d; tentando pelo navegador (pode ter sessão/cookies)")
-                navigateAfterProbe(url)
+                step(StepKind.ERROR, url, d)
+                if (r.status == 401 || r.status == 403) {
+                    sawHttpAuthError = true
+                    candidateStatus[key] = "exige sessão (HTTP ${r.status})"
+                    finish(ResultState.REQUIRES_SESSION, url, "O servidor respondeu HTTP ${r.status}: exige sessão/autenticação. $UNVERIFIED", errorInfo = d)
+                } else {
+                    candidateStatus[key] = "não verificado (HTTP ${r.status})"
+                    finish(ResultState.UNVERIFIED_CANDIDATE, url, "$UNVERIFIED O servidor respondeu HTTP ${r.status}.", errorInfo = d)
+                }
             }
             is ProbeResult.NetworkError -> {
-                val d = "Sondagem sem resposta: ${UrlSafety.scrubText(r.message)}"
-                diagnostics += d
-                step(StepKind.ERROR, url, "$d; tentando pelo navegador")
-                navigateAfterProbe(url)
+                val info = "${r.category}: ${UrlSafety.scrubText(r.message)}"
+                diagnostics += "Sondagem sem resposta — $info"
+                step(StepKind.ERROR, url, "sondagem sem resposta — $info")
+                candidateStatus[key] = "não verificado (${r.category})"
+                finish(ResultState.UNVERIFIED_CANDIDATE, url, "$UNVERIFIED Falha de rede na validação (${r.category}); o app NÃO navegou até o arquivo.", errorInfo = info)
             }
             is ProbeResult.Inconclusive -> {
                 diagnostics += "Sondagem inconclusiva: ${r.reason}"
-                step(StepKind.SCAN, url, "sondagem inconclusiva: ${r.reason}; tentando pelo navegador")
-                navigateAfterProbe(url)
+                step(StepKind.SCAN, url, "sondagem inconclusiva: ${r.reason}")
+                candidateStatus[key] = "não verificado"
+                finish(ResultState.UNVERIFIED_CANDIDATE, url, "$UNVERIFIED Validação inconclusiva (${r.reason}); o app NÃO navegou até o arquivo.")
             }
         }
     }
@@ -431,7 +451,7 @@ class ResolverEngine(
             probingCandidate = c
             candidateStatus[key] = "verificando metadados"
             step(StepKind.SCAN, url, "URL provável de arquivo: validando via HEAD/Range 0-0 (sem baixar)")
-            listener.requestProbe(url, policy.domains.toSet())
+            listener.requestProbe(url, policy.domains + probeExtra)
         } else {
             listener.navigate(url)
         }
@@ -452,6 +472,21 @@ class ResolverEngine(
         if (state != EngineState.WAITING_CONFIRMATION) return
         pending = null
         endPause()
+        if (p.source == PendingSource.PROBE) {
+            val origin = p.origin!!
+            if (allow) {
+                if (rememberDomain) policy.trust(p.host) else probeExtra += DomainPolicy.registrable(p.host)
+                step(StepKind.CONFIRM, origin, "usuário PERMITIU ${p.host} para a validação${if (rememberDomain) " (domínio lembrado)" else " (apenas desta vez)"}")
+                setState(EngineState.RUNNING, "Validando arquivo via ${p.host}")
+                probingUrl = origin; probingCandidate = p.candidate; stepStartedAt = clock()
+                listener.requestProbe(origin, policy.domains + probeExtra)
+            } else {
+                step(StepKind.CONFIRM, origin, "usuário NEGOU ${p.host}")
+                candidateStatus[UrlSafety.loopKey(origin)] = "não verificado (domínio recusado)"
+                finish(ResultState.UNVERIFIED_CANDIDATE, origin, "$UNVERIFIED Redirecionamento para ${p.host} recusado por você.")
+            }
+            return
+        }
         if (allow) {
             if (rememberDomain) policy.trust(p.host)
             step(StepKind.CONFIRM, p.url, "usuário PERMITIU ${p.host}${if (rememberDomain) " (domínio lembrado)" else " (apenas desta vez)"}")

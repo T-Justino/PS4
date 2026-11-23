@@ -10,16 +10,19 @@ O app **nunca baixa o arquivo**: o `DownloadListener` apenas entrega URL e metad
 3. Execute em um emulador/aparelho com Android 10+ (API 29+) que tenha o **Android System WebView / Chrome atualizado** (Safe Browsing depende dele).
 4. Linha de comando: `./gradlew assembleDebug` → `app/build/outputs/apk/debug/app-debug.apk`; `./gradlew testDebugUnitTest` roda os testes de unidade.
 
+## Versão
+A versão e o commit aparecem no rodapé do app (`BuildConfig.VERSION_NAME` / `GIT_COMMIT`, preenchidos pelo CI via `GITHUB_SHA`).
+
 ## Como usar
 1. Digite uma URL `https://…` e toque em **Analisar** (compartilhar uma URL de outro app para o Link Resolver também preenche o campo).
 2. Abas inferiores: **Navegador** (WebView + abas), **Candidatos** (links/botões detectados com pontuação e motivos; botão *Seguir*/*Clicar* para ação manual), **Histórico** (etapas), **Resultado**.
 3. A automação só segue candidatos com pontuação ≥ 40 em domínios já confiáveis. Domínio novo ⇒ diálogo *Permitir domínio / Só desta vez / Negar*.
 4. CAPTCHA, verificação anti-robô ou login ⇒ a automação **pausa**; resolva na própria página. Ela retoma sozinha quando o desafio deixa de ser detectado (ou toque em *Já resolvi — verificar*).
 5. Resultado: URL (valores sensíveis mascarados), host, MIME, nome estimado, tamanho, pontuação, evidências, diagnóstico de erro, candidatos, histórico e estado: **Arquivo confirmado**, **Candidato não verificado**, **Link intermediário**, **Exige sessão**, **Erro de rede**, **Nenhum candidato encontrado**, **Bloqueado**.
-   URLs com cara de arquivo são validadas por **HEAD** (ou **GET com `Range: bytes=0-0`**) antes de navegar — só cabeçalhos, sem baixar o corpo, sem cookies, com checagem de IP interno a cada salto. O `DownloadListener` é evidência adicional. Páginas de erro do navegador (`chrome-error://`) nunca são analisadas. *Copiar URL* copia a URL completa (se tiver token/assinatura, o app avisa e marca a área de transferência como sensível no Android 13+).
+   URLs com cara de arquivo são validadas (cliente **OkHttp**) por **HEAD** (ou **GET com `Range: bytes=0-0`**) antes de navegar — só cabeçalhos, sem baixar o corpo, sem cookies, com checagem de IP interno a cada salto. O `DownloadListener` é evidência adicional. Páginas de erro do navegador (`chrome-error://`) nunca são analisadas. *Copiar URL* copia a URL completa (se tiver token/assinatura, o app avisa e marca a área de transferência como sensível no Android 13+).
 
 ## Como testar
-**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 48 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
+**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 56 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
 
 **Manuais no aparelho** (o app só aceita HTTPS público; `localhost`/IPs privados são bloqueados de propósito, então hospede `testpages/` em HTTPS — p.ex. GitHub Pages — ou use um túnel HTTPS):
 | Página | Esperado |
@@ -58,3 +61,9 @@ Limites ajustáveis em `core/Models.kt` (`Limits`).
 - Detecção de CAPTCHA/login é heurística (seletores e frases); sites com desafios incomuns podem passar despercebidos — use *Parar* a qualquer momento.
 - Botões que só funcionam por JavaScript (sem URL) não são clicados automaticamente; aparecem em *Candidatos* com *Clicar* manual.
 - O código Android (`TabManager`, `MainActivity`, layouts) foi escrito sem acesso ao SDK no ambiente de desenvolvimento: o `TabManager` foi compilado contra o framework Android 15 e o núcleo foi testado na JVM, mas **a primeira compilação completa no Android Studio ainda não foi feita**. Se aparecer algum erro de build, é simples de corrigir; abra uma issue/mensagem com o log.
+
+## Validação HTTP (v0.2.0)
+- Cliente OkHttp 4.12 (HTTP/2 + HTTP/1.1, TLS do sistema) com perfis de tentativa: UA estilo Chrome (sem `; wv`/`Version/4.0`) em h2+http/1.1, depois só http/1.1, depois o UA do WebView. Hipótese para o `unexpected end of stream`/`ERR_EMPTY_RESPONSE` do Hetzner: o servidor fecha a conexão sem responder ao UA de WebView. Não foi possível reproduzir no ambiente de desenvolvimento (host bloqueado); o diagnóstico por tentativa mostra no aparelho qual perfil funcionou.
+- Validação inconclusiva **não** navega até o binário: o resultado vira *Candidato não verificado* (ou *Exige sessão*, em 401/403), com o link preservado e botão **Copiar** (aba Candidatos e aba Resultado).
+- Redirecionamento do arquivo para domínio novo pede a mesma confirmação de domínio e revalida.
+- Diagnóstico (aba Resultado/Histórico): DNS, TCP, TLS (versão/cifra), protocolo, HTTP, timeout, redirecionamentos — sem IPs, cookies, cabeçalhos nem valores de query.

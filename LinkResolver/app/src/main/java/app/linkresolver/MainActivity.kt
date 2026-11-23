@@ -28,6 +28,7 @@ import app.linkresolver.core.HttpFileProbe
 import app.linkresolver.core.NavDecision
 import app.linkresolver.core.PageScanner
 import app.linkresolver.core.ResolveResult
+import app.linkresolver.core.ResultState
 import app.linkresolver.core.ResolverEngine
 import app.linkresolver.core.ScoredCandidate
 import app.linkresolver.core.Step
@@ -78,11 +79,12 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
             android.webkit.WebView.setWebContentsDebuggingEnabled(true)
         }
 
+        b.versionText.text = "Link Resolver v${BuildConfig.VERSION_NAME} · commit ${BuildConfig.GIT_COMMIT}"
         engine = ResolverEngine(listener = this)
         tabs = TabManager(this, b.webContainer, this)
         tabs.openMain()
 
-        adapter = CandidateAdapter { onCandidateAction(it) }
+        adapter = CandidateAdapter({ onCandidateAction(it) }, { copyCandidate(it) })
         b.candList.layoutManager = LinearLayoutManager(this)
         b.candList.adapter = adapter
 
@@ -228,14 +230,29 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         b.logText.text = logBuf
     }
 
-    private fun copyUrl() {
-        val url = lastResult?.url ?: return
+    private fun copyToClipboard(url: String, sensitive: Boolean, verified: Boolean) {
         val clip = ClipData.newPlainText("URL", url)
-        if (Build.VERSION.SDK_INT >= 33 && lastResult?.urlHasSensitiveParams == true) {
+        if (Build.VERSION.SDK_INT >= 33 && sensitive) {
             clip.description.extras = PersistableBundle().apply { putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true) }
         }
         (getSystemService(CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(clip)
-        toast(if (lastResult?.urlHasSensitiveParams == true) "URL copiada (contém token/assinatura — não compartilhe)" else getString(R.string.copied))
+        val msg = StringBuilder(getString(R.string.copied))
+        if (!verified) msg.append(" — NÃO verificada")
+        if (sensitive) msg.append(" (contém token/assinatura — não compartilhe)")
+        toast(msg.toString())
+    }
+
+    private fun copyUrl() {
+        val r = lastResult ?: return
+        val url = r.url ?: return
+        copyToClipboard(url, r.urlHasSensitiveParams, r.state == ResultState.VERIFIED_FILE)
+    }
+
+    private fun copyCandidate(c: ScoredCandidate) {
+        val url = c.url ?: return
+        val verified = lastResult?.state == ResultState.VERIFIED_FILE &&
+            lastResult?.url?.let { UrlSafety.loopKey(it) == UrlSafety.loopKey(url) } == true
+        copyToClipboard(url, UrlSafety.hasSensitiveParams(url), verified)
     }
 
     // ------------------------------------------------------------------ ResolverEngine.Listener
@@ -275,7 +292,11 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         lastResult = result
         handler.removeCallbacks(ticker); handler.removeCallbacks(scanRunnable)
         b.resState.text = result.state.label
+        adapter.setStatuses(result.candidates.map { it.status })
         b.resDetails.text = buildString {
+            if (result.url != null && result.state != ResultState.VERIFIED_FILE) {
+                append("⚠ LINK NÃO VERIFICADO — os metadados do arquivo não foram confirmados. Use “Copiar URL” e teste manualmente.\n\n")
+            }
             append("URL: ").append(result.displayUrl ?: "—").append('\n')
             if (result.urlHasSensitiveParams) append("(valores sensíveis mascarados aqui; “Copiar URL” copia a URL completa)\n")
             append("Host: ").append(result.host ?: "—").append('\n')
@@ -302,8 +323,8 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
 
     override fun requestProbe(url: String, trustedDomains: Set<String>) {
         probeExecutor.execute {
-            val r = probe.probe(url, trustedDomains)
-            handler.post { if (!isDestroyed) engine.onProbeResult(url, r) }
+            val rep = probe.probe(url, trustedDomains)
+            handler.post { if (!isDestroyed) engine.onProbeResult(url, rep.result, rep.diagnostics) }
         }
     }
 
