@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste: popup de anúncio separado da guia legítima</title>
+<style>body{font-family:sans-serif;max-width:40em;margin:1em auto;padding:0 1em}button{font-size:1.1em;padding:.6em 1.2em}.box{width:304px;height:78px;border:1px solid #888;padding:6px;box-sizing:border-box}</style></head>
+<body>
+<h1>Teste: popup de anúncio separado da guia legítima</h1>
+<p>"Continuar" abre a guia legítima. "Receber prêmio" abre uma guia de propaganda (o app deve fechá-la sozinho).</p><p><button id="go">Continuar</button></p><p><button id="ad">Receber prêmio</button></p><script>document.getElementById("go").addEventListener("click",function(){window.open("download.html","_blank");});document.getElementById("ad").addEventListener("click",function(){window.open("anuncio.html","_blank");});</script>
+<hr><small>Página de teste do Link Resolver v0.4.0 — conteúdo inofensivo.</small>
+</body></html>

@@ -1,0 +1,6 @@
+<!doctype html><meta charset="utf-8"><title>Teste de desafio</title>
+<h1>Desafio simulado (NÃO é um CAPTCHA real)</h1>
+<p>Um bloco visível com a classe .g-recaptcha simula o desafio: o app deve PAUSAR. Clique no botão abaixo para "resolver"; a automação deve retomar sozinha.</p>
+<div id="c" class="g-recaptcha" style="width:304px;height:78px;border:1px solid #888">verify you are human</div>
+<button onclick="document.getElementById('c').remove();document.getElementById('ok').hidden=false;document.body.innerText=document.body.innerText.replace('verify you are human','')">Simular resolução humana</button>
+<p id="ok" hidden><a href="exemplo.zip">Baixar arquivo</a></p>
