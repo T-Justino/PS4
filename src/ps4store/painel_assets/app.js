@@ -108,6 +108,18 @@ function mostrarJogo(d) {
   if (j.url) meta.appendChild(link(j.url, "página de referência"));
   box.appendChild(meta);
   d.avisos.forEach((a) => box.appendChild(el("div", "aviso-box", a)));
+  if (d.conflitos && d.conflitos.length) {
+    const det = el("details", "conflitos");
+    det.appendChild(el("summary", null, d.conflitos.length + " CUSA(s) em conflito (não associados a este jogo)"));
+    const ul = el("ul");
+    d.conflitos.slice(0, 8).forEach((c) => {
+      const outros = c.outrosJogos.length ? " · também atribuído a: " + c.outrosJogos.join("; ") + (c.maisOutros ? " (+" + c.maisOutros + ")" : "") : "";
+      ul.appendChild(el("li", null, c.cusa + " · " + c.motivo + outros + " · " + c.rotulo));
+    });
+    if (d.conflitos.length > 8) ul.appendChild(el("li", "desc", "… e mais " + (d.conflitos.length - 8)));
+    det.appendChild(ul);
+    box.appendChild(det);
+  }
   if (!d.total) {
     box.appendChild(el("div", "card", "Nenhuma versão CUSA cadastrada para " + j.qid + ". Isso NÃO quer dizer que o jogo não tenha CUSA: só que ainda não há registro com fonte. Nada foi inventado."));
     return;
@@ -140,12 +152,18 @@ function voltar() {
   if (window.location.hash) history.replaceState(null, "", window.location.pathname);
 }
 
+const fmt = (n) => Number(n || 0).toLocaleString("pt-BR");
 async function estado() {
+  const ul = $("estado");
   try {
     const e = await api("/api/estado");
-    $("estado").textContent = e.jogosNoIndice + " jogos no índice · " + e.registrosDeVersao + " registro(s) de versão" + (e.cusasWikidata ? " · " + e.cusasWikidata + " CUSA(s) do Wikidata" : "");
-    if (!e.jogosNoIndice) $("msg-lista").textContent = "Índice de busca vazio: só aparecem jogos com versões cadastradas (gere o índice com ps4store.wikidata --atualizar).";
-  } catch (e) { $("estado").textContent = "sem resposta do servidor"; }
+    ul.replaceChildren();
+    [["Jogos pesquisáveis", e.jogosPesquisaveis, ""], ["Jogos com CUSA", e.jogosComCusa, ""], ["CUSAs distintos", e.cusasDistintos, ""],
+     ["Registros manuais", e.registrosManuais, ""], ["Conflitos pendentes", e.conflitosPendentes, e.conflitosPendentes ? "pend" : ""]].forEach((c) => {
+      const li = el("li", c[2]); li.appendChild(el("b", null, fmt(c[1]))); li.appendChild(document.createTextNode(c[0])); ul.appendChild(li);
+    });
+    if (!e.jogosPesquisaveis) $("msg-lista").textContent = "Índice de busca vazio: só aparecem jogos com versões cadastradas (gere o índice com ps4store.wikidata --atualizar).";
+  } catch (err) { ul.replaceChildren(el("li", "carregando", "sem resposta do servidor")); }
 }
 
 $("form-busca").addEventListener("submit", (ev) => { ev.preventDefault(); voltar(); buscar(false); });

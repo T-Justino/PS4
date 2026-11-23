@@ -287,8 +287,9 @@ def test_interface_fluxo_completo_no_celular(navegador, srv, tmp_path):
     pedidos = []
     pg.on("request", lambda r: pedidos.append(r.url))
     pg.goto(f"http://127.0.0.1:{srv.port}/")
-    pg.locator("#estado").filter(has_text="jogos no índice").wait_for(timeout=8000)
-    assert "5 jogos no índice · 3 registro(s)" in pg.inner_text("#estado")
+    pg.locator("#estado li b").first.wait_for(timeout=8000)
+    cab = pg.locator("#estado li").all_inner_texts()
+    assert [c.replace("\n", " ") for c in cab] == ["5 Jogos pesquisáveis", "1 Jogos com CUSA", "2 CUSAs distintos", "3 Registros manuais", "0 Conflitos pendentes"]
     pg.fill("#q", "BATMAN")
     pg.click("button.primario")
     pg.wait_for_selector("#lista li")
@@ -392,7 +393,9 @@ def test_cusa_em_conflito_nao_associa_a_nenhum_jogo_e_avisa(srv_wd):
     j = srv_wd.get("/api/jogos?q=CUSA90099")[2]
     assert j["total"] == 0 and "CONFLITO" in j["aviso"]
     d = srv_wd.get("/api/jogo?qid=Q990900006")[2]
-    assert d["total"] == 0 and any("CONFLITO para revisão" in a and "CUSA90099" in a for a in d["avisos"])
+    assert d["total"] == 0 and d["avisos"] == ["1 CUSA(s) em conflito no Wikidata, NÃO associados a este jogo: CUSA90099."]
+    assert d["conflitos"] == [{"cusa": "CUSA90099", "motivo": "mesmo CUSA em mais de um jogo", "outrosJogos": ["Conflito B"], "maisOutros": 0,
+                              "classificacao": "nao-auditado", "rotulo": "não auditado"}]
 
 
 def test_busca_por_nome_continua_livre_e_mostra_contagem_do_wikidata(srv_wd):
@@ -444,3 +447,66 @@ def test_interface_pesquisa_por_cusa_e_exibe_origem_wikidata(navegador, srv_wd):
     pg.wait_for_selector("#jogo .card")
     assert "Também no Wikidata" in pg.inner_text("#jogo") and "CITADO: fonte vista, página não conferida" in pg.inner_text("#jogo")
     pg.close()
+
+
+# ---------- cabeçalho com contadores separados e avisos de conflito compactos ----------
+def test_estado_separa_jogos_com_cusa_cusas_distintos_registros_manuais_e_conflitos(srv_wd, srv):
+    e = srv_wd.get("/api/estado")[2]
+    assert (e["jogosPesquisaveis"], e["jogosComCusa"], e["cusasDistintos"], e["registrosManuais"], e["registrosWikidata"], e["conflitosPendentes"]) == (5, 3, 4, 3, 3, 1)
+    sem = srv.get("/api/estado")[2]                                                                  # só curados: 5 jogos no índice, 1 com CUSA, 2 CUSAs, 3 manuais, 0 conflitos
+    assert (sem["jogosPesquisaveis"], sem["jogosComCusa"], sem["cusasDistintos"], sem["registrosManuais"], sem["conflitosPendentes"]) == (5, 1, 2, 3, 0)
+    assert e["jogosNoIndice"] == 5 and e["registrosDeVersao"] == 3 and e["somenteLeitura"] is True      # chaves antigas preservadas
+
+
+def faz_wd_com_muitos_conflitos(tmp_path, n=12):
+    from ps4store import cusas
+    idx = busca.indice_vazio()
+    jogos = [("Q990910000", "Middle Aqui Principal")] + [(f"Q99092{k:04d}", f"Outro Jogo {k}") for k in range(n)]
+    busca.importar(idx, busca.carregar_fontes(FONTES), "wikidata", [{"nome": nm, "url": f"https://www.wikidata.org/wiki/{q}", "idFonte": f"wikidata:{q}"} for q, nm in jogos])
+    linhas = [["Q990910000", f"CUSA9{k:04d}"] for k in range(n)] + [[f"Q99092{k:04d}", f"CUSA9{k:04d}"] for k in range(n)]
+    doc = cusas.construir({"P5971": {"rotulo": "x", "consultadoEm": "2026-11-23", "linhas": linhas}}, idx, versoes.carregar(SEMENTE), "2026-11-23")
+    (tmp_path / "wd2.json").write_text(json.dumps(doc), encoding="utf-8")
+    busca.salvar_indice(idx, str(tmp_path / "idx2.json"))
+    return str(tmp_path / "idx2.json"), str(tmp_path / "wd2.json"), doc
+
+
+def test_muitos_conflitos_geram_um_aviso_curto_e_lista_compacta_com_classificacao(tmp_path):
+    from ps4store import auditoria
+    ip, wd, doc = faz_wd_com_muitos_conflitos(tmp_path)
+    aud = auditoria.auditar(doc, busca.carregar_indice(ip), versoes.carregar(SEMENTE))
+    ap = tmp_path / "aud.json"
+    ap.write_text(json.dumps(aud), encoding="utf-8")
+    s = painel.criar_servidor(0, ip, SEMENTE, arq_cusas=wd, arq_auditoria=str(ap))
+    threading.Thread(target=s.serve_forever, daemon=True).start()
+    c = Cli(s)
+    d = c.get("/api/jogo?qid=Q990910000")[2]
+    assert len(d["avisos"]) == 1 and len(d["avisos"][0]) < 160 and d["avisos"][0].startswith("12 CUSA(s) em conflito no Wikidata, NÃO associados a este jogo: CUSA90000, CUSA90001, CUSA90002, CUSA90003 (+8).")
+    assert len(d["conflitos"]) == 12 and all(x["classificacao"] == "associacao-contraditoria" and x["rotulo"] == "associação contraditória" for x in d["conflitos"])
+    assert all(len(x["outrosJogos"]) == 1 and x["maisOutros"] == 0 for x in d["conflitos"]) and d["registros"] == []
+    s.shutdown()
+    s.server_close()
+
+
+def test_interface_mostra_conflitos_em_lista_recolhivel_e_cabecalho_novo(navegador, tmp_path):
+    ip, wd, doc = faz_wd_com_muitos_conflitos(tmp_path)
+    s = painel.criar_servidor(0, ip, SEMENTE, arq_cusas=wd, arq_auditoria=str(tmp_path / "sem-auditoria.json"))
+    threading.Thread(target=s.serve_forever, daemon=True).start()
+    pg = navegador.new_page(viewport={"width": 390, "height": 844})
+    pg.goto(f"http://127.0.0.1:{s.server_address[1]}/")
+    pg.locator("#estado li b").first.wait_for(timeout=8000)
+    cab = [c.replace("\n", " ") for c in pg.locator("#estado li").all_inner_texts()]
+    assert cab[0] == "13 Jogos pesquisáveis" and cab[1].endswith("Jogos com CUSA") and cab[3] == "3 Registros manuais" and cab[4] == "12 Conflitos pendentes"
+    pg.fill("#q", "middle aqui")
+    pg.click("button.primario")
+    pg.wait_for_selector("#lista li")
+    pg.locator("#lista li").first.click()
+    pg.wait_for_selector("#jogo details.conflitos")
+    assert not pg.locator("#jogo details.conflitos").get_attribute("open") and pg.locator("#jogo .aviso-box").count() >= 1
+    pg.click("#jogo details.conflitos summary")
+    txt = pg.inner_text("#jogo details.conflitos")
+    assert "12 CUSA(s) em conflito (não associados a este jogo)" in txt and "… e mais 4" in txt and "não auditado" in txt and txt.count("CUSA9") == 8
+    assert pg.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    pg.screenshot(path=str(tmp_path / "conflitos.png"), full_page=True)
+    pg.close()
+    s.shutdown()
+    s.server_close()

@@ -35,3 +35,11 @@ dt{font-size:.78rem;color:var(--mut);margin-top:6px}dd{margin:0;overflow-wrap:an
 .erro{color:var(--erro)}
 a{color:var(--ac)}
 footer{border-top:1px solid var(--bd);margin-top:16px}
+
+.contadores{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.contadores li{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:6px 10px;font-size:.78rem;color:var(--mut);display:flex;flex-direction:column}
+.contadores li b{font-size:1.15rem;color:var(--tx);font-weight:650}
+.contadores li.pend b{color:var(--warn)}
+details.conflitos{margin:10px 0}
+details.conflitos ul{margin:6px 0 10px;padding-left:18px;font-size:.88rem}
+details.conflitos li{margin:4px 0;overflow-wrap:anywhere}

@@ -16,7 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from . import busca, cusas, unificada, versoes
+from . import auditoria, busca, cusas, unificada, versoes
 
 HOST = "127.0.0.1"
 PORTA_PADRAO = 8765
@@ -40,8 +40,8 @@ class ParametroInvalido(ValueError):
 class Dados:
     """Índice de busca + versões, recarregados quando o arquivo muda (mtime). Leitura apenas."""
 
-    def __init__(self, indice: str, arq_versoes: str, arq_cusas: str = cusas.DADOS_PADRAO):
-        self.indice_path, self.versoes_path, self.cusas_path = indice, arq_versoes, arq_cusas
+    def __init__(self, indice: str, arq_versoes: str, arq_cusas: str = cusas.DADOS_PADRAO, arq_auditoria: str = auditoria.AUDITORIA_PADRAO):
+        self.indice_path, self.versoes_path, self.cusas_path, self.auditoria_path = indice, arq_versoes, arq_cusas, arq_auditoria
         self._lock = threading.Lock()
         self._cache: dict[str, tuple[float, dict]] = {}
 
@@ -66,6 +66,9 @@ class Dados:
 
     def wikidata(self) -> dict:
         return self._carregar("w", self.cusas_path, cusas.carregar_dados)
+
+    def auditoria(self) -> dict:
+        return self._carregar("a", self.auditoria_path, auditoria.carregar_auditoria)
 
 
 def _qs(query: str, permitidos: set[str]) -> dict[str, str]:
@@ -139,6 +142,36 @@ def listar_jogos(dados: Dados, q: str, com_versoes: bool, limite: int) -> dict:
     return {"total": total, "mostrando": min(total, limite), "itens": itens[:limite], "aviso": aviso, "tipoBusca": tipo}
 
 
+MOTIVOS_CURTOS = {"o Wikidata atribui o mesmo CUSA a mais de um jogo": "mesmo CUSA em mais de um jogo",
+                  "contradiz o registro curado: o CUSA já está cadastrado para outro Q-id": "contradiz o registro curado"}
+
+
+def resumir_conflitos(qid: str, wd: dict, aud: dict, nome: str) -> list[dict]:
+    """Conflitos do jogo, uma linha curta cada: CUSA, motivo curto, outros jogos (até 3) e a classificação da auditoria (se houver). Não afirma tipo de produto."""
+    por_cusa = {c.get("cusa"): c for c in aud.get("conflitos", [])}
+    out = []
+    for c in unificada.conflitos_do_jogo(qid, wd):
+        outros = [n for q, n in zip(c["qids"], c.get("jogos", [])) if q != qid]
+        a = por_cusa.get(c["cusa"])
+        out.append({"cusa": c["cusa"], "motivo": MOTIVOS_CURTOS.get(c["motivo"], c["motivo"]), "outrosJogos": outros[:3], "maisOutros": max(len(outros) - 3, 0),
+                    "classificacao": a["classificacao"] if a else "nao-auditado", "rotulo": a["rotulo"] if a else auditoria.ROTULOS["nao-auditado"]})
+    return out
+
+
+def estatisticas(dados: Dados) -> dict:
+    """Contadores do cabeçalho: cada um separado (não misturar jogos, CUSAs, registros manuais e conflitos)."""
+    idx, vdoc, wd = dados.indice(), dados.versoes(), dados.wikidata()
+    no_indice = {_qid_de(t) for t in idx.get("titulos", []) if _qid_de(t)}
+    com = {r["qid"] for r in vdoc.get("versoes", [])} | {r["qid"] for r in wd.get("registros", [])}
+    if no_indice:
+        com &= no_indice
+    cusas_ = {r["cusa"] for r in vdoc.get("versoes", [])} | {r["cusa"] for r in wd.get("registros", [])}
+    return {"jogosPesquisaveis": len(idx.get("titulos", [])), "jogosComCusa": len(com), "cusasDistintos": len(cusas_),
+            "registrosManuais": len(vdoc.get("versoes", [])), "registrosWikidata": len(wd.get("registros", [])), "conflitosPendentes": len(wd.get("conflitos", [])),
+            "jogosNoIndice": len(idx.get("titulos", [])), "registrosDeVersao": len(vdoc.get("versoes", [])), "cusasWikidata": len(wd.get("registros", [])),
+            "conflitosWikidata": len(wd.get("conflitos", [])), "somenteLeitura": True}
+
+
 def detalhar_jogo(dados: Dados, qid: str, cusa: str, regiao: str, idioma: str) -> dict | None:
     idx, vdoc, wd = dados.indice(), dados.versoes(), dados.wikidata()
     rs = unificada.registros_do_jogo(qid, vdoc, wd)
@@ -155,13 +188,15 @@ def detalhar_jogo(dados: Dados, qid: str, cusa: str, regiao: str, idioma: str) -
         if r.get("origem") == "curado" and t is not None and busca.norm(r.get("jogo")) != busca.norm(t["nome"]):
             avisos.append(f"O registro {r['cusa']} foi cadastrado como \"{r['jogo']}\" para este Q-id: confira o vínculo.")
             break
-    for c in unificada.conflitos_do_jogo(qid, wd):
-        avisos.append(f"CONFLITO para revisão: o CUSA {c['cusa']} ({c['motivo']}); não foi associado a este jogo.")
+    conflitos = resumir_conflitos(qid, wd, dados.auditoria(), nome)
+    if conflitos:                                                   # UM aviso curto; o detalhe vai na lista compacta `conflitos`
+        lista = ", ".join(c["cusa"] for c in conflitos[:4]) + (f" (+{len(conflitos) - 4})" if len(conflitos) > 4 else "")
+        avisos.append(f"{len(conflitos)} CUSA(s) em conflito no Wikidata, NÃO associados a este jogo: {lista}.")
     visiveis, omitidos = versoes.consultar({"versoes": rs}, cusa=cusa or None, regiao=regiao or None, idioma=idioma or None)
     return {"jogo": {"nome": nome, "qid": qid, "ano": (t or {}).get("lancamento"), "url": (t or {}).get("url") or ""},
             "total": len(rs), "cusasDistintos": len({r["cusa"] for r in rs}), "registros": visiveis, "omitidos": omitidos,
             "origens": {"curado": sum(1 for r in rs if r.get("origem") == "curado"), "wikidata": sum(1 for r in rs if r.get("origem") == "wikidata")},
-            "filtros": {"cusa": cusa, "regiao": regiao, "idioma": idioma}, "avisos": avisos,
+            "filtros": {"cusa": cusa, "regiao": regiao, "idioma": idioma}, "avisos": avisos, "conflitos": conflitos,
             "temJogoBase": any(r.get("escopo") == "jogo-base" for r in rs if r.get("origem") == "curado")}
 
 
@@ -209,9 +244,7 @@ class Handler(BaseHTTPRequestHandler):
             dados: Dados = self.server.dados
             if rota == "/api/estado":
                 _qs(u.query, set())
-                return self._json(200, {"jogosNoIndice": len(dados.indice().get("titulos", [])), "registrosDeVersao": len(dados.versoes().get("versoes", [])),
-                                        "cusasWikidata": len(dados.wikidata().get("registros", [])), "conflitosWikidata": len(dados.wikidata().get("conflitos", [])),
-                                        "somenteLeitura": True}, head)
+                return self._json(200, estatisticas(dados), head)
             if rota == "/api/jogos":
                 p = _qs(u.query, {"q", "com_versoes", "limite"})
                 q = _texto(p.get("q", ""), "q", 100)
@@ -259,12 +292,12 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def criar_servidor(porta: int = PORTA_PADRAO, indice: str = busca.INDICE_PADRAO, arq_versoes: str = versoes.VERSOES_PADRAO, host: str = HOST,
-                   arq_cusas: str = cusas.DADOS_PADRAO) -> ThreadingHTTPServer:
+                   arq_cusas: str = cusas.DADOS_PADRAO, arq_auditoria: str = auditoria.AUDITORIA_PADRAO) -> ThreadingHTTPServer:
     if host != HOST:
         raise ValueError("o painel só pode escutar em 127.0.0.1")
     if not (porta == 0 or 1024 <= porta <= 65535):
         raise ValueError("porta deve ser 0 (qualquer) ou de 1024 a 65535")
-    dados = Dados(indice, arq_versoes, arq_cusas)
+    dados = Dados(indice, arq_versoes, arq_cusas, arq_auditoria)
     erros = versoes.validar_doc(dados.versoes())
     if erros:
         raise ValueError(f"o arquivo de versões tem {len(erros)} problema(s); rode: python -m ps4store.versoes --validar")
@@ -282,9 +315,10 @@ def main(argv=None) -> int:
     ap.add_argument("--indice", default=busca.INDICE_PADRAO)
     ap.add_argument("--versoes", default=versoes.VERSOES_PADRAO)
     ap.add_argument("--cusas", default=cusas.DADOS_PADRAO, help="CUSAs alegados no Wikidata (gerados por ps4store.cusas)")
+    ap.add_argument("--auditoria", default=auditoria.AUDITORIA_PADRAO, help="relatório de conflitos (gerado por ps4store.auditoria; opcional)")
     a = ap.parse_args(argv)
     try:
-        srv = criar_servidor(a.porta, a.indice, a.versoes, arq_cusas=a.cusas)
+        srv = criar_servidor(a.porta, a.indice, a.versoes, arq_cusas=a.cusas, arq_auditoria=a.auditoria)
     except OSError as e:
         print(f"ERRO  não foi possível abrir a porta {a.porta} em 127.0.0.1 ({e.strerror or type(e).__name__}). Já há um painel rodando? Use --porta OUTRA.", file=sys.stderr)
         return 2
