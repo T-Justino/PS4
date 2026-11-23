@@ -13,6 +13,7 @@ internal class Sim(val limits: Limits = Limits()) : ResolverEngine.Listener {
     var result: ResolveResult? = null
     var answerDomain: Boolean? = null           // null = deixa pendente
     val queue = ArrayDeque<() -> Unit>()
+    var probeFn: ((String, Set<String>) -> ProbeReport?)? = null
     val alias = HashMap<String, String>()       // URL pedida -> URL final após redirecionamentos do servidor
     private var current: String? = null
     lateinit var e: ResolverEngine
@@ -40,7 +41,7 @@ internal class Sim(val limits: Limits = Limits()) : ResolverEngine.Listener {
     override fun requestProbe(url: String, trustedDomains: Set<String>) {
         probed += url
         queue += {
-            val rep = probes[url] ?: ProbeReport(ProbeResult.Page(url, 200, "text/html"), emptyList())
+            val rep = probeFn?.invoke(url, trustedDomains) ?: probes[url] ?: ProbeReport(ProbeResult.Page(url, 200, "text/html"), emptyList())
             e.onProbeResult(url, rep.result, rep.diagnostics, rep.hops)
         }
     }

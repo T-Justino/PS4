@@ -8,8 +8,8 @@ import org.junit.Test
  * no Chromium (src/test/resources/scans) — valida scanner + pontuação + motor de ponta a ponta.
  */
 class RealPagesFixtureTest {
-    private val base = "https://t-justino.github.io/PS4/v3/"
-    private val fileUrl = "${base}files/teste.bin"
+    private val base = "https://raw.githack.com/T-Justino/PS4/gh-pages/v3/"
+    private val fileUrl = "https://cdn.jsdelivr.net/gh/T-Justino/PS4@gh-pages/v3/files/teste.bin"
 
     private fun load(rel: String): PageScan {
         val name = "scans/v3__" + rel.replace("/", "__").removeSuffix(".html") + ".json"
@@ -30,6 +30,7 @@ class RealPagesFixtureTest {
         val r = s.run(base + "abc/a.html")
         assertEquals(r.message, ResultState.VERIFIED_FILE, r.state)
         assertEquals(fileUrl, r.url); assertEquals("teste.bin", r.fileName)
+        assertEquals(listOf("cdn.jsdelivr.net"), s.asked)            // arquivo em outro domínio: confirmação humana
         assertEquals(listOf("${base}abc/b.html", "${base}abc/c.html", fileUrl), s.probed)
         assertFalse(s.navigated.any { it.endsWith(".bin") })      // nunca navega até o binário
     }
@@ -65,9 +66,27 @@ class RealPagesFixtureTest {
             s.alias[hopUrl] = "${base}http/destino.html"
             val r = s.run(base + "http/$code.html")
             assertEquals("HTTP $code: ${r.message}", ResultState.VERIFIED_FILE, r.state)
-            assertEquals(listOf("httpbingo.org"), s.asked)            // domínio desconhecido pediu confirmação humana
+            assertEquals(listOf("httpbin.dev", "cdn.jsdelivr.net"), s.asked)   // domínios desconhecidos pediram confirmação humana
             assertTrue(r.path.any { it.kind == PathKind.HTTP_REDIRECT && it.code == code })
         }
+    }
+
+    @Test fun rawGithub302RedirectAsksAgainAndConfirmsWithoutNavigating() {
+        val s = sim("http/raw302.html")
+        val raw = s.pages[base + "http/raw302.html"]!!.candidates.single().url!!
+        assertTrue(raw.startsWith("https://github.com/"))
+        s.probeFn = { url, trusted ->
+            if (url != raw) null
+            else if ("githubusercontent.com" in trusted) ProbeReport(
+                ProbeResult.File("https://raw.githubusercontent.com/T-Justino/PS4/gh-pages/v3/files/teste.bin", 200, "application/octet-stream", 204800, null, "HEAD", true),
+                emptyList(), listOf(RedirectHop(302, raw, "https://raw.githubusercontent.com/T-Justino/PS4/gh-pages/v3/files/teste.bin")))
+            else ProbeReport(ProbeResult.NeedsDomain("raw.githubusercontent.com", "https://raw.githubusercontent.com/T-Justino/PS4/gh-pages/v3/files/teste.bin"), emptyList())
+        }
+        val r = s.run(base + "http/raw302.html")
+        assertEquals(r.message, ResultState.VERIFIED_FILE, r.state)
+        assertEquals(listOf("github.com", "raw.githubusercontent.com"), s.asked)
+        assertTrue(r.path.any { it.code == 302 })
+        assertFalse(s.navigated.any { it.contains("teste.bin") })
     }
 
     @Test fun unknownDomainDeniedStopsWithoutRequests() {

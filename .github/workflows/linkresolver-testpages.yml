@@ -1,6 +1,7 @@
 name: LinkResolver test pages
 
-# Publica LinkResolver/testpages na branch gh-pages (GitHub Pages) e verifica as URLs de teste.
+# Publica LinkResolver/testpages na branch gh-pages. As páginas são servidas por raw.githack.com
+# (HTML) e o arquivo de teste por cdn.jsdelivr.net — sem precisar ativar o GitHub Pages.
 on:
   push:
     branches: [claude/link-resolver-android-1vnk2h]
@@ -19,7 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      SITE: https://t-justino.github.io/PS4
+      PAGES: https://raw.githack.com/T-Justino/PS4/gh-pages/v3
+      FILE: https://cdn.jsdelivr.net/gh/T-Justino/PS4@gh-pages/v3/files/teste.bin
     steps:
       - uses: actions/checkout@v4
 
@@ -32,47 +34,36 @@ jobs:
           force_orphan: true
           commit_message: "testpages: ${{ github.sha }}"
 
-      - name: Tentar habilitar o GitHub Pages (melhor esforço)
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          code=$(curl -s -o /tmp/pages.json -w '%{http_code}' -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/pages" \
-            -d '{"source":{"branch":"gh-pages","path":"/"}}')
-          echo "POST /pages -> HTTP $code"; head -c 400 /tmp/pages.json; echo
-
-      - name: Verificar URLs publicadas e servidor de redirecionamentos
+      - name: Verificar URLs de teste (HTML, arquivo, redirecionamentos reais)
         run: |
           S=/tmp/summary.md
           echo "## Páginas de teste do Link Resolver v0.3.0" > $S
-          ok=0
-          for i in $(seq 1 24); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/v3/abc/a.html" || true)
-            [ "$code" = "200" ] && ok=1 && break
-            echo "tentativa $i: HTTP $code (aguardando o Pages)"; sleep 10
-          done
-          if [ $ok = 0 ]; then
-            echo "::warning::GitHub Pages ainda não serve $SITE. Ative em Settings → Pages → Deploy from a branch → gh-pages / (root)."
-            echo "⚠ **Pages não está servindo.** Ative em *Settings → Pages → Deploy from a branch → `gh-pages` / `(root)`* e reexecute este workflow." >> $S
-          fi
           echo '| URL | HTTP | Content-Type |' >> $S; echo '|---|---|---|' >> $S
-          for p in v3/index.html v3/abc/a.html v3/abc/b.html v3/abc/c.html v3/meta/start.html v3/js/start.html \
-                   v3/http/301.html v3/http/302.html v3/http/303.html v3/http/307.html v3/http/308.html v3/http/destino.html \
-                   v3/loop/a.html v3/loop/b.html v3/dead/start.html v3/dead/fim.html v3/long/1.html v3/long/4.html v3/ads/start.html v3/files/teste.bin; do
-            r=$(curl -s -o /dev/null -w '%{http_code} %{content_type}' "$SITE/$p" || true)
-            echo "| \`$SITE/$p\` | ${r%% *} | ${r#* } |" >> $S
+          fail=0
+          for p in index.html abc/a.html abc/b.html abc/c.html meta/start.html meta/destino.html js/start.html js/destino.html \
+                   http/301.html http/302.html http/303.html http/307.html http/308.html http/raw302.html http/destino.html \
+                   loop/a.html loop/b.html dead/start.html dead/fim.html long/1.html long/2.html long/3.html long/4.html ads/start.html; do
+            r=""
+            for i in 1 2 3 4 5 6; do   # a CDN pode levar alguns segundos para ver o commit novo
+              r=$(curl -s -L -o /dev/null -w '%{http_code} %{content_type}' "$PAGES/$p" || true)
+              [ "${r%% *}" = "200" ] && break; sleep 10
+            done
+            [ "${r%% *}" = "200" ] || fail=1
+            echo "| \`$PAGES/$p\` | ${r%% *} | ${r#* } |" >> $S
           done
-          echo >> $S; echo '### Arquivo de teste (HEAD e Range 0-0, como o app faz)' >> $S; echo '```' >> $S
-          curl -sI "$SITE/v3/files/teste.bin" | tr -d '\r' | grep -iE '^(HTTP|content-type|content-length|accept-ranges)' >> $S || true
-          curl -s -o /dev/null -D - -r 0-0 "$SITE/v3/files/teste.bin" | tr -d '\r' | grep -iE '^(HTTP|content-range|content-type)' >> $S || true
+          echo >> $S; echo '### Arquivo de teste (jsDelivr): HEAD e Range 0-0' >> $S; echo '```' >> $S
+          curl -sI "$FILE" | tr -d '\r' | grep -iE '^(HTTP|content-type|content-length|accept-ranges)' >> $S || true
+          curl -s -o /dev/null -D - -r 0-0 "$FILE" | tr -d '\r' | grep -iE '^(HTTP|content-range)' >> $S || true
           echo '```' >> $S
-          echo '### Redirecionamentos HTTP reais (httpbingo.org)' >> $S; echo '```' >> $S
-          D='https%3A%2F%2Ft-justino.github.io%2FPS4%2Fv3%2Fhttp%2Fdestino.html'
+          echo '### Redirecionamentos HTTP reais (httpbin.dev)' >> $S; echo '```' >> $S
+          D='https%3A%2F%2Fraw.githack.com%2FT-Justino%2FPS4%2Fgh-pages%2Fv3%2Fhttp%2Fdestino.html'
           for c in 301 302 303 307 308; do
             echo "status_code=$c:" >> $S
-            curl -sI -m 20 "https://httpbingo.org/redirect-to?url=$D&status_code=$c" | tr -d '\r' | grep -iE '^(HTTP|location)' >> $S || echo "(sem resposta)" >> $S
+            curl -s -o /dev/null -D - -m 20 "https://httpbin.dev/redirect-to?url=$D&status_code=$c" | tr -d '\r' | grep -iE '^(HTTP|location)' >> $S || echo "(sem resposta)" >> $S
           done
           echo '```' >> $S
+          echo '### 302 real github.com → raw.githubusercontent.com' >> $S; echo '```' >> $S
+          curl -sI "https://github.com/T-Justino/PS4/raw/gh-pages/v3/files/teste.bin" | tr -d '\r' | grep -iE '^(HTTP|location)' >> $S || true
+          echo '```' >> $S
           cat $S; cat $S >> "$GITHUB_STEP_SUMMARY"
+          [ $fail = 0 ] || echo "::warning::alguma URL de teste não respondeu 200 (veja a tabela)"

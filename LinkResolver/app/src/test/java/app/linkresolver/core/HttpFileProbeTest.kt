@@ -44,6 +44,11 @@ class HttpFileProbeTest {
                     ex.responseHeaders.add("Content-Range", "bytes 0-0/5000")
                     ex.sendResponseHeaders(206, 1); ex.responseBody.write(0); ex.responseBody.close()
                 }
+                "/head403.bin" -> if (ex.requestMethod == "HEAD") ex.sendResponseHeaders(403, -1) else {
+                    ex.responseHeaders.add("Content-Type", "application/octet-stream")
+                    ex.responseHeaders.add("Content-Range", "bytes 0-0/777")
+                    ex.sendResponseHeaders(206, 1); ex.responseBody.write(0); ex.responseBody.close()
+                }
                 "/page" -> { ex.responseHeaders.add("Content-Type", "text/html; charset=utf-8"); ex.sendResponseHeaders(200, -1) }
                 "/empty" -> ex.close()                                   // ERR_EMPTY_RESPONSE
                 "/forbidden" -> ex.sendResponseHeaders(403, -1)
@@ -74,6 +79,12 @@ class HttpFileProbeTest {
         val r = probe().probe(url("/nohead.bin"), trusted).result as ProbeResult.File
         assertEquals("GET", r.method); assertEquals(5000L, r.contentLength)
         assertEquals(listOf("HEAD", "GET"), methods); assertEquals("bytes=0-0", ranges.last())
+    }
+
+    @Test fun head403FallsBackToRangeGet() {
+        val r = probe().probe(url("/head403.bin"), trusted).result as ProbeResult.File
+        assertEquals("GET", r.method); assertEquals(777L, r.contentLength)
+        assertEquals(listOf("HEAD", "GET"), methods)
     }
 
     @Test fun serverRejectingWebViewUserAgentIsRecoveredWithChromeLikeProfile() {

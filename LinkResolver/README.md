@@ -22,7 +22,7 @@ A versão e o commit aparecem no rodapé do app (`BuildConfig.VERSION_NAME` / `G
    URLs com cara de arquivo são validadas (cliente **OkHttp**) por **HEAD** (ou **GET com `Range: bytes=0-0`**) antes de navegar — só cabeçalhos, sem baixar o corpo, sem cookies, com checagem de IP interno a cada salto. O `DownloadListener` é evidência adicional. Páginas de erro do navegador (`chrome-error://`) nunca são analisadas. *Copiar URL* copia a URL completa (se tiver token/assinatura, o app avisa e marca a área de transferência como sensível no Android 13+).
 
 ## Como testar
-**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 82 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
+**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 84 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
 
 **Manuais no aparelho** (o app só aceita HTTPS público; `localhost`/IPs privados são bloqueados de propósito, então hospede `testpages/` em HTTPS — p.ex. GitHub Pages — ou use um túnel HTTPS):
 | Página | Esperado |
@@ -76,18 +76,21 @@ Limites ajustáveis em `core/Models.kt` (`Limits`).
 - **Loops e limites:** 3ª visita à mesma URL, caminho que só leva a páginas já visitadas, 2 páginas sem nenhuma URL nova, 15 páginas, profundidade 6, tempos e domínios — todos interrompem e preservam os candidatos.
 - Em qualquer falha os links encontrados (todas as páginas) ficam na aba **Candidatos**, com botão **Copiar** e status "não verificado".
 
-### Páginas de teste (HTTPS)
-Publicadas pelo workflow *LinkResolver test pages* na branch `gh-pages` (GitHub Pages: *Settings → Pages → Deploy from a branch → gh-pages / root*, uma única vez). Base: `https://t-justino.github.io/PS4/v3/` — menu em `…/v3/index.html`.
+### Páginas de teste (HTTPS, sem configurar nada)
+O workflow *LinkResolver test pages* publica `LinkResolver/testpages` na branch `gh-pages`. As páginas são servidas por **raw.githack.com** (HTML), o arquivo de teste (200 KB, `v3/files/teste.bin`) por **cdn.jsdelivr.net** e os redirecionamentos HTTP reais por **httpbin.dev** (`/redirect-to?url=…&status_code=…`) e **github.com** (302 para raw.githubusercontent.com). Como cada serviço é um domínio diferente, o app pede **confirmação de domínio** durante os testes (toque em *Permitir domínio*). Menu: `https://raw.githack.com/T-Justino/PS4/gh-pages/v3/index.html`.
+
+Base: `https://raw.githack.com/T-Justino/PS4/gh-pages/v3/`
 
 | Teste | URL inicial | Esperado |
 |---|---|---|
-| A→B→C→arquivo | `https://t-justino.github.io/PS4/v3/abc/a.html` | Arquivo confirmado; caminho de 3 páginas; não navega até o `.bin` |
-| Meta refresh | `https://t-justino.github.io/PS4/v3/meta/start.html` | segue o destino do meta refresh |
-| Redirecionamento JS | `https://t-justino.github.io/PS4/v3/js/start.html` | segue o destino do `location.href` |
-| HTTP 301/302/303/307/308 | `https://t-justino.github.io/PS4/v3/http/301.html` (idem 302, 303, 307, 308) | pede confirmação para `httpbingo.org`; registra o código HTTP; confirma o arquivo |
-| Loop | `https://t-justino.github.io/PS4/v3/loop/a.html` | Bloqueado: loop detectado |
-| Sem link válido | `https://t-justino.github.io/PS4/v3/dead/start.html` | Nenhum candidato; "política de privacidade" preservada para cópia |
-| 4 etapas | `https://t-justino.github.io/PS4/v3/long/1.html` | Arquivo confirmado após 4 páginas |
-| Anúncios | `https://t-justino.github.io/PS4/v3/ads/start.html` | ignora anúncios e segue "Continuar" |
+| A→B→C→arquivo | `…/v3/abc/a.html` | Arquivo confirmado após 3 páginas; confirma `cdn.jsdelivr.net`; não navega até o `.bin` |
+| Meta refresh | `…/v3/meta/start.html` | segue o destino do meta refresh |
+| Redirecionamento JS | `…/v3/js/start.html` | segue o destino do `location.href` |
+| HTTP 301/302/303/307/308 | `…/v3/http/301.html` (idem `302`, `303`, `307`, `308`) | pede confirmação para `httpbin.dev`; registra o código HTTP; confirma o arquivo |
+| 302 direto ao arquivo | `…/v3/http/raw302.html` | pede confirmação de `github.com` e de `raw.githubusercontent.com`; confirma o arquivo por HEAD/Range |
+| Loop | `…/v3/loop/a.html` | Bloqueado: loop detectado |
+| Sem link válido | `…/v3/dead/start.html` | Nenhum candidato; "política de privacidade" preservada para cópia |
+| 4 etapas | `…/v3/long/1.html` | Arquivo confirmado após 4 páginas |
+| Anúncios | `…/v3/ads/start.html` | ignora anúncios e segue "Continuar" |
 
-Os redirecionamentos HTTP reais vêm do servidor público `https://httpbingo.org/redirect-to?url=…&status_code=…` (HTTPS). As páginas estáticas e o arquivo (`files/teste.bin`, 200 KB) vêm do GitHub Pages.
+(`…` = `https://raw.githack.com/T-Justino/PS4/gh-pages`.) Observação: `raw.githack.com` recusa HEAD (403) em alguns arquivos; a verificação cai para GET `Range: bytes=0-0`, e páginas continuam sendo navegadas normalmente. `httpbin.org` e `httpbingo.org` bloqueiam IPs de datacenter, por isso foram trocados.

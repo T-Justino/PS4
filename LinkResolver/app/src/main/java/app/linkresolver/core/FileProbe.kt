@@ -106,7 +106,7 @@ class HttpFileProbe(
             if (System.nanoTime() > deadline) { diag += "orçamento de tempo da sondagem esgotado"; break }
             val head = run(p, url, trustedDomains, "HEAD", diag, holder)
             val needGet = head is ProbeResult.NetworkError ||
-                (head is ProbeResult.HttpError && head.status in setOf(400, 405, 501))
+                (head is ProbeResult.HttpError && head.status in setOf(400, 403, 405, 501)) // 403: URLs assinadas só para GET recusam HEAD
             val r = if (needGet) {
                 val g = run(p, url, trustedDomains, "GET", diag, holder)
                 if (g is ProbeResult.NetworkError && head is ProbeResult.HttpError) head else g
