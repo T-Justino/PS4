@@ -1,0 +1,50 @@
+name: LinkResolver net check
+
+# Diagnóstico: quais hosts públicos servem HTML estático e redirecionamentos HTTP reais a partir de um runner.
+on:
+  push:
+    branches: [claude/link-resolver-android-1vnk2h]
+    paths: ['.github/workflows/linkresolver-netcheck.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Redirecionamentos HTTP reais
+        run: |
+          UA='Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36'
+          D='https%3A%2F%2Fgithub.com%2FT-Justino%2FPS4'
+          show() { echo "--- $1"; shift; "$@" 2>&1 | tr -d '\r' | grep -iE '^(HTTP|location|content-type|server|cf-ray)' | head -6 || true; }
+          for host in httpbingo.org httpbin.org; do
+            for m in "" "-X GET"; do
+              show "$host redirect-to 302 (${m:-HEAD}) UA padrão" curl -s -m 20 -D - -o /dev/null ${m:--I} "https://$host/redirect-to?url=$D&status_code=302"
+              show "$host redirect-to 302 (${m:-HEAD}) UA Chrome" curl -s -m 20 -A "$UA" -D - -o /dev/null ${m:--I} "https://$host/redirect-to?url=$D&status_code=302"
+            done
+          done
+          show "postman-echo redirect" curl -s -m 20 -A "$UA" -D - -o /dev/null "https://postman-echo.com/redirect-to?url=$D&status_code=307"
+          show "www.github.com (301 real)" curl -s -m 20 -I https://www.github.com/T-Justino/PS4
+          show "github raw (302 real)" curl -s -m 20 -I https://github.com/T-Justino/PS4/raw/claude/link-resolver-android-1vnk2h/LinkResolver/README.md
+          show "httpstat.us 301" curl -s -m 20 -I https://httpstat.us/301
+      - name: HTML estático sem GitHub Pages (CDNs de repositório)
+        run: |
+          for u in \
+            "https://cdn.jsdelivr.net/gh/T-Justino/PS4@gh-pages/v3/abc/a.html" \
+            "https://raw.githack.com/T-Justino/PS4/gh-pages/v3/abc/a.html" \
+            "https://rawcdn.githack.com/T-Justino/PS4/gh-pages/v3/abc/a.html" \
+            "https://cdn.statically.io/gh/T-Justino/PS4/gh-pages/v3/abc/a.html" \
+            "https://raw.githubusercontent.com/T-Justino/PS4/gh-pages/v3/abc/a.html" \
+            "https://t-justino.github.io/PS4/v3/abc/a.html"; do
+            echo "--- $u"
+            curl -s -m 25 -L -D - -o /tmp/body.html "$u" | tr -d '\r' | grep -iE '^(HTTP|content-type|x-content-type-options|content-security-policy|content-disposition)' | head -6
+            head -c 120 /tmp/body.html | tr '\n' ' '; echo
+          done
+          echo "--- teste.bin via githack/jsdelivr"
+          for u in "https://rawcdn.githack.com/T-Justino/PS4/gh-pages/v3/files/teste.bin" "https://cdn.jsdelivr.net/gh/T-Justino/PS4@gh-pages/v3/files/teste.bin"; do
+            echo "$u"; curl -sI -m 25 "$u" | tr -d '\r' | grep -iE '^(HTTP|content-type|content-length|accept-ranges)'
+            curl -s -o /dev/null -D - -r 0-0 -m 25 "$u" | tr -d '\r' | grep -iE '^(HTTP|content-range)'
+          done
