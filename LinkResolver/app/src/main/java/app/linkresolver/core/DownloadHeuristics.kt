@@ -108,7 +108,12 @@ object DownloadHeuristics {
         if (raw.source == "derived-raw") reasons += "derivado de /blob/ (o GitHub não expôs o link Raw)"
         if (raw.source == "meta-refresh") { score += 55; reasons += "redirecionamento automático da página (meta refresh)" }
         if (raw.source == "js-redirect") { score += 55; reasons += "redirecionamento automático da página (JavaScript)" }
-        if (!raw.visible) { score -= 25; reasons += "elemento oculto" }
+        if (!raw.visible) {
+            // candidatos de arquivo/Raw escondidos costumam ser a versão "tela larga" de uma célula duplicada: penalidade leve
+            val strong = url != null && (looksLikeFileUrl(url) || GithubUrls.isRawLink(url) ||
+                (GithubUrls.isBlobView(url) && extensionOf(url) in FILE_EXTENSIONS))
+            score -= if (strong) 8 else 25; reasons += "elemento oculto"
+        }
         if (raw.disabled) { score -= 45; reasons += "desabilitado (aguardando liberação)" }
         if (raw.dynamic) { score += 8; reasons += "criado/liberado dinamicamente" }
         if (raw.source == "button" && isStepText(raw.text)) { score += 10; reasons += "botão de ação" }

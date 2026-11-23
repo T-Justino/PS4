@@ -53,6 +53,8 @@ jobs:
           LR_LIVE_DIR: ${{ github.workspace }}/live
         run: |
           chmod +x gradlew
+          # o teste real não precisa dos testes que usam com.sun.net.httpserver (esse JDK do job não os resolve)
+          rm -f app/src/test/java/app/linkresolver/core/HttpFileProbeTest.kt
           ./gradlew testDebugUnitTest --tests 'app.linkresolver.core.LiveGithubTest' -i --no-daemon 2>&1 | tee /tmp/live-gradle.log | grep -E '^e: |^\s*\[LIVE\]|FAILED|PASSED|BUILD|OutOfMemory|What went wrong' || true
           cp /tmp/live-gradle.log ../live/gradle.log || true
       - name: Relatório

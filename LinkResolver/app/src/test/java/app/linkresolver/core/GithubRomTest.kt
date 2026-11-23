@@ -80,6 +80,7 @@ class GithubRomTest {
         val roms = scored.filter { it.url?.contains("/blob/") == true && DownloadHeuristics.extensionOf(it.url!!) in DownloadHeuristics.FILE_EXTENSIONS }
         assertEquals(201, roms.size)
         assertTrue(roms.all { it.linkClass == LinkClass.FILE_VIEW_PAGE && it.score >= 60 })
+        assertTrue("duplicata escondida (tela larga) + visível (tela pequena): fica a visível", roms.all { it.raw.visible })
         val noise = scored.filter { it.url?.contains("/blob/") == true && it.url!!.endsWith("README.md") || it.url?.contains("/tree/") == true }
         assertTrue(noise.all { it.score < 40 })
         assertTrue(scored.first { it.url!!.contains("doubleclick") }.ad)

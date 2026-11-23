@@ -56,10 +56,13 @@ if(!ch){
  if(pv&&(/(login|log-in|signin|sign-in|auth|sso|oauth|account|entrar|conta)/.test(location.pathname.toLowerCase())||/(sign in|log in|faça login|fa[cç]a o login|entrar na (sua )?conta|iniciar sess)/.test(body))){ch='LOGIN';hint='campo de senha visível'}}
 out.challenge=ch;out.hint=hint;
 /* ---- candidatos ---- */
-var n=0,seen={};
+var n=0,seen={},seenIdx={};
 function add(e,url,source,dl){
  if(out.cands.length>=1500)return;
- var t=txt(e);var key=(url||'')+'|'+t+'|'+source;if(seen[key])return;seen[key]=1;
+ var t=txt(e);var key=(url||'')+'|'+t+'|'+source;
+ if(seen[key]){/* duplicata (ex.: célula de tela larga oculta + célula de tela pequena visível): fica a versão VISÍVEL */
+  var oc0=out.cands[seenIdx[key]];if(oc0&&!oc0.vis&&vis(e)){var id2=String(++n);try{e.setAttribute('data-lr-id',id2)}catch(x){}oc0.id=id2;oc0.vis=true;oc0.dis=isDis(e)}return}
+ seen[key]=1;seenIdx[key]=out.cands.length;
  var id=null;
  if(!url||source==='button'||true){id=String(++n);try{e.setAttribute('data-lr-id',id)}catch(x){}}
  out.cands.push({url:url,text:t,tag:e.tagName.toLowerCase(),source:source,dl:!!dl,rel:((e.getAttribute&&e.getAttribute('rel'))||'').toLowerCase(),ctx:ctx(e),id:id,vis:vis(e),dis:isDis(e),dyn:!!(e.hasAttribute&&e.hasAttribute('data-lr-dyn')),blank:!!(e.getAttribute&&e.getAttribute('target')==='_blank')})}
