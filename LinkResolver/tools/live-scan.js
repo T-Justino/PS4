@@ -16,7 +16,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const report = [];
   const log = m => { console.log(m); report.push(m); };
   await p.goto(repo, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await p.waitForSelector('a[href*="/blob/"]', { timeout: 40000 }).catch(() => log('AVISO: nenhum link /blob/ apareceu em 40 s'));
+  await p.waitForSelector('a[href*="/blob/"]', { timeout: 40000, state: 'attached' }).catch(() => log('AVISO: nenhum link /blob/ apareceu em 40 s'));
   await sleep(1500);
   const raw = await p.evaluate(script);
   fs.writeFileSync(path.join(outDir, 'dir.json'), JSON.stringify(raw));
@@ -24,6 +24,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const roms = d.cands.filter(c => ROM.test((c.url || '').split('?')[0]));
   log(`DIR ${p.url()}  total=${d.total}  mantidos=${d.cands.length}  ROMs=${roms.length}`);
   log('primeiros candidatos: ' + d.cands.slice(0, 8).map(c => `${(c.url || '').replace('https://github.com', '')}`).join(' | '));
+  log('ROMs (url | visível | texto): ' + roms.slice(0, 6).map(c => `${(c.url || '').replace('https://github.com', '')} | ${c.vis} | ${c.text}`).join('  ##  '));
   for (const n of ['astrohawk.smc', 'blt.sfc', 'bucket.smc']) log(`  ${n}: ${d.cands.some(c => (c.url || '').endsWith('/' + n)) ? 'ENCONTRADO' : 'ausente'}`);
   const first = roms.find(c => /\/blob\//.test(c.url));
   if (!first) { log('FALHA: nenhuma página /blob/ de ROM'); fs.writeFileSync(path.join(outDir, 'report.txt'), report.join('\n')); await b.close(); process.exit(0); }

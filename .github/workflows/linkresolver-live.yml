@@ -53,7 +53,8 @@ jobs:
           LR_LIVE_DIR: ${{ github.workspace }}/live
         run: |
           chmod +x gradlew
-          ./gradlew testDebugUnitTest --tests 'app.linkresolver.core.LiveGithubTest' -i --no-daemon 2>&1 | tee /tmp/live-gradle.log | grep -E '^\s*\[LIVE\]|FAILED|PASSED|BUILD' || true
+          ./gradlew testDebugUnitTest --tests 'app.linkresolver.core.LiveGithubTest' -i --no-daemon 2>&1 | tee /tmp/live-gradle.log | grep -E '^e: |^\s*\[LIVE\]|FAILED|PASSED|BUILD|OutOfMemory|What went wrong' || true
+          cp /tmp/live-gradle.log ../live/gradle.log || true
       - name: Relatório
         if: always()
         run: |
