@@ -45,7 +45,8 @@ class TabManager(
         fun onProgress(tab: BrowserTab, percent: Int)
         fun onDownload(tab: BrowserTab, info: DownloadInfo)
         fun onHttpError(tab: BrowserTab, url: String, code: Int)
-        fun onPageError(tab: BrowserTab, url: String, description: String)
+        /** Erro na navegação do quadro principal. */
+        fun onMainFrameError(tab: BrowserTab, url: String, code: Int, description: String)
         fun onSafeBrowsingHit(tab: BrowserTab, url: String, threat: String)
         /** Decide se um popup (com ou sem gesto do usuário) pode virar aba. */
         fun allowPopup(opener: BrowserTab, userGesture: Boolean): Boolean
@@ -56,6 +57,8 @@ class TabManager(
 
     companion object {
         const val MAX_TABS = 4
+        const val ERROR_SSL = -11
+        const val ERROR_RENDER_GONE = -100
     }
 
     private var nextId = 0
@@ -158,13 +161,13 @@ class TabManager(
         }
 
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: android.webkit.WebResourceError) {
-            if (request.isForMainFrame) cb.onPageError(tab, request.url.toString(), "${error.errorCode} ${error.description}")
+            if (request.isForMainFrame) cb.onMainFrameError(tab, request.url.toString(), error.errorCode, error.description.toString())
         }
 
         // Nunca prosseguir diante de erro de certificado.
         override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
             handler.cancel()
-            cb.onPageError(tab, error.url ?: "", "erro SSL (${error.primaryError}) — carregamento cancelado")
+            cb.onMainFrameError(tab, error.url ?: "", ERROR_SSL, "erro SSL (${error.primaryError}) — carregamento cancelado")
         }
 
         // Safe Browsing: sempre voltar para a segurança, sem relatar a URL.
@@ -181,7 +184,7 @@ class TabManager(
         }
 
         override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
-            cb.onPageError(tab, "", "processo de renderização encerrado")
+            cb.onMainFrameError(tab, "", ERROR_RENDER_GONE, "processo de renderização encerrado")
             if (tab !== main) close(tab)
             return true
         }

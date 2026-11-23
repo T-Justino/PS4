@@ -24,6 +24,7 @@ import androidx.webkit.WebViewFeature
 import app.linkresolver.core.DownloadHeuristics
 import app.linkresolver.core.DownloadInfo
 import app.linkresolver.core.EngineState
+import app.linkresolver.core.HttpFileProbe
 import app.linkresolver.core.NavDecision
 import app.linkresolver.core.PageScanner
 import app.linkresolver.core.ResolveResult
@@ -52,6 +53,8 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
     /** Aba que originou uma navegação pendente de confirmação (ex.: popup). */
     private var navTab: BrowserTab? = null
     private var lastPollAt = 0L
+    private val probeExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
+    private val probe by lazy { HttpFileProbe(android.webkit.WebSettings.getDefaultUserAgent(this)) }
 
     private val ticker = object : Runnable {
         override fun run() {
@@ -136,6 +139,7 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
 
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
+        probeExecutor.shutdownNow()
         if (isFinishing) {
             tabs.destroyAll()
             clearSession() // cookies só vivem enquanto o app está aberto
@@ -182,6 +186,7 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
     private fun scanNow() {
         if (engine.state != EngineState.RUNNING && engine.state != EngineState.WAITING_HUMAN) return
         val tab = tabs.active ?: return
+        if (ResolverEngine.isErrorUrl(tab.webView.url)) return // nunca varrer páginas internas de erro
         lastPollAt = System.currentTimeMillis()
         tab.webView.evaluateJavascript(PageScanner.SCRIPT) { raw ->
             PageScanner.parse(raw)?.let { engine.onScan(it) }
@@ -277,7 +282,15 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
             append("Tipo MIME: ").append(result.mimeType ?: "—").append('\n')
             append("Nome estimado: ").append(result.fileName ?: "—").append('\n')
             append("Tamanho: ").append(DownloadHeuristics.formatSize(result.sizeBytes)).append('\n')
+            result.candidateScore?.let { append("Pontuação do candidato: ").append(it).append('\n') }
             append('\n').append(result.message)
+            result.errorInfo?.let { append("\n\nErro: ").append(it) }
+            if (result.evidence.isNotEmpty()) append("\n\nEvidências:\n").append(result.evidence.joinToString("\n") { "• $it" })
+            if (result.diagnostics.isNotEmpty()) append("\n\nDiagnóstico:\n").append(result.diagnostics.joinToString("\n") { "• $it" })
+            if (result.candidates.isNotEmpty()) {
+                append("\n\nCandidatos (${result.candidates.size}):\n")
+                append(result.candidates.joinToString("\n") { "• [${it.score}] ${it.text.ifBlank { "(sem texto)" }} — ${it.displayUrl} — ${it.status}" })
+            }
         }
         val sdf = timeFmt
         b.resSteps.text = "Histórico de etapas (${result.steps.size}):\n" + result.steps.joinToString("\n") {
@@ -285,6 +298,13 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         }
         b.btnCopy.isEnabled = result.url != null
         showPane(3)
+    }
+
+    override fun requestProbe(url: String, trustedDomains: Set<String>) {
+        probeExecutor.execute {
+            val r = probe.probe(url, trustedDomains)
+            handler.post { if (!isDestroyed) engine.onProbeResult(url, r) }
+        }
     }
 
     override fun requestRescan(delayMs: Long) {
@@ -334,13 +354,15 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
 
     override fun onDownload(tab: BrowserTab, info: DownloadInfo) {
         // O WebView NÃO baixa nada: apenas entrega URL e metadados. O app nunca inicia o download.
-        if (engine.isActive) engine.onDownload(info)
-        else toast("Download detectado — inicie uma análise para registrá-lo")
+        if (engine.state == EngineState.IDLE) toast("Download detectado — inicie uma análise para registrá-lo")
+        else engine.onDownload(info)
         if (tab.openerId != null) tabs.close(tab)
     }
 
     override fun onHttpError(tab: BrowserTab, url: String, code: Int) { if (engine.isActive) engine.onHttpError(url, code) }
-    override fun onPageError(tab: BrowserTab, url: String, description: String) { if (engine.isActive) engine.onPageError(url, description) }
+    override fun onMainFrameError(tab: BrowserTab, url: String, code: Int, description: String) {
+        if (tab === tabs.active || tab.openerId == null) engine.onMainFrameError(url, code, description)
+    }
 
     override fun onSafeBrowsingHit(tab: BrowserTab, url: String, threat: String) {
         if (engine.isActive) engine.onSafeBrowsingHit(url, threat) else toast("Safe Browsing bloqueou a página ($threat)")

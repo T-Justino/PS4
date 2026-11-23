@@ -10,6 +10,7 @@ class ResolverEngineTest {
         var result: ResolveResult? = null
         var rescans = 0
         var denied = 0
+        val probes = mutableListOf<String>()
         override fun navigate(url: String) { navigated += url }
         override fun askDomain(host: String, url: String, reason: String) { asked += host }
         override fun onStateChanged(state: EngineState, message: String) {}
@@ -18,6 +19,7 @@ class ResolverEngineTest {
         override fun onResult(result: ResolveResult) { this.result = result }
         override fun requestRescan(delayMs: Long) { rescans++ }
         override fun onNavigationDenied(url: String) { denied++ }
+        override fun requestProbe(url: String, trustedDomains: Set<String>) { probes += url }
     }
 
     private var now = 0L
@@ -55,7 +57,7 @@ class ResolverEngineTest {
         assertEquals(listOf("files.other.org"), f.asked)
         assertEquals(1, f.navigated.size)
         e.answerDomain(true, true)
-        assertEquals("https://files.other.org/a.zip", f.navigated.last())
+        assertEquals(listOf("https://files.other.org/a.zip"), f.probes) // arquivo provável: sondagem antes de navegar
         assertTrue(e.policy.isTrusted("x.other.org"))
     }
 
@@ -88,21 +90,21 @@ class ResolverEngineTest {
     @Test fun captchaPausesAndResumesOnlyWhenCleared() {
         val f = Fake(); val e = engine(f)
         e.start("https://site.com/")
-        e.onScan(scan("https://site.com/", c("https://site.com/a.zip", "Download"), ch = ChallengeKind.CAPTCHA))
+        e.onScan(scan("https://site.com/", c("https://site.com/get/a", "Download"), ch = ChallengeKind.CAPTCHA))
         assertEquals(EngineState.WAITING_HUMAN, e.state)
         assertEquals(1, f.navigated.size)
-        e.onScan(scan("https://site.com/", c("https://site.com/a.zip", "Download"), ch = ChallengeKind.CAPTCHA))
+        e.onScan(scan("https://site.com/", c("https://site.com/get/a", "Download"), ch = ChallengeKind.CAPTCHA))
         assertEquals(1, f.navigated.size)
-        e.onScan(scan("https://site.com/", c("https://site.com/a.zip", "Download")))
+        e.onScan(scan("https://site.com/", c("https://site.com/get/a", "Download")))
         assertEquals(EngineState.RUNNING, e.state)
-        assertEquals("https://site.com/a.zip", f.navigated.last())
+        assertEquals("https://site.com/get/a", f.navigated.last())
     }
 
     @Test fun loginThenDownloadRequiresSession() {
         val f = Fake(); val e = engine(f)
         e.start("https://site.com/")
         e.onScan(scan("https://site.com/login", ch = ChallengeKind.LOGIN))
-        e.onScan(scan("https://site.com/ok", c("https://site.com/a.zip", "Download")))
+        e.onScan(scan("https://site.com/ok", c("https://site.com/get/a", "Download")))
         e.onDownload(DownloadInfo("https://site.com/a.zip", "application/zip", null, 10))
         assertEquals(ResultState.REQUIRES_SESSION, f.result?.state)
     }
@@ -114,7 +116,7 @@ class ResolverEngineTest {
         e.onScan(scan("https://site.com/", ch = ChallengeKind.CAPTCHA))
         now = 200_000; e.tick()
         assertEquals(EngineState.WAITING_HUMAN, e.state)
-        e.onScan(scan("https://site.com/", c("https://site.com/a.zip", "Download")))
+        e.onScan(scan("https://site.com/", c("https://site.com/get/a", "Download")))
         e.tick()
         assertEquals(EngineState.RUNNING, e.state)
     }

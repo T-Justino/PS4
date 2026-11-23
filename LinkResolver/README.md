@@ -15,10 +15,11 @@ O app **nunca baixa o arquivo**: o `DownloadListener` apenas entrega URL e metad
 2. Abas inferiores: **Navegador** (WebView + abas), **Candidatos** (links/botões detectados com pontuação e motivos; botão *Seguir*/*Clicar* para ação manual), **Histórico** (etapas), **Resultado**.
 3. A automação só segue candidatos com pontuação ≥ 40 em domínios já confiáveis. Domínio novo ⇒ diálogo *Permitir domínio / Só desta vez / Negar*.
 4. CAPTCHA, verificação anti-robô ou login ⇒ a automação **pausa**; resolva na própria página. Ela retoma sozinha quando o desafio deixa de ser detectado (ou toque em *Já resolvi — verificar*).
-5. Resultado: URL (valores sensíveis mascarados), host, MIME, nome estimado, tamanho, histórico e estado: **Arquivo verificado**, **Link intermediário**, **Exige sessão**, **Bloqueado**. *Copiar URL* copia a URL completa (se tiver token/assinatura, o app avisa e marca a área de transferência como sensível no Android 13+).
+5. Resultado: URL (valores sensíveis mascarados), host, MIME, nome estimado, tamanho, pontuação, evidências, diagnóstico de erro, candidatos, histórico e estado: **Arquivo confirmado**, **Candidato não verificado**, **Link intermediário**, **Exige sessão**, **Erro de rede**, **Nenhum candidato encontrado**, **Bloqueado**.
+   URLs com cara de arquivo são validadas por **HEAD** (ou **GET com `Range: bytes=0-0`**) antes de navegar — só cabeçalhos, sem baixar o corpo, sem cookies, com checagem de IP interno a cada salto. O `DownloadListener` é evidência adicional. Páginas de erro do navegador (`chrome-error://`) nunca são analisadas. *Copiar URL* copia a URL completa (se tiver token/assinatura, o app avisa e marca a área de transferência como sensível no Android 13+).
 
 ## Como testar
-**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 27 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
+**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 48 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
 
 **Manuais no aparelho** (o app só aceita HTTPS público; `localhost`/IPs privados são bloqueados de propósito, então hospede `testpages/` em HTTPS — p.ex. GitHub Pages — ou use um túnel HTTPS):
 | Página | Esperado |

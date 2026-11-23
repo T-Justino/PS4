@@ -2,9 +2,15 @@ package app.linkresolver.core
 
 /** Estado final apresentado ao usuário. */
 enum class ResultState(val label: String) {
-    VERIFIED_FILE("Arquivo verificado"),
+    /** Metadados confirmados (HEAD/Range e/ou DownloadListener). */
+    VERIFIED_FILE("Arquivo confirmado"),
+    /** URL com cara de arquivo, mas sem confirmação de metadados. */
+    UNVERIFIED_CANDIDATE("Candidato não verificado"),
+    /** Link para outra página (precisa de mais etapas). */
     INTERMEDIATE_LINK("Link intermediário"),
     REQUIRES_SESSION("Exige sessão"),
+    NETWORK_ERROR("Erro de rede"),
+    NO_CANDIDATE("Nenhum candidato encontrado"),
     BLOCKED("Bloqueado"),
 }
 
@@ -84,6 +90,13 @@ data class Step(
     val note: String,
 )
 
+data class CandidateSummary(
+    val displayUrl: String,
+    val text: String,
+    val score: Int,
+    val status: String,
+)
+
 data class ResolveResult(
     val state: ResultState,
     /** URL completa (pode conter token). Use [displayUrl] para exibição/logs. */
@@ -96,4 +109,11 @@ data class ResolveResult(
     val message: String,
     val steps: List<Step>,
     val urlHasSensitiveParams: Boolean,
+    val candidateScore: Int? = null,
+    val candidates: List<CandidateSummary> = emptyList(),
+    /** Evidências que sustentam o estado (ex.: "HEAD 200 …", "DownloadListener …"). */
+    val evidence: List<String> = emptyList(),
+    /** Diagnóstico de erros/sondagens, já higienizado. */
+    val diagnostics: List<String> = emptyList(),
+    val errorInfo: String? = null,
 )

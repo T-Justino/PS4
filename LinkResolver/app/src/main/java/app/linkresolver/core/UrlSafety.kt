@@ -29,7 +29,7 @@ object UrlSafety {
     const val MAX_URL_LENGTH = 4096
 
     val DANGEROUS_SCHEMES = setOf(
-        "javascript", "data", "file", "content", "intent", "market", "blob",
+        "javascript", "data", "file", "content", "intent", "market", "blob", "chrome-error", "about-error",
         "ftp", "ws", "wss", "vbscript", "chrome", "view-source", "android-app", "sms", "tel", "mailto",
     )
 
@@ -216,6 +216,17 @@ object UrlSafety {
             if (!q.isNullOrEmpty()) append('?').append(q)
         }
     }
+
+    fun isPrivateAddress(a: java.net.InetAddress): Boolean {
+        if (a.isAnyLocalAddress || a.isLoopbackAddress || a.isLinkLocalAddress || a.isSiteLocalAddress || a.isMulticastAddress) return true
+        val b = a.address
+        return if (b.size == 4) isPrivateIpv4(IntArray(4) { b[it].toInt() and 255 })
+        else (b[0].toInt() and 0xfe) == 0xfc
+    }
+
+    /** Higieniza qualquer URL embutida em texto livre (mensagens de exceção, logs). */
+    fun scrubText(s: String): String =
+        Regex("""https?://[^\s"')]+""").replace(s) { redact(it.value) }
 
     fun host(raw: String): String? = parse(raw)?.host?.takeIf { it.isNotEmpty() }
 
