@@ -263,20 +263,20 @@ def test_http_429_tenta_uma_vez_e_erros_tem_causa_legivel(monkeypatch):
         if len(chamadas) == 1:
             raise urllib.error.HTTPError(req.full_url, 429, "Too Many Requests", {"Retry-After": "2"}, None)
         return Resp(b"ok")
-    monkeypatch.setattr(capas.urllib.request, "urlopen", abre)
+    monkeypatch.setattr(capas, "_ABRIR", abre)
     esperas = []
     assert capas._http("https://upload.wikimedia.org/x.png", "ua", 100, dormir=esperas.append) == b"ok" and esperas == [2] and len(chamadas) == 2
 
     def sempre403(req, timeout):
         raise urllib.error.HTTPError(req.full_url, 403, "Forbidden", {}, None)
-    monkeypatch.setattr(capas.urllib.request, "urlopen", sempre403)
+    monkeypatch.setattr(capas, "_ABRIR", sempre403)
     with pytest.raises(capas.ErroHttp) as e:
         capas._http("https://upload.wikimedia.org/x.png", "ua", 100)
     assert e.value.codigo == 403 and e.value.descricao() == "HTTP 403 Forbidden"
 
     def sem_rede(req, timeout):
         raise urllib.error.URLError(OSError("sem rota"))
-    monkeypatch.setattr(capas.urllib.request, "urlopen", sem_rede)
+    monkeypatch.setattr(capas, "_ABRIR", sem_rede)
     with pytest.raises(capas.ErroHttp) as e:
         capas._http("https://upload.wikimedia.org/x.png", "ua", 100)
     assert e.value.codigo == 0 and e.value.descricao().startswith("rede:")
@@ -367,3 +367,36 @@ def test_painel_expoe_interesse_so_em_memoria_e_importador_le(srv_capas, tmp_pat
     assert capas.interesse_do_painel(1) == []                                                      # painel fora do ar: segue sem prioridade
     assert srv_capas.get("/api/interesse?x=1")[0] == 400 and srv_capas.req("POST", "/api/interesse")[0] == 405
     assert not (tmp_path / "interesse.json").exists()
+
+
+def test_thumb_wikimedia_permitido_e_hosts_continuam_restritos():
+    ok = ["https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/X.jpg/330px-X.jpg", "https://upload.wikimedia.org/x.png", "https://en.wikipedia.org/w/api.php"]
+    ruim = ["http://thumb.wikimedia.org/x.jpg", "https://thumb.wikimedia.org.evil.example/x.jpg", "https://evil.example/thumb.wikimedia.org", "https://wikimedia.org/x", "ftp://thumb.wikimedia.org/x"]
+    assert all(capas._host_permitido(u) for u in ok) and not any(capas._host_permitido(u) for u in ruim)
+    for u in ruim:
+        with pytest.raises(ValueError):
+            capas._http(u, "ua", 10)
+
+
+def test_redirecionamento_so_dentro_dos_dominios_autorizados():
+    import urllib.request
+    h = capas._RedirecionamentoRestrito()
+    req = urllib.request.Request("https://upload.wikimedia.org/a.png")
+    assert h.redirect_request(req, None, 302, "Found", {}, "https://thumb.wikimedia.org/b.png").full_url == "https://thumb.wikimedia.org/b.png"
+    assert h.redirect_request(req, None, 302, "Found", {}, "/c.png").full_url == "https://upload.wikimedia.org/c.png"
+    for destino in ("https://evil.example/x.png", "http://upload.wikimedia.org/x.png", "https://upload.wikimedia.org.evil.example/x.png"):
+        with pytest.raises(ValueError):
+            h.redirect_request(req, None, 302, "Found", {}, destino)
+
+
+def test_negativo_causado_pelo_bloqueio_de_host_e_reavaliado_na_hora_e_imagem_valida_fica(tmp_path):
+    d = str(tmp_path / "c")
+    capas.importar([("Q990700001", "Bom", None, "")], fetch_multi(p18={"Q990700001": "B.png"}, commons={"File:B.png": pagina("File:B.png")}), d, pausa=0)
+    antes = (Path(d) / "Q990700001.png").read_bytes()
+    idx = capas.carregar_indice(d)
+    idx["semImagem"]["Q990700002"] = {"motivo": "download-falhou:ValueError: host não permitido: thumb.wikimedia.org", "consultadoEm": capas.agora(), "versao": capas.IMPORTADOR_VERSAO}
+    capas.salvar_indice(idx, d)
+    assert not capas._recente(idx["semImagem"]["Q990700002"])
+    est = capas.importar([("Q990700001", "Bom", None, ""), ("Q990700002", "Outro", None, "")],
+                         fetch_multi(p18={"Q990700002": "O.png"}, commons={"File:O.png": pagina("File:O.png")}), d, pausa=0)
+    assert est["jaTinham"] == 1 and est["comImagem"] == 1 and (Path(d) / "Q990700001.png").read_bytes() == antes

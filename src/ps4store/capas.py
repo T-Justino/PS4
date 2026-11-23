@@ -27,7 +27,7 @@ from . import busca, unificada, versoes, cusas, wikidata
 
 DIR_PADRAO = "local/capas"
 SCHEMA = "ps4store.capas/v1"
-HOSTS = {"query.wikidata.org", "commons.wikimedia.org", "upload.wikimedia.org"}
+HOSTS = {"query.wikidata.org", "commons.wikimedia.org", "upload.wikimedia.org", "thumb.wikimedia.org"}   # thumb.wikimedia.org: domínio das miniaturas devolvidas pelo Commons
 WIKIPEDIA_RE = re.compile(r"^[a-z]{2,3}\.wikipedia\.org$")          # Wikipedia em qualquer idioma (só leitura da API pública)
 RETENTAR_DIAS = 14                                                  # jogo sem imagem não é consultado de novo antes disso
 MAX_BUSCAS_COMMONS = 15                                             # buscas por nome (1 requisição cada) por execução
@@ -103,14 +103,31 @@ class ErroHttp(OSError):
         return (f"HTTP {self.codigo} {self.motivo}" if self.codigo else self.motivo) + (f" (Retry-After {self.retry_after})" if self.retry_after else "")
 
 
-def _http(url: str, ua: str, maximo: int, timeout: int = 60, dormir=time.sleep) -> bytes:
+def _host_permitido(url: str) -> bool:
     p = urllib.parse.urlsplit(url)
-    if p.scheme != "https" or not (p.hostname in HOSTS or WIKIPEDIA_RE.match(p.hostname or "")):
-        raise ValueError(f"host não permitido: {p.hostname}")
+    return p.scheme == "https" and bool(p.hostname) and (p.hostname in HOSTS or bool(WIKIPEDIA_RE.match(p.hostname)))
+
+
+class _RedirecionamentoRestrito(urllib.request.HTTPRedirectHandler):
+    """Redirecionamento só para https e para a mesma lista de domínios; qualquer outro destino é recusado."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        destino = urllib.parse.urljoin(req.full_url, newurl)
+        if not _host_permitido(destino):
+            raise ValueError(f"redirecionamento para host não permitido: {urllib.parse.urlsplit(destino).hostname}")
+        return super().redirect_request(req, fp, code, msg, headers, destino)
+
+
+_ABRIR = urllib.request.build_opener(_RedirecionamentoRestrito).open
+
+
+def _http(url: str, ua: str, maximo: int, timeout: int = 60, dormir=time.sleep) -> bytes:
+    if not _host_permitido(url):
+        raise ValueError(f"host não permitido: {urllib.parse.urlsplit(url).hostname}")
     req = urllib.request.Request(url, headers={"User-Agent": ua, "Accept": "*/*"})
     for tentativa in (0, 1):
         try:
-            with urllib.request.urlopen(req, timeout=timeout) as r:
+            with _ABRIR(req, timeout=timeout) as r:
                 corpo = r.read(maximo + 1)
             break
         except urllib.error.HTTPError as e:
@@ -357,6 +374,8 @@ def _recente(s: dict) -> bool:
         t = datetime.fromisoformat(s.get("consultadoEm", ""))
     except ValueError:
         return False
+    if "host não permitido" in str(s.get("motivo", "")) or any("host não permitido" in str(t) for t in s.get("tentativas", [])):
+        return False                                                # bloqueio do próprio importador (já corrigido), não resposta da fonte
     dias = 1 if str(s.get("motivo", "")).startswith("download-falhou") else RETENTAR_DIAS
     return (datetime.now(timezone.utc) - t).days < dias
 
