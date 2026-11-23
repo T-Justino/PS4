@@ -118,6 +118,11 @@ class ResolverEngine(
     private var expectTab = false
     private var lastOpensWindows = false
     private var probingUrlKey: String? = null
+    // --- v0.4.3: objetivo contextual ---
+    private var goal: GoalContext? = null
+    private var userPref: String? = null
+    private val mismatches = mutableListOf<String>()
+    private val mismatchKeys = HashSet<String>()
 
     val isActive: Boolean get() = state != EngineState.IDLE && state != EngineState.FINISHED
     val currentDepth: Int get() = depth
@@ -126,13 +131,15 @@ class ResolverEngine(
         fun isErrorUrl(url: String?): Boolean =
             url != null && (url.startsWith("chrome-error:") || url.startsWith("about:neterror") || url.startsWith("data:text/html,chromewebdata"))
         private const val LATE_DOWNLOAD_WINDOW_MS = 30_000L
+        const val MISMATCH_STATUS = "Arquivo válido — conteúdo diferente"
         const val UNVERIFIED = "Link NÃO verificado — copie e teste manualmente."
     }
 
     // ------------------------------------------------------------------ início/fim
 
-    fun start(rawUrl: String) {
+    fun start(rawUrl: String, preference: String? = null) {
         reset()
+        userPref = preference?.trim()?.takeIf { it.isNotEmpty() }
         val input = rawUrl.trim()
         when (val v = UrlSafety.check(input)) {
             is UrlSafety.Verdict.Rejected -> {
@@ -175,6 +182,7 @@ class ResolverEngine(
         lastCountdown = 0; pageWaitStart = 0; autoClicks = 0; clickedKeys.clear(); pendingClick = null; clickTarget = null
         manualResumes = 0; ignoreChallengeOnPage = false
         primaryResult = null; resumeResults.clear(); confirmedKeys.clear(); inResume = false; expectTab = false; lastOpensWindows = false
+        goal = null; mismatches.clear(); mismatchKeys.clear()
     }
 
     private fun resetPageCounters() {
@@ -352,7 +360,7 @@ class ResolverEngine(
         if (info.relevant != null) return
         if (isErrorUrl(scan.url)) { closeSecondaryTab(tabId, "página de erro"); return }
         val pageHost = UrlSafety.host(scan.url) ?: ""
-        val scored = scan.candidates.map { DownloadHeuristics.score(it, pageHost, policy) }.sortedByDescending { it.score }
+        val scored = scan.candidates.map { Relevance.apply(DownloadHeuristics.score(it, pageHost, policy), goal) }.sortedByDescending { it.score }
         val actionable = scored.any {
             it.safe && !it.ad && it.url != null && (it.score >= limits.autoScoreThreshold || (isStepLike(it) && it.score >= limits.tier2MinScore))
         } || scored.any { DownloadHeuristics.isAutoClickEligible(it, limits.tier2MinScore) }
@@ -573,11 +581,11 @@ class ResolverEngine(
             return
         }
         if (canUpgrade) { state = EngineState.RUNNING; step(StepKind.RESUME, info.url, "download tardio do candidato: promovendo resultado") }
-        evidence += "DownloadListener: ${info.mimeType ?: "mime desconhecido"}, ${DownloadHeuristics.formatSize(info.contentLength.takeIf { it > 0 })}"
         confirmFile(
             info.url, info.mimeType?.substringBefore(';')?.trim(),
             DownloadHeuristics.estimateFileName(info.url, info.contentDisposition),
             info.contentLength.takeIf { it > 0 }, "Arquivo identificado pelo DownloadListener.",
+            "DownloadListener: ${info.mimeType ?: "mime desconhecido"}, ${DownloadHeuristics.formatSize(info.contentLength.takeIf { it > 0 })}",
         )
     }
 
@@ -608,13 +616,11 @@ class ResolverEngine(
             is ProbeResult.File -> {
                 val line = "${r.method} ${r.status}: mime=${r.mimeType ?: "?"} tamanho=${DownloadHeuristics.formatSize(r.contentLength)}" +
                     (if (r.acceptRanges) " range=sim" else "")
-                step(StepKind.SCAN, url, "sondagem confirmou arquivo — $line")
-                evidence += line
-                candidateStatus[key] = "arquivo confirmado"
+                step(StepKind.SCAN, url, "sondagem validou o arquivo — $line")
                 confirmFile(
                     r.finalUrl, r.mimeType,
                     DownloadHeuristics.estimateFileName(r.finalUrl, r.contentDisposition) ?: DownloadHeuristics.estimateFileName(url, null),
-                    r.contentLength, "Metadados confirmados por ${r.method} (sem baixar o corpo).",
+                    r.contentLength, "Metadados confirmados por ${r.method} (sem baixar o corpo).", line,
                 )
             }
             is ProbeResult.Blocked -> {
@@ -673,7 +679,17 @@ class ResolverEngine(
         listener.navigate(workTab, url)
     }
 
-    private fun confirmFile(url: String, mime: String?, name: String?, size: Long?, how: String) {
+    private fun confirmFile(url: String, mime: String?, name: String?, size: Long?, how: String, evidenceLine: String) {
+        // O arquivo é válido por HTTP; mas corresponde ao que se procurava? Se não, NÃO encerra com sucesso: segue procurando.
+        val cand = followedUrl?.let { allCands[UrlSafety.loopKey(it)] } ?: allCands[UrlSafety.loopKey(url)]
+        val compat = Relevance.compat(goal, FileFacts(url, name, mime, cand?.raw?.text ?: ""))
+        if (compat.verdict == Verdict.MISMATCH) {
+            recordMismatch(url, name, evidenceLine, compat.reason)
+            continueAfterMismatch()
+            return
+        }
+        evidence += evidenceLine
+        probingUrlKey?.let { candidateStatus[it] = "arquivo confirmado" }
         confirmedKeys += UrlSafety.loopKey(url)
         followedUrl?.let { confirmedKeys += UrlSafety.loopKey(it) }
         probingUrlKey?.let { confirmedKeys += it }
@@ -690,6 +706,32 @@ class ResolverEngine(
             if (needsSession) ResultState.REQUIRES_SESSION else ResultState.VERIFIED_FILE,
             url, msg, mime, name, size,
         )
+    }
+
+    private fun recordMismatch(url: String, name: String?, evidenceLine: String, why: String) {
+        val k = UrlSafety.loopKey(url)
+        mismatchKeys += k
+        followedUrl?.let { mismatchKeys += UrlSafety.loopKey(it) }
+        probingUrlKey?.let { mismatchKeys += it; candidateStatus[it] = MISMATCH_STATUS }
+        candidateStatus[k] = MISMATCH_STATUS
+        mismatches += "${name ?: UrlSafety.redact(url)} — $evidenceLine — $why"
+        step(StepKind.SCAN, url, "Arquivo válido — conteúdo diferente: $why ($evidenceLine)")
+        diagnostics += "Arquivo válido — conteúdo diferente: ${name ?: UrlSafety.redact(url)} ($why)"
+        setDecision("arquivo válido por HTTP, mas conteúdo diferente do objetivo: $why")
+        addPath(PathKind.FILE, url, "$evidenceLine — conteúdo diferente do objetivo", LinkClass.WRONG_CONTENT)
+    }
+
+    /** Depois de um arquivo válido porém incompatível: investiga o próximo candidato relevante (respeitando os limites). */
+    private fun continueAfterMismatch() {
+        if (mismatches.size > limits.maxMismatches) { finishWithBest("Limite de ${limits.maxMismatches} arquivos de conteúdo diferente atingido"); return }
+        val next = allCands.values.sortedByDescending { it.score }.firstOrNull {
+            val k = UrlSafety.loopKey(it.url ?: return@firstOrNull false)
+            it.safe && !it.ad && !it.raw.disabled && (visits[k] ?: 0) == 0 && k !in rejected && k !in mismatchKeys && k !in confirmedKeys &&
+                it.score >= limits.tier2MinScore
+        }
+        if (next == null) { finishWithBest("Não há outros candidatos relevantes para investigar"); return }
+        stepStartedAt = clock(); scanAttempts = 0
+        follow(next, manual = false, "outro candidato relevante (o arquivo anterior tinha conteúdo diferente): ")
     }
 
     // ------------------------------------------------------------------ varredura
@@ -732,9 +774,14 @@ class ResolverEngine(
         }
 
         val pageHost = UrlSafety.host(scan.url) ?: UrlSafety.host(startUrl ?: "") ?: ""
+        if (goal == null) {
+            // Objetivo = contexto da PRIMEIRA página analisada (título/cabeçalho/descrição) + preferência opcional do usuário
+            goal = GoalContext.build(scan.title, scan.heading, scan.description, userPref)
+            step(StepKind.SCAN, scan.url, "objetivo da busca (${goal!!.describe()})" + if (goal!!.informative) "" else " — contexto insuficiente: sem filtro por relevância")
+        }
         val derived = derivedRawCandidate(scan)
         val scored = (if (derived != null) scan.candidates + derived else scan.candidates)
-            .map { DownloadHeuristics.score(it, pageHost, policy) }
+            .map { Relevance.apply(DownloadHeuristics.score(it, pageHost, policy), goal) }
             .sortedByDescending { it.score }
         lastScored = scored
         lastWaitHint = scan.waitHint
@@ -786,8 +833,13 @@ class ResolverEngine(
         return RawCandidate(raw, "Raw (derivado de /blob/)", "a", "derived-raw", false, "", "", null, true)
     }
 
+    /** "pontuação 155 (técnica 100 + contexto 55): motivos…" — técnica e contexto sempre separadas. */
+    private fun describeScore(c: ScoredCandidate) =
+        "pontuação ${c.score}" + (if (c.relevance != 0) " (técnica ${c.technical} ${if (c.relevance > 0) "+" else "−"} contexto ${Math.abs(c.relevance)})" else "") +
+            ": ${(c.reasons + c.relevanceReasons).joinToString(", ")}"
+
     private fun isStepLike(c: ScoredCandidate) =
-        c.raw.source == "meta-refresh" || c.raw.source == "js-redirect" || DownloadHeuristics.isStepText(c.raw.text)
+        c.raw.source == "meta-refresh" || c.raw.source == "js-redirect" || DownloadHeuristics.isStepText(c.raw.text) || DownloadHeuristics.isHostButton(c)
 
     private fun chooseAndFollow() {
         val usable = lastScored.filter {
@@ -918,7 +970,7 @@ class ResolverEngine(
         }
         if (!registerVisit(url)) return
         depth++
-        val why = "pontuação ${c.score}: ${c.reasons.joinToString(", ")}"
+        val why = describeScore(c)
         setDecision("${if (manual) "usuário escolheu" else "seguiu automaticamente"} «${c.raw.text.take(40)}» (${c.linkClass.label}; $why)")
         addPath(PathKind.PAGE, url, "${tag}${if (manual) "escolha manual" else "decisão automática"}: $why", c.linkClass)
         beginStep(url, c, "$tag${if (manual) "manual" else "auto"} etapa $depth/${limits.maxDepth}; $why")
@@ -987,7 +1039,8 @@ class ResolverEngine(
                 // "Só desta vez": sem sondagem (ela exige domínio confiável); navega direto.
                 setDecision("domínio ${p.host} confirmado pelo usuário; seguiu «${p.candidate?.raw?.text?.take(40) ?: "?"}»")
                 addPath(PathKind.PAGE, p.url, "decisão automática após confirmação humana do domínio ${p.host}", p.candidate?.linkClass ?: LinkClass.PAGE)
-                beginStep(p.url, if (rememberDomain) p.candidate else null, "auto (domínio confirmado) etapa $depth/${limits.maxDepth}")
+                beginStep(p.url, if (rememberDomain) p.candidate else null,
+                    "auto (domínio confirmado) etapa $depth/${limits.maxDepth}" + (p.candidate?.let { "; ${describeScore(it)}" } ?: ""))
             } else {
                 redirectsInStep = 0; scanAttempts = 0; stepStartedAt = clock()
                 followedUrl = p.url; mainFrameError = false
@@ -1041,7 +1094,7 @@ class ResolverEngine(
 
     private fun registerVisit(url: String): Boolean {
         val key = UrlSafety.loopKey(url)
-        if (key in confirmedKeys) return true // voltar a uma URL já confirmada como arquivo nunca é loop
+        if (key in confirmedKeys || key in mismatchKeys) return true // voltar a uma URL já confirmada (ou válida de conteúdo diferente) nunca é loop
         val n = (visits[key] ?: 0) + 1
         visits[key] = n
         val allowed = if (humanAuthHappened) limits.maxVisitsPerUrl + 1 else limits.maxVisitsPerUrl
@@ -1112,7 +1165,7 @@ class ResolverEngine(
      * exige sessão, ou nenhum candidato.
      */
     private fun finishWithBest(reason: String) {
-        val all = allCandsSorted().filter { it.safe && !it.ad && it.url != null }
+        val all = allCandsSorted().filter { it.safe && !it.ad && it.url != null && UrlSafety.loopKey(it.url!!) !in mismatchKeys }
         val file = all.firstOrNull { it.linkClass == LinkClass.FILE_CANDIDATE && it.score > 0 }
         val page = all.firstOrNull {
             (it.linkClass == LinkClass.PAGE || it.linkClass == LinkClass.FILE_VIEW_PAGE) && it.score >= limits.tier2MinScore &&
@@ -1127,6 +1180,13 @@ class ResolverEngine(
             )
             sawHttpAuthError && bestUrl == null ->
                 finish(ResultState.REQUIRES_SESSION, null, "$reason. O servidor respondeu 401/403: provável necessidade de sessão/login.")
+            mismatches.isNotEmpty() || goal?.userSpecified == true || goal?.formats?.isNotEmpty() == true ->
+                finish(
+                    ResultState.TARGET_NOT_FOUND, (file ?: page)?.takeIf { it.relevance >= 0 }?.url,
+                    "$reason. Arquivo desejado não encontrado" +
+                        (if (mismatches.isNotEmpty()) ": ${mismatches.size} arquivo(s) válido(s) por HTTP tinham conteúdo diferente do objetivo (ver abaixo)" else "") +
+                        ". Os melhores candidatos NÃO verificados estão na lista; $UNVERIFIED",
+                )
             file != null ->
                 finish(ResultState.UNVERIFIED_CANDIDATE, file.url, "$reason. URL com aparência de arquivo, mas os metadados NÃO foram confirmados. $UNVERIFIED")
             page != null ->
@@ -1150,7 +1210,11 @@ class ResolverEngine(
             }
         CandidateSummary(
             it.url?.let { u -> UrlSafety.redact(u) } ?: "(sem URL)", it.raw.text, it.score, status,
-            url = it.url, kind = if (confirmed) LinkClass.CONFIRMED_FILE else it.linkClass,
+            url = it.url, kind = when {
+                key != null && key in mismatchKeys -> LinkClass.WRONG_CONTENT
+                confirmed -> LinkClass.CONFIRMED_FILE
+                else -> it.linkClass
+            },
         )
     }
 
@@ -1187,6 +1251,8 @@ class ResolverEngine(
             errorInfo = errorInfo,
             path = path.toList(),
             isResume = false,
+            goal = goal?.takeIf { it.informative }?.describe(),
+            mismatches = mismatches.toList(),
         )
         // Retomada explícita: se já havia arquivo confirmado, o novo resultado é apresentado SEPARADAMENTE.
         val asExtra = inResume && prim != null && isConfirmed(prim)

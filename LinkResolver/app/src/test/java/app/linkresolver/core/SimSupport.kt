@@ -84,11 +84,11 @@ internal class Sim(val limits: Limits = Limits()) : ResolverEngine.Listener {
     override fun closeTab(tabId: Int) { closed += tabId; queue += { e.onTabClosed(tabId) } }
     override fun onWorkTabChanged(tabId: Int) { workTabs += tabId }
 
-    fun start(url: String) { e = ResolverEngine(limits, { now }, this); e.start(url) }
+    fun start(url: String, preference: String? = null) { e = ResolverEngine(limits, { now }, this); e.start(url, preference) }
     fun step(n: Int) { repeat(n) { queue.removeFirstOrNull()?.invoke() } }
     fun pump() { var guard = 0; while (queue.isNotEmpty() && guard++ < 800) queue.removeFirst()() }
-    fun run(url: String): ResolveResult {
-        start(url); pump()
+    fun run(url: String, preference: String? = null): ResolveResult {
+        start(url, preference); pump()
         return result ?: error("motor não terminou; estado=${e.state}")
     }
     /** Passa o tempo (dispara os temporizadores do motor) e processa as consequências. */

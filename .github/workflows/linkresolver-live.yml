@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [claude/link-resolver-android-1vnk2h]
-    paths: ['LinkResolver/tools/live-scan.js', '.github/workflows/linkresolver-live.yml', 'LinkResolver/app/src/test/java/app/linkresolver/core/LiveGithubTest.kt']
+    paths: ['LinkResolver/tools/live-scan.js', 'LinkResolver/app/src/test/java/app/linkresolver/core/LiveDiagTest.kt', '.github/workflows/linkresolver-live.yml', 'LinkResolver/app/src/test/java/app/linkresolver/core/LiveGithubTest.kt']
 
 permissions:
   contents: read
@@ -55,12 +55,12 @@ jobs:
           chmod +x gradlew
           # o teste real não precisa dos testes que usam com.sun.net.httpserver (esse JDK do job não os resolve)
           rm -f app/src/test/java/app/linkresolver/core/HttpFileProbeTest.kt
-          ./gradlew testDebugUnitTest --tests 'app.linkresolver.core.LiveGithubTest' -i --no-daemon 2>&1 | tee /tmp/live-gradle.log | grep -E '^e: |^\s*\[LIVE\]|FAILED|PASSED|BUILD|OutOfMemory|What went wrong' || true
+          ./gradlew testDebugUnitTest --tests 'app.linkresolver.core.LiveGithubTest' --tests 'app.linkresolver.core.LiveDiagTest' -i --no-daemon 2>&1 | tee /tmp/live-gradle.log | grep -E '^e: |^\s*\[LIVE\]|FAILED|PASSED|BUILD|OutOfMemory|What went wrong' || true
           cp /tmp/live-gradle.log ../live/gradle.log || true
       - name: Relatório
         if: always()
         run: |
-          { echo '## Teste real GitHub (retrobrews/snes-games)'; echo '```'; cat ../live/report.txt 2>/dev/null; echo; cat ../live/live-report.txt 2>/dev/null; echo '```'; } | tee -a "$GITHUB_STEP_SUMMARY"
+          { echo '## Teste real GitHub (retrobrews/snes-games)'; echo '```'; cat ../live/report.txt 2>/dev/null; echo; cat ../live/live-report.txt 2>/dev/null; echo; cat ../live/diag-report.txt 2>/dev/null; echo '```'; } | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

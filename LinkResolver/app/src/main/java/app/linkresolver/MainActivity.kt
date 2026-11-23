@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         lastResult = null; extraResults.clear(); mainDetails = ""
         b.resState.setText(R.string.no_result); b.resDetails.text = ""; b.resSteps.text = ""; b.btnCopy.isEnabled = false
         showPane(0)
-        engine.start(input)
+        engine.start(input, b.prefInput.text?.toString())   // preferência opcional de nome/formato
         startTicker()
     }
 
@@ -361,7 +361,9 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         append("Nome estimado: ").append(result.fileName ?: "—").append('\n')
         append("Tamanho: ").append(DownloadHeuristics.formatSize(result.sizeBytes)).append('\n')
         result.candidateScore?.let { append("Pontuação do candidato: ").append(it).append('\n') }
+        result.goal?.let { append("Objetivo: ").append(it).append('\n') }
         append('\n').append(result.message)
+        if (result.mismatches.isNotEmpty()) append("\n\nArquivo válido — conteúdo diferente (não é o resultado):\n").append(result.mismatches.joinToString("\n") { "• $it" })
         result.errorInfo?.let { append("\n\nErro: ").append(it) }
         if (result.evidence.isNotEmpty()) append("\n\nEvidências:\n").append(result.evidence.joinToString("\n") { "• $it" })
         if (result.diagnostics.isNotEmpty()) append("\n\nDiagnóstico:\n").append(result.diagnostics.joinToString("\n") { "• $it" })

@@ -43,10 +43,10 @@ class CandidateAdapter(
             c.trusted -> "confiável"
             else -> "domínio novo"
         }
-        h.b.candTitle.text = "[${c.score}] ${c.raw.text.ifBlank { "(sem texto)" }}  · ${c.linkClass.label} · $badge"
+        h.b.candTitle.text = "[${c.score}${if (c.relevance != 0) " = ${c.technical}${if (c.relevance > 0) "+" else "−"}${Math.abs(c.relevance)}" else ""}] ${c.raw.text.ifBlank { "(sem texto)" }}  · ${c.linkClass.label} · $badge"
         h.b.candUrl.text = c.url?.let { UrlSafety.redact(it) } ?: "(sem URL — botão de script, ${c.raw.tag})"
         val status = statuses.getOrNull(position) ?: "não verificado"
-        h.b.candReasons.text = "Status: $status\n" + c.reasons.joinToString(" • ").ifEmpty { "sem sinais" }
+        h.b.candReasons.text = "Status: $status\n" + (c.reasons + c.relevanceReasons.map { "contexto: $it" }).joinToString(" • ").ifEmpty { "sem sinais" }
         h.b.candCopy.isEnabled = c.url != null && c.safe && !c.ad
         h.b.candCopy.setOnClickListener { onCopy(c) }
         val actionable = !c.ad && (c.url == null || c.safe) && (c.url != null || c.raw.elementId != null)

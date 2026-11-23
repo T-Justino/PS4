@@ -11,6 +11,8 @@ enum class ResultState(val label: String) {
     REQUIRES_SESSION("Exige sessão"),
     NETWORK_ERROR("Erro de rede"),
     NO_CANDIDATE("Nenhum candidato encontrado"),
+    /** Havia contexto/objetivo e nenhum arquivo compatível foi confirmado. */
+    TARGET_NOT_FOUND("Arquivo desejado não encontrado"),
     LOOP_DETECTED("Loop detectado"),
     BLOCKED("Bloqueado"),
 }
@@ -31,6 +33,8 @@ enum class LinkClass(val label: String) {
     FILE_VIEW_PAGE("página de visualização de arquivo"),
     FILE_CANDIDATE("candidato de download"),
     CONFIRMED_FILE("arquivo confirmado"),
+    /** Arquivo confirmado por HTTP, mas que não corresponde ao objetivo (ex.: vídeo tutorial). */
+    WRONG_CONTENT("arquivo válido — conteúdo diferente"),
 }
 
 enum class PathKind(val label: String) {
@@ -93,6 +97,8 @@ data class Limits(
     /** Quanto esperar por um efeito (navegação, nova guia, mudança no DOM) depois de um clique automático. */
     val clickEffectWaitMs: Long = 4_000,
     val maxManualResumes: Int = 5,
+    /** Quantos arquivos válidos de conteúdo diferente tolerar antes de desistir. */
+    val maxMismatches: Int = 3,
 )
 
 /** Elemento bruto encontrado pelo script de varredura da página. */
@@ -125,6 +131,11 @@ data class ScoredCandidate(
     val trusted: Boolean,
     /** Rede de anúncios conhecida: nunca é seguido nem oferecido para confirmação. */
     val ad: Boolean,
+    /** Pontuação técnica de download (sem contexto). `score` = técnica + [relevance]. */
+    val technical: Int = score,
+    /** Relevância contextual (nome/formato do objetivo; tutoriais penalizados). */
+    val relevance: Int = 0,
+    val relevanceReasons: List<String> = emptyList(),
 ) {
     val url: String? get() = raw.url
     /** Candidato de download (URL/atributo de arquivo) ou página intermediária. */
@@ -152,6 +163,9 @@ data class PageScan(
     val opensWindows: Boolean = false,
     /** Total de candidatos encontrados na página (antes do corte por prioridade). */
     val totalCandidates: Int = 0,
+    /** Meta description / og:description e primeiro h1 (contexto do objetivo). */
+    val description: String = "",
+    val heading: String = "",
 )
 
 data class DownloadInfo(
@@ -202,4 +216,8 @@ data class ResolveResult(
     /** Resultado de uma retomada explícita, apresentado separadamente do resultado confirmado anterior. */
     val isResume: Boolean = false,
     val resumeIndex: Int = 0,
+    /** Objetivo usado na seleção contextual (nome/formatos). */
+    val goal: String? = null,
+    /** Arquivos válidos por HTTP, mas de conteúdo diferente do objetivo. */
+    val mismatches: List<String> = emptyList(),
 )

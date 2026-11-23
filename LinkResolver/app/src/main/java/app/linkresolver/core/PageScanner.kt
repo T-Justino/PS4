@@ -14,7 +14,8 @@ object PageScanner {
     const val SCRIPT = """
 (function(){
 try{
-var out={url:location.href,title:document.title||'',cands:[],challenge:null,hint:null,wait:false,cd:0,ad:false,wo:false};
+var out={url:location.href,title:document.title||'',cands:[],challenge:null,hint:null,wait:false,cd:0,ad:false,wo:false,desc:'',h1:''};
+try{var md=document.querySelector('meta[name="description"],meta[property="og:description"]');out.desc=((md&&md.content)||'').slice(0,300);var h=document.querySelector('h1');out.h1=((h&&h.innerText)||'').replace(/\s+/g,' ').trim().slice(0,150)}catch(x){}
 /* observador de mudanças dinâmicas (idempotente; somente leitura do DOM; não toca em relógios nem scripts do site) */
 if(!window.__lrObs){try{
  window.__lrVer=0;
@@ -82,7 +83,7 @@ for(var m=0;m<els.length;m++){var e=els[m];var found=false;
   else{var m2=oc.match(/location(?:\.href)?\s*=\s*['"]([^'"]+)['"]/);if(m2){var u3=abs(m2[1]);if(u3){add(e,u3,'onclick',false);found=true}}}}
  if(!found&&e.tagName!=='A'){var f=e.form;
   if(f&&f.action&&(f.method||'get').toLowerCase()==='get'){var fu=abs(f.action);if(fu){add(e,fu,'form',false);found=true}}}
- if(!found&&e.tagName!=='A'&&/(download|baixar|descargar|continue|continuar|get link|obter|gerar|iniciar|pr[oó]ximo|next|prosseguir|avan[cç]ar|liberar|proceed|free download|get file)/i.test(txt(e)))add(e,null,'button',false)}
+ if(!found&&e.tagName!=='A'&&/(download|baixar|descargar|continue|continuar|get link|obter|gerar|iniciar|pr[oó]ximo|next|prosseguir|avan[cç]ar|liberar|proceed|free download|get file|mediafire|mega|1\s*file|1fichier|google\s*drive|dropbox|pixeldrain|gofile|krakenfiles|terabox|workupload)/i.test(txt(e)))add(e,null,'button',false)}
 var mt=document.querySelector('meta[http-equiv="refresh" i]');
 if(mt){var c2=mt.getAttribute('content')||'';var mr=c2.match(/url\s*=\s*['"]?([^'";]+)/i);
  if(mr){var u4=abs(mr[1].trim());if(u4){add(mt,u4,'meta-refresh',false);out.cands[out.cands.length-1].vis=true;out.cands[out.cands.length-1].text='(meta refresh '+(parseInt(c2,10)||0)+'s)'}}}
@@ -182,6 +183,8 @@ return JSON.stringify(out)
                 countdownSec = o.optInt("cd", 0),
                 opensWindows = o.optBoolean("wo", false),
                 totalCandidates = o.optInt("total", list.size),
+                description = o.optString("desc", ""),
+                heading = o.optString("h1", ""),
             )
         } catch (e: Exception) {
             null

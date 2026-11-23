@@ -17,6 +17,20 @@ object DownloadHeuristics {
         "ngp", "ngc", "ws", "wsc", "vb", "col", "rom", "chd", "cso", "pbp", "wad", "nsp", "xci",
     )
 
+    /** Hospedagens externas de arquivos (botões "Mediafire", "Mega", "1File"…). */
+    private val FILE_HOSTS = listOf(
+        "mediafire.com", "mega.nz", "mega.io", "1fichier.com", "1file.io", "drive.google.com", "dropbox.com", "pixeldrain.com", "gofile.io",
+        "krakenfiles.com", "terabox.com", "workupload.com", "uptobox.com", "katfile.com", "rapidgator.net", "nitroflare.com", "send.cm", "mixdrop.co",
+    )
+    private val HOST_WORDS = Regex("""(?i)\b(media\s*fire|mega(\.nz)?|1\s*file|1fichier|google\s*drive|gdrive|dropbox|pixeldrain|gofile|krakenfiles|terabox|workupload|uptobox|katfile|rapidgator|nitroflare|send\.cm)\b""")
+
+    /** Nome da hospedagem (pela URL ou pelo texto do botão), ou null. */
+    fun hostingName(url: String?, text: String): String? {
+        url?.let { u -> UrlSafety.host(u)?.let { h -> FILE_HOSTS.firstOrNull { h == it || h.endsWith(".$it") }?.let { return it.substringBefore('.') } } }
+        return HOST_WORDS.find(text)?.value?.lowercase(Locale.ROOT)
+    }
+    fun isHostButton(c: ScoredCandidate): Boolean = hostingName(c.url, c.raw.text) != null
+
     private val FILE_LIST_CONTEXT = Regex("""(?i)(directory-row|file-name|filename|js-navigation-open|react-directory|file-list|filelist|listing)""")
     private val RAW_WORDS = Regex("""(?i)\b(raw|view\s+raw|raw\s+file\s+content|download\s+raw\s+file)\b""")
     private val FILENAME_TEXT = Regex("""^[\p{L}\p{N}_\-. ()\[\]!&',+~]{1,120}\.([A-Za-z0-9]{1,8})$""")
@@ -105,6 +119,7 @@ object DownloadHeuristics {
             score -= 15; reasons += "rel patrocinado/nofollow"
         }
         if (raw.source == "data-attr" || raw.source == "onclick") { score += 5; reasons += "URL em atributo de script" }
+        hostingName(url, raw.text)?.let { h -> score += 35; reasons += "hospedagem externa ($h)" }
         if (raw.source == "derived-raw") reasons += "derivado de /blob/ (o GitHub não expôs o link Raw)"
         if (raw.source == "meta-refresh") { score += 55; reasons += "redirecionamento automático da página (meta refresh)" }
         if (raw.source == "js-redirect") { score += 55; reasons += "redirecionamento automático da página (JavaScript)" }

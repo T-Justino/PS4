@@ -40,6 +40,17 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const rawLinks = r2.cands.filter(c => /\/raw\/|raw\.githubusercontent\.com/.test(c.url || ''));
   log(`BLOB ${q.url()}  candidatos=${r2.total}  links Raw: ${rawLinks.map(c => `"${c.text}" ${c.url}`).join(' | ') || 'NENHUM (o app derivará de /blob/)'}`);
   log(`  (1ª varredura: ${r1.cands.filter(c => /\/raw\//.test(c.url || '')).length} raw; 2ª: ${rawLinks.length})`);
+  // Cenário ADICIONAL de diagnóstico (página real; apenas varredura, sem navegar nem baixar)
+  try {
+    const diagUrl = process.env.LR_DIAG_URL || 'https://dlpsgame.com/snes-station-ps4-pkg/';
+    const dp = await ctx.newPage();
+    await dp.goto(diagUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await sleep(4000);
+    const draw = await dp.evaluate(script);
+    fs.writeFileSync(path.join(outDir, 'diag.json'), JSON.stringify(draw));
+    const dj = JSON.parse(draw);
+    log(`DIAG ${dp.url()} título="${dj.title}" h1="${dj.h1}" candidatos=${dj.total}`);
+  } catch (e) { log('DIAG indisponível: ' + String(e).slice(0, 120)); }
   fs.writeFileSync(path.join(outDir, 'report.txt'), report.join('\n'));
   await b.close();
 })().catch(e => { console.error(e); process.exit(1); });
