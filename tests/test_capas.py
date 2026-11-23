@@ -164,3 +164,108 @@ def test_visual_390px_com_capa_placeholder_e_sugestao(srv_capas, tmp_path):
     finally:
         b.close()
         ctx.stop()
+
+
+# ---------- 5H-complemento: múltiplos provedores, conferência do jogo, fila ----------
+def fetch_multi(p18=None, wiki=None, busca=None, commons=None):
+    """p18: {qid: arquivo}; wiki: {titulo_artigo: arquivo}; busca: {termo: [páginas]}; commons: páginas File: por título (resolução por nome)."""
+    commons = commons or {}
+
+    def f(url, maximo):
+        if "query.wikidata.org" in url:
+            b = [{"g": {"value": f"http://www.wikidata.org/entity/{q}"}, "img": {"value": "http://commons.wikimedia.org/wiki/Special:FilePath/" + n.replace(" ", "%20")}} for q, n in (p18 or {}).items()]
+            return json.dumps({"results": {"bindings": b}}).encode()
+        if ".wikipedia.org/w/api.php" in url:
+            import urllib.parse as up
+            tits = up.unquote(url.split("titles=")[1]).split("|")
+            pgs = {str(i): {"title": t, **({"pageimage": wiki[t].replace(" ", "_")} if t in (wiki or {}) else {})} for i, t in enumerate(tits)}
+            return json.dumps({"query": {"pages": pgs}}).encode()
+        if "generator=search" in url:
+            import urllib.parse as up
+            termo = up.unquote(url.split("gsrsearch=")[1]).split('"')[1]
+            return json.dumps({"query": {"pages": {str(i): p for i, p in enumerate((busca or {}).get(termo, []))}}}).encode()
+        if "commons.wikimedia.org/w/api.php" in url:
+            import urllib.parse as up
+            tits = up.unquote(url.split("titles=")[1]).split("|")
+            return json.dumps({"query": {"pages": {str(i): commons[t] for i, t in enumerate(tits) if t in commons}}}).encode()
+        if "upload.wikimedia.org" in url:
+            return png_min()
+        raise AssertionError(url)
+    return f
+
+
+def test_fallback_entre_provedores_e_ordem(tmp_path):
+    d = str(tmp_path / "c")
+    jogos = [("Q990100001", "Jogo Um", "2015", "https://en.wikipedia.org/wiki/Jogo_Um"),            # P18 com licença NC -> cai para a Wikipedia (livre)
+             ("Q990100002", "Jogo Dois", "2016", "https://en.wikipedia.org/wiki/Jogo_Dois_(video_game)"),   # sem P18; Wikipedia sem imagem -> busca no Commons
+             ("Q990100003", "Jogo Tres", "2017", "https://en.wikipedia.org/wiki/Jogo_Tres"),          # nada em lugar nenhum -> placeholder
+             ("Q990100004", "Jogo Quatro", None, "")]                                                  # sem página no índice: só P18
+    commons = {"File:NC Um.png": pagina("File:NC Um.png", lic="CC BY-NC 4.0"), "File:Livre Um.png": pagina("File:Livre Um.png"),
+               "File:P4.png": pagina("File:P4.png", mime="image/png")}
+    busca = {"Jogo Dois": [pagina("File:Jogo Dois cover.png", cats=["Category:Video game covers"], extra={"ImageDescription": {"value": "Cover of the video game Jogo Dois"}})]}
+    f = fetch_multi(p18={"Q990100001": "NC Um.png", "Q990100004": "P4.png"}, wiki={"Jogo Um": "Livre Um.png"}, busca=busca, commons=commons)
+    est = capas.importar(jogos, f, d, pausa=0, dormir=lambda s: None)
+    assert est["comImagem"] == 3 and est["porProvedor"] == {"wikidata-p18": 1, "wikipedia": 1, "commons-busca": 1} and est["semP18"] == 1
+    idx = capas.carregar_indice(d)
+    assert idx["capas"]["Q990100001"]["provedor"] == "wikipedia" and "Jogo Um" in idx["capas"]["Q990100001"]["correspondencia"]
+    assert idx["capas"]["Q990100002"]["provedor"] == "commons-busca" and idx["capas"]["Q990100002"]["tipo"] == "capa"
+    assert idx["capas"]["Q990100004"]["provedor"] == "wikidata-p18" and idx["capas"]["Q990100004"]["jogo"]["qid"] == "Q990100004"
+    assert idx["capas"]["Q990100001"]["consultadoEm"] and idx["capas"]["Q990100001"]["paginaUrl"].startswith("https://commons.wikimedia.org/")
+    assert "thumbUrl" not in idx["capas"]["Q990100001"] and "Q990100003" in idx["semImagem"]               # sem URL externa guardada para exibição (só cache local)
+    # provedor escolhido pelo usuário limita a busca
+    est2 = capas.importar([("Q990100009", "Outro", None, "")], fetch_multi(), d, pausa=0, provedores=("wikidata-p18",))
+    assert est2["comImagem"] == 0
+
+
+def test_correspondencia_imagem_jogo_rejeita_sequencia_filme_e_ano_errado():
+    c = capas.confere_titulo_arquivo
+    assert c("Batman: Arkham Knight", "2015", "File:Batman Arkham Knight cover.jpg")
+    assert c("Batman: Arkham Knight", "2015", "File:Batman Arkham Knight 2015 screenshot.png")
+    assert not c("Batman: Arkham Knight", "2015", "File:Batman Arkham Knight 2 cover.jpg")          # outra numeração
+    assert not c("Batman: Arkham Knight", "2015", "File:Batman Arkham Knight 2019 Comic-Con.jpg")   # ano diferente
+    assert not c("Batman", "1989", "File:Batman Arkham Knight cover.jpg")                            # nome do jogo é prefixo de outro título
+    assert not c("Doom", None, "File:Doom Eternal cover.jpg")
+    assert c("Doom", None, "File:Doom cover.png") and c("Cyberpunk 2077", "2020", "File:Cyberpunk 2077 logo.svg".replace("svg", "png"))
+
+
+def test_busca_commons_rejeita_arquivo_sem_indicio_de_videogame_e_de_outro_jogo(tmp_path):
+    d = str(tmp_path / "c")
+    busca = {"Doom": [pagina("File:Doom Eternal cover.png", extra={"ImageDescription": {"value": "video game"}}),            # outro jogo
+                      pagina("File:Doom poster.png", extra={"ImageDescription": {"value": "a film poster"}})]}                  # sem indício de videogame
+    est = capas.importar([("Q990200001", "Doom", None, "")], fetch_multi(busca=busca), d, pausa=0)
+    assert est["comImagem"] == 0 and not list(Path(d).glob("Q*"))
+
+
+def test_prefere_imagem_vertical_a_horizontal(tmp_path):
+    d = str(tmp_path / "c")
+    h = pagina("File:Jogo H cover.png"); h["imageinfo"][0].update(thumbwidth=360, thumbheight=200)
+    v = pagina("File:Jogo H box.png"); v["imageinfo"][0].update(thumbwidth=360, thumbheight=500)
+    for p in (h, v):
+        p["imageinfo"][0]["extmetadata"]["ImageDescription"] = {"value": "video game"}
+    est = capas.importar([("Q990200002", "Jogo H", None, "")], fetch_multi(busca={"Jogo H": [h, v]}), d, pausa=0)
+    assert est["comImagem"] == 1 and capas.carregar_indice(d)["capas"]["Q990200002"]["arquivoCommons"] == "File:Jogo H box.png"
+
+
+def test_sem_imagem_nao_e_reconsultado_logo_e_fila_avanca(tmp_path):
+    d = str(tmp_path / "c")
+    jogos = [("Q990300001", "Nada Aqui", None, "")]
+    capas.importar(jogos, fetch_multi(), d, pausa=0)
+    assert "Q990300001" in capas.carregar_indice(d)["semImagem"]
+    est = capas.importar(jogos, lambda u, m: (_ for _ in ()).throw(AssertionError("não deve consultar")), d, pausa=0)
+    assert est["requisicoes"] == 0 and est["jaTinham"] == 1
+    idx = {"titulos": [{"nome": f"Jogo {i}", "idFonte": f"wikidata:Q99{i:05d}", "url": ""} for i in range(1, 50)]}
+    wd = {"registros": [{"cusa": f"CUSA{i:05d}", "jogo": f"Jogo {i}", "qid": f"Q99{i:05d}", "origem": "wikidata", "evidencias": []} for i in range(1, 50)]}
+    a = capas.escolher_amostra(idx, {"versoes": []}, {"registros": []}, ["jogo 7"], 3, ignorar={"Q9900007"}, prioridade=["Q9900042", "Q9999999"])
+    assert [x[0] for x in a][0] == "Q9900042" and "Q9900007" not in [x[0] for x in a] and len(a) == 3
+
+
+def test_painel_expoe_interesse_so_em_memoria_e_importador_le(srv_capas, tmp_path):
+    assert srv_capas.get("/api/interesse")[2] == {"qids": []}
+    srv_capas.get("/api/jogo?qid=Q15891648")
+    srv_capas.get("/api/jogos?q=batman")
+    q = srv_capas.get("/api/interesse")[2]["qids"]
+    assert q[0] in ("Q990700002", "Q990700003", "Q15891648") and "Q15891648" in q and all(capas.QID_RE.match(x) for x in q)
+    assert capas.interesse_do_painel(srv_capas.port) == q
+    assert capas.interesse_do_painel(1) == []                                                      # painel fora do ar: segue sem prioridade
+    assert srv_capas.get("/api/interesse?x=1")[0] == 400 and srv_capas.req("POST", "/api/interesse")[0] == 405
+    assert not (tmp_path / "interesse.json").exists()

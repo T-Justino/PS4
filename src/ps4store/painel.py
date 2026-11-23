@@ -12,6 +12,7 @@ import os
 import re
 import sys
 import threading
+from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
@@ -46,6 +47,7 @@ class Dados:
         self.dir_capas, self.apelidos_path = dir_capas, arq_apelidos
         self._lock = threading.Lock()
         self._cache: dict[str, tuple[float, dict]] = {}
+        self._interesse: deque[str] = deque(maxlen=200)             # só Q-ids, só em memória (nada é gravado): fila de prioridade para o importador de capas
 
     def _carregar(self, chave: str, caminho: str, loader):
         try:
@@ -71,6 +73,16 @@ class Dados:
 
     def auditoria(self) -> dict:
         return self._carregar("a", self.auditoria_path, auditoria.carregar_auditoria)
+
+    def marcar(self, qids) -> None:
+        with self._lock:
+            for q in qids:
+                if q and q not in self._interesse:
+                    self._interesse.appendleft(q)
+
+    def interesse(self) -> list[str]:
+        with self._lock:
+            return list(self._interesse)
 
     def capas(self) -> dict:
         return self._carregar("c", str(Path(self.dir_capas) / "indice.json"), lambda _c: capas.carregar_indice(self.dir_capas))
@@ -162,6 +174,8 @@ def listar_jogos(dados: Dados, q: str, com_versoes: bool, limite: int, offset: i
             it["capa"] = {k: it["capa"][k] for k in ("url", "tipo")}
     total = len(itens)
     pagina = itens[offset:offset + limite]
+    if q and offset == 0:
+        dados.marcar([it.get("qid") for it in pagina[:8]])
     return {"total": total, "mostrando": len(pagina), "offset": offset, "temMais": offset + len(pagina) < total, "itens": pagina, "aviso": aviso,
             "tipoBusca": tipo, "sugestoes": sugestoes, "viaApelido": via == "apelido"}
 
@@ -273,6 +287,9 @@ class Handler(BaseHTTPRequestHandler):
                 if not ach:
                     return self._json(404, {"erro": "sem imagem local para este jogo"}, head)
                 return self._enviar(200, ach[0].read_bytes(), ach[1], head, {"Cache-Control": "private, max-age=3600"})
+            if rota == "/api/interesse":
+                _qs(u.query, set())
+                return self._json(200, {"qids": dados.interesse()}, head)
             if rota == "/api/estado":
                 _qs(u.query, set())
                 return self._json(200, estatisticas(dados), head)
@@ -306,6 +323,8 @@ class Handler(BaseHTTPRequestHandler):
                 if idioma and not IDIOMA_RE.match(idioma):
                     raise ParametroInvalido("idioma inválido")
                 r = detalhar_jogo(dados, qid, cusa, regiao, idioma)
+                if r:
+                    dados.marcar([qid])
                 return self._json(200, r, head) if r else self._json(404, {"erro": "jogo não encontrado no índice nem nos registros de versão"}, head)
             return self._json(404, {"erro": "rota inexistente"}, head)
         except ParametroInvalido as e:
