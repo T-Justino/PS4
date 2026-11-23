@@ -45,3 +45,13 @@ Só busca e consulta de versões (os dados são os da 5B: 3 registros de Batman:
 - Só miniatura **local** (sem hotlink; nenhuma URL externa é usada para exibir). Cache em `local/capas/`; jogo sem imagem só é reconsultado após 14 dias.
 - Fila progressiva: `python -m ps4store.capas --fila 30 [--painel-porta 8765] [--jogos "a,b"]`. Prioridade: jogos que você abriu/pesquisou no painel (`/api/interesse`, só Q-ids em memória; o painel não grava nada) → nomes pedidos → jogos com CUSA. Cada execução processa ≤ 30 jogos; rode de novo para avançar. O painel nunca busca imagem.
 - Investigadas e **não** integradas: bases que exigem chave (RAWG, IGDB, TheGamesDB, SteamGridDB) e CDNs de lojas/promo (sem permissão de reuso). Isso vem do meu conhecimento prévio; não foi possível verificar da sandbox (sem rede).
+
+### Correção de cobertura (resultado real: 2 de 40)
+Causas prováveis encontradas por leitura do código (a sandbox não tem rede; confirme com `--diagnostico`):
+- A busca na Wikipedia só funcionava se o índice tivesse o link do artigo; muitos itens têm só a página do Wikidata → agora o artigo vem do **Wikidata (sitelink en/pt)**, por Q-id, em UMA consulta que também traz logo (P154), colagem (P2716) e a categoria do Commons (P373).
+- O Wikipedia/Commons por nome exigia o nome literal no arquivo; com identificação por Q-id isso não é mais exigido (só a busca por texto, `commons-busca`, continua estrita).
+- Provável causa dos downloads falhos: miniatura de 360 px, largura fora da lista padrão do Wikimedia (pode dar HTTP 429) → agora 330 px, uma nova tentativa em 429/503 respeitando `Retry-After`, e o motivo real (código HTTP/rede) é gravado.
+- Provedores (em ordem): `wikidata-p18`, `wikidata-outras` (logo/colagem), `wikipedia` (imagens do artigo que estão no Commons, ≥200 px, sem ícones), `commons-categoria` (P373), `commons-busca`. Imagem de uso justo local da Wikipedia continua rejeitada (não é reutilizável).
+- Registros negativos de versões antigas (sem `versao`) são reavaliados sozinhos; imagens válidas nunca são apagadas nem refeitas. `--reavaliar` refaz também negativos recentes. Falha de download é refeita em 1 dia.
+- `python -m ps4store.capas --diagnostico 5` mostra, por jogo, o que o Wikidata devolve, a licença/tamanho no Commons e o código HTTP do download (sem gravar). `--status` lista os motivos por jogo.
+- Fonte especializada (RAWG, IGDB, TheGamesDB, SteamGridDB, etc.): exigem chave e/ou não têm licença de reuso compatível; não integradas. Não verificado com rede.

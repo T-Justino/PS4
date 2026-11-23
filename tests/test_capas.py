@@ -1,5 +1,6 @@
 """5G: capas (importador com respostas simuladas, sem rede), rota /capa/<Qid>, busca inteligente no painel e um teste visual a ~390 px."""
 import json
+from datetime import datetime, timedelta, timezone
 import struct
 import threading
 import zlib
@@ -22,7 +23,7 @@ def pagina(titulo, lic="CC BY-SA 4.0", autor="Fulano", cats=(), mime="image/png"
     ext.update(extra or {})
     return {"title": titulo, "categories": [{"title": c} for c in cats],
             "imageinfo": [{"mime": mime, "thumburl": "https://upload.wikimedia.org/x/" + titulo.replace(" ", "_"), "descriptionurl": "https://commons.wikimedia.org/wiki/" + titulo.replace(" ", "_"),
-                           "thumbwidth": 360, "thumbheight": 480, "extmetadata": ext}]}
+                           "thumbwidth": 330, "thumbheight": 440, "width": 800, "height": 1000, "extmetadata": ext}]}
 
 
 def fetch_falso(imgs: dict, paginas: list[dict], png=None):
@@ -31,8 +32,10 @@ def fetch_falso(imgs: dict, paginas: list[dict], png=None):
 
     def f(url, maximo):
         if "query.wikidata.org" in url:
-            b = [{"g": {"value": f"http://www.wikidata.org/entity/{q}"}, "img": {"value": "http://commons.wikimedia.org/wiki/Special:FilePath/" + n.replace(" ", "%20")}} for q, n in imgs.items()]
+            b = [{"g": {"value": f"http://www.wikidata.org/entity/{q}"}, "k": {"value": "p18"}, "v": {"value": "http://commons.wikimedia.org/wiki/Special:FilePath/" + n.replace(" ", "%20")}} for q, n in imgs.items()]
             return json.dumps({"results": {"bindings": b}}).encode()
+        if "generator=" in url:
+            return json.dumps({"query": {"pages": {}}}).encode()
         if "commons.wikimedia.org/w/api.php" in url:
             return json.dumps({"query": {"pages": {str(i): p for i, p in enumerate(paginas)}}}).encode()
         if "upload.wikimedia.org" in url:
@@ -167,54 +170,149 @@ def test_visual_390px_com_capa_placeholder_e_sugestao(srv_capas, tmp_path):
 
 
 # ---------- 5H-complemento: múltiplos provedores, conferência do jogo, fila ----------
-def fetch_multi(p18=None, wiki=None, busca=None, commons=None):
-    """p18: {qid: arquivo}; wiki: {titulo_artigo: arquivo}; busca: {termo: [páginas]}; commons: páginas File: por título (resolução por nome)."""
+def fetch_multi(p18=None, wiki=None, busca=None, commons=None, sitelinks=None, cats=None, logos=None, categoria=None, falha_thumb=None):
+    """p18/logos: {qid: arquivo}; sitelinks: {qid: titulo_en}; wiki: {titulo: [arquivos do artigo]}; cats: {qid: categoria}; categoria: {nome: [páginas]};
+    busca: {termo: [páginas]}; commons: páginas File: por título; falha_thumb: exceção a levantar no download."""
+    import urllib.parse as up
     commons = commons or {}
 
     def f(url, maximo):
         if "query.wikidata.org" in url:
-            b = [{"g": {"value": f"http://www.wikidata.org/entity/{q}"}, "img": {"value": "http://commons.wikimedia.org/wiki/Special:FilePath/" + n.replace(" ", "%20")}} for q, n in (p18 or {}).items()]
+            b = []
+            for k, dic in (("p18", p18), ("logo", logos)):
+                b += [{"g": {"value": f"http://www.wikidata.org/entity/{q}"}, "k": {"value": k}, "v": {"value": "http://commons.wikimedia.org/wiki/Special:FilePath/" + n.replace(" ", "%20")}} for q, n in (dic or {}).items()]
+            b += [{"g": {"value": f"http://www.wikidata.org/entity/{q}"}, "k": {"value": "wen"}, "v": {"value": t}} for q, t in (sitelinks or {}).items()]
+            b += [{"g": {"value": f"http://www.wikidata.org/entity/{q}"}, "k": {"value": "cat"}, "v": {"value": c}} for q, c in (cats or {}).items()]
             return json.dumps({"results": {"bindings": b}}).encode()
         if ".wikipedia.org/w/api.php" in url:
-            import urllib.parse as up
             tits = up.unquote(url.split("titles=")[1]).split("|")
-            pgs = {str(i): {"title": t, **({"pageimage": wiki[t].replace(" ", "_")} if t in (wiki or {}) else {})} for i, t in enumerate(tits)}
+            pgs = {str(i): {"title": t, "images": [{"title": "File:" + a} for a in (wiki or {}).get(t, [])]} for i, t in enumerate(tits)}
             return json.dumps({"query": {"pages": pgs}}).encode()
         if "generator=search" in url:
-            import urllib.parse as up
             termo = up.unquote(url.split("gsrsearch=")[1]).split('"')[1]
             return json.dumps({"query": {"pages": {str(i): p for i, p in enumerate((busca or {}).get(termo, []))}}}).encode()
+        if "generator=categorymembers" in url:
+            cat = up.unquote(url.split("gcmtitle=")[1]).split("&")[0].removeprefix("Category:")
+            return json.dumps({"query": {"pages": {str(i): p for i, p in enumerate((categoria or {}).get(cat, []))}}}).encode()
         if "commons.wikimedia.org/w/api.php" in url:
-            import urllib.parse as up
             tits = up.unquote(url.split("titles=")[1]).split("|")
             return json.dumps({"query": {"pages": {str(i): commons[t] for i, t in enumerate(tits) if t in commons}}}).encode()
         if "upload.wikimedia.org" in url:
+            if falha_thumb:
+                raise falha_thumb
             return png_min()
         raise AssertionError(url)
     return f
 
 
-def test_fallback_entre_provedores_e_ordem(tmp_path):
+def test_fallback_entre_provedores_por_id_sem_exigir_nome_no_arquivo(tmp_path):
     d = str(tmp_path / "c")
-    jogos = [("Q990100001", "Jogo Um", "2015", "https://en.wikipedia.org/wiki/Jogo_Um"),            # P18 com licença NC -> cai para a Wikipedia (livre)
-             ("Q990100002", "Jogo Dois", "2016", "https://en.wikipedia.org/wiki/Jogo_Dois_(video_game)"),   # sem P18; Wikipedia sem imagem -> busca no Commons
-             ("Q990100003", "Jogo Tres", "2017", "https://en.wikipedia.org/wiki/Jogo_Tres"),          # nada em lugar nenhum -> placeholder
-             ("Q990100004", "Jogo Quatro", None, "")]                                                  # sem página no índice: só P18
-    commons = {"File:NC Um.png": pagina("File:NC Um.png", lic="CC BY-NC 4.0"), "File:Livre Um.png": pagina("File:Livre Um.png"),
-               "File:P4.png": pagina("File:P4.png", mime="image/png")}
-    busca = {"Jogo Dois": [pagina("File:Jogo Dois cover.png", cats=["Category:Video game covers"], extra={"ImageDescription": {"value": "Cover of the video game Jogo Dois"}})]}
-    f = fetch_multi(p18={"Q990100001": "NC Um.png", "Q990100004": "P4.png"}, wiki={"Jogo Um": "Livre Um.png"}, busca=busca, commons=commons)
+    jogos = [("Q990100001", "Jogo Um", "2015", ""),      # P18 com licença NC -> cai para o artigo da Wikipedia (Q-id -> sitelink), arquivo SEM o nome do jogo
+             ("Q990100002", "Jogo Dois", "2016", ""),    # sem P18/logo; categoria do Commons (P373) do Q-id
+             ("Q990100003", "Jogo Tres", "2017", ""),    # só logo (P154)
+             ("Q990100004", "Jogo Quatro", None, ""),    # nada ligado por ID; só a busca por nome acha
+             ("Q990100005", "Jogo Cinco", None, "")]     # nada em lugar nenhum -> placeholder
+    commons = {"File:NC Um.png": pagina("File:NC Um.png", lic="CC BY-NC 4.0"), "File:Foto qualquer.png": pagina("File:Foto qualquer.png"), "File:Logo Tres.png": pagina("File:Logo Tres.png")}
+    f = fetch_multi(p18={"Q990100001": "NC Um.png"}, sitelinks={"Q990100001": "Jogo Um"}, wiki={"Jogo Um": ["Foto qualquer.png", "Flag of Brazil.png", "Question icon.png"]},
+                    cats={"Q990100002": "Jogo Dois (video game)"}, logos={"Q990100003": "Logo Tres.png"},
+                    categoria={"Jogo Dois (video game)": [pagina("File:Screenshot de 2016.png"), pagina("File:Padlock.png")]},
+                    busca={"Jogo Quatro": [pagina("File:Jogo Quatro cover.png", extra={"ImageDescription": {"value": "video game"}})]}, commons=commons)
     est = capas.importar(jogos, f, d, pausa=0, dormir=lambda s: None)
-    assert est["comImagem"] == 3 and est["porProvedor"] == {"wikidata-p18": 1, "wikipedia": 1, "commons-busca": 1} and est["semP18"] == 1
+    assert est["comImagem"] == 4 and est["porProvedor"] == {"wikipedia": 1, "commons-categoria": 1, "wikidata-outras": 1, "commons-busca": 1} and est["semP18"] == 1
     idx = capas.carregar_indice(d)
-    assert idx["capas"]["Q990100001"]["provedor"] == "wikipedia" and "Jogo Um" in idx["capas"]["Q990100001"]["correspondencia"]
-    assert idx["capas"]["Q990100002"]["provedor"] == "commons-busca" and idx["capas"]["Q990100002"]["tipo"] == "capa"
-    assert idx["capas"]["Q990100004"]["provedor"] == "wikidata-p18" and idx["capas"]["Q990100004"]["jogo"]["qid"] == "Q990100004"
+    assert idx["capas"]["Q990100001"]["provedor"] == "wikipedia" and "Q-id" in idx["capas"]["Q990100001"]["correspondencia"]
+    assert idx["capas"]["Q990100001"]["arquivoCommons"] == "File:Foto qualquer.png"               # sem o nome do jogo, mas ligado por ID
+    assert idx["capas"]["Q990100002"]["provedor"] == "commons-categoria" and idx["capas"]["Q990100003"]["provedor"] == "wikidata-outras"
+    assert idx["capas"]["Q990100004"]["provedor"] == "commons-busca" and idx["capas"]["Q990100004"]["jogo"]["qid"] == "Q990100004"
     assert idx["capas"]["Q990100001"]["consultadoEm"] and idx["capas"]["Q990100001"]["paginaUrl"].startswith("https://commons.wikimedia.org/")
-    assert "thumbUrl" not in idx["capas"]["Q990100001"] and "Q990100003" in idx["semImagem"]               # sem URL externa guardada para exibição (só cache local)
-    # provedor escolhido pelo usuário limita a busca
+    assert "thumbUrl" not in idx["capas"]["Q990100001"]
+    neg = idx["semImagem"]["Q990100005"]
+    assert neg["motivo"] == "sem-candidato" and neg["versao"] == capas.IMPORTADOR_VERSAO and any(t.startswith("wikipedia:") for t in neg["tentativas"])
     est2 = capas.importar([("Q990100009", "Outro", None, "")], fetch_multi(), d, pausa=0, provedores=("wikidata-p18",))
     assert est2["comImagem"] == 0
+
+
+def test_download_falho_registra_causa_real_e_e_refeito_logo(tmp_path):
+    d = str(tmp_path / "c")
+    jogos = [("Q990400001", "Jogo", None, "")]
+    f429 = fetch_multi(p18={"Q990400001": "A.png"}, commons={"File:A.png": pagina("File:A.png")}, falha_thumb=capas.ErroHttp(429, "Too Many Requests", "30"))
+    est = capas.importar(jogos, f429, d, pausa=0)
+    assert est["comImagem"] == 0 and est["falhasDownload"] == {"HTTP 429 Too Many Requests": 1}
+    neg = capas.carregar_indice(d)["semImagem"]["Q990400001"]
+    assert neg["motivo"].startswith("download-falhou:HTTP 429") and "Retry-After 30" in neg["motivo"]
+    assert capas._recente(neg)                                                                       # recém-registrado: não consulta de novo no mesmo instante
+    neg["consultadoEm"] = "2000-01-01T00:00:00+00:00"                                                # falha de download envelhece em 1 dia, não em 14
+    assert not capas._recente(neg)
+    meio = dict(neg, consultadoEm=(datetime.now(timezone.utc) - timedelta(days=3)).isoformat())
+    assert not capas._recente(meio) and capas._recente(dict(meio, motivo="sem-candidato", versao=capas.IMPORTADOR_VERSAO))
+
+
+def test_http_429_tenta_uma_vez_e_erros_tem_causa_legivel(monkeypatch):
+    import io
+    import urllib.error
+    chamadas = []
+
+    class Resp:
+        def __init__(self, b): self.b = io.BytesIO(b)
+        def read(self, n): return self.b.read(n)
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+
+    def abre(req, timeout):
+        chamadas.append(1)
+        if len(chamadas) == 1:
+            raise urllib.error.HTTPError(req.full_url, 429, "Too Many Requests", {"Retry-After": "2"}, None)
+        return Resp(b"ok")
+    monkeypatch.setattr(capas.urllib.request, "urlopen", abre)
+    esperas = []
+    assert capas._http("https://upload.wikimedia.org/x.png", "ua", 100, dormir=esperas.append) == b"ok" and esperas == [2] and len(chamadas) == 2
+
+    def sempre403(req, timeout):
+        raise urllib.error.HTTPError(req.full_url, 403, "Forbidden", {}, None)
+    monkeypatch.setattr(capas.urllib.request, "urlopen", sempre403)
+    with pytest.raises(capas.ErroHttp) as e:
+        capas._http("https://upload.wikimedia.org/x.png", "ua", 100)
+    assert e.value.codigo == 403 and e.value.descricao() == "HTTP 403 Forbidden"
+
+    def sem_rede(req, timeout):
+        raise urllib.error.URLError(OSError("sem rota"))
+    monkeypatch.setattr(capas.urllib.request, "urlopen", sem_rede)
+    with pytest.raises(capas.ErroHttp) as e:
+        capas._http("https://upload.wikimedia.org/x.png", "ua", 100)
+    assert e.value.codigo == 0 and e.value.descricao().startswith("rede:")
+
+
+def test_negativos_de_versao_antiga_sao_reavaliados_sem_tocar_nas_imagens_validas(tmp_path):
+    d = str(tmp_path / "c")
+    capas.importar([("Q990500001", "Bom", None, "")], fetch_multi(p18={"Q990500001": "B.png"}, commons={"File:B.png": pagina("File:B.png")}), d, pausa=0)
+    antes = (Path(d) / "Q990500001.png").read_bytes()
+    idx = capas.carregar_indice(d)
+    idx["semImagem"]["Q990500002"] = {"motivo": "sem-P18", "consultadoEm": capas.agora()}          # formato antigo: sem 'versao'
+    capas.salvar_indice(idx, d)
+    lista = [("Q990500001", "Bom", None, ""), ("Q990500002", "Novo", None, "")]
+    consultas = []
+    base = fetch_multi(p18={"Q990500002": "N.png"}, commons={"File:N.png": pagina("File:N.png")})
+    est = capas.importar(lista, lambda u, m: (consultas.append(u), base(u, m))[1], d, pausa=0)
+    assert est["jaTinham"] == 1 and est["comImagem"] == 1 and capas.carregar_indice(d)["capas"]["Q990500002"]["provedor"] == "wikidata-p18"
+    assert (Path(d) / "Q990500001.png").read_bytes() == antes and not any("Q990500001" in u for u in consultas)       # válida: intacta e não reconsultada
+    # --reavaliar refaz negativos recentes (versão atual) sem tocar nas imagens
+    idx = capas.carregar_indice(d)
+    idx["semImagem"]["Q990500003"] = {"motivo": "sem-candidato", "consultadoEm": capas.agora(), "versao": capas.IMPORTADOR_VERSAO}
+    capas.salvar_indice(idx, d)
+    lista = [("Q990500003", "Tres", None, "")]
+    assert capas.importar(lista, fetch_multi(), d, pausa=0)["jaTinham"] == 1
+    assert capas.importar(lista, fetch_multi(), d, pausa=0, reavaliar=True)["jaTinham"] == 0
+
+
+def test_diagnostico_mostra_causa_por_jogo_sem_gravar(tmp_path, capsys):
+    idx = {"schema": "ps4store.indice/v1", "fontes": {}, "titulos": [{"nome": "Jogo Diag", "idFonte": "wikidata:Q990600001", "url": "", "fonte": "wikidata"}]}
+    arq = tmp_path / "i.json"
+    arq.write_text(json.dumps(idx))
+    dados = str(tmp_path / "cx")
+    f = fetch_multi(p18={"Q990600001": "D.png"}, commons={"File:D.png": pagina("File:D.png", lic="CC BY-NC 4.0")})
+    rc = capas.main(["--diagnostico", "3", "--jogos", "jogo diag", "--indice", str(arq), "--versoes", SEMENTE, "--cusas", SEM_WD, "--dir", dados, "--pausa", "0"], fetch=f, dormir=lambda s: None)
+    out = capsys.readouterr().out
+    assert rc == 0 and "p18=1" in out and "rejeitada: licenca-nao-permitida" in out and "nada foi gravado" in out and not Path(dados).exists()
 
 
 def test_correspondencia_imagem_jogo_rejeita_sequencia_filme_e_ano_errado():
