@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
 <title>PS4 Store BR · Jogos</title>
 <link rel="stylesheet" href="/estilo.css">
 </head>
 <body>
 <header>
   <h1>PS4 Store BR</h1>
-  <p class="sub">Jogos e versões CUSA · só metadados, sem downloads</p>
+  <p class="sub">Catálogo local de jogos e versões CUSA · só metadados, sem downloads</p>
   <ul id="estado" class="contadores" aria-label="Resumo dos dados"><li class="carregando">carregando…</li></ul>
 </header>
 <main>
@@ -35,8 +36,10 @@
       </div>
       <button type="button" id="so-versoes" class="secundario">Mostrar só jogos com versões cadastradas</button>
     </form>
+    <div id="sugestoes" class="sugestoes" hidden></div>
     <p id="msg-lista" class="msg" role="status"></p>
-    <ul id="lista" class="cards"></ul>
+    <ul id="lista" class="cards grade-jogos"></ul>
+    <button type="button" id="mais" class="secundario" hidden>Mostrar mais</button>
   </section>
 
   <section id="vista-jogo" hidden>

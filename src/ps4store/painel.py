@@ -16,7 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from . import auditoria, busca, cusas, unificada, versoes
+from . import auditoria, busca, busca_inteligente, capas, cusas, unificada, versoes
 
 HOST = "127.0.0.1"
 PORTA_PADRAO = 8765
@@ -40,8 +40,10 @@ class ParametroInvalido(ValueError):
 class Dados:
     """Índice de busca + versões, recarregados quando o arquivo muda (mtime). Leitura apenas."""
 
-    def __init__(self, indice: str, arq_versoes: str, arq_cusas: str = cusas.DADOS_PADRAO, arq_auditoria: str = auditoria.AUDITORIA_PADRAO):
+    def __init__(self, indice: str, arq_versoes: str, arq_cusas: str = cusas.DADOS_PADRAO, arq_auditoria: str = auditoria.AUDITORIA_PADRAO,
+                 dir_capas: str = capas.DIR_PADRAO, arq_apelidos: str = busca_inteligente.APELIDOS_PADRAO):
         self.indice_path, self.versoes_path, self.cusas_path, self.auditoria_path = indice, arq_versoes, arq_cusas, arq_auditoria
+        self.dir_capas, self.apelidos_path = dir_capas, arq_apelidos
         self._lock = threading.Lock()
         self._cache: dict[str, tuple[float, dict]] = {}
 
@@ -69,6 +71,13 @@ class Dados:
 
     def auditoria(self) -> dict:
         return self._carregar("a", self.auditoria_path, auditoria.carregar_auditoria)
+
+    def capas(self) -> dict:
+        return self._carregar("c", str(Path(self.dir_capas) / "indice.json"), lambda _c: capas.carregar_indice(self.dir_capas))
+
+    def motor(self) -> busca_inteligente.Motor:
+        idx = self.indice()                                         # recria o motor só quando o índice (ou os apelidos) mudam
+        return self._carregar("m", self.indice_path, lambda _c: busca_inteligente.Motor(idx, busca_inteligente.carregar_apelidos(self.apelidos_path)))
 
 
 def _qs(query: str, permitidos: set[str]) -> dict[str, str]:
@@ -107,13 +116,16 @@ def _contagem(rs: list[dict]) -> dict:
     return {"nRegistros": len(rs), "nCusas": len({r["cusa"] for r in rs}), "nWikidata": sum(1 for r in rs if r.get("origem") == "wikidata")}
 
 
-def listar_jogos(dados: Dados, q: str, com_versoes: bool, limite: int) -> dict:
+def listar_jogos(dados: Dados, q: str, com_versoes: bool, limite: int, offset: int = 0) -> dict:
     idx, vdoc, wd = dados.indice(), dados.versoes(), dados.wikidata()
     por_qid = unificada.agrupar(vdoc, wd)
     fontes = idx.get("fontes", {})
     nomes = {_qid_de(t): t for t in idx.get("titulos", []) if _qid_de(t)}
     itens: list[dict] = []
     aviso = ""
+    sugestoes: list[str] = []
+    via = ""
+    cp = dados.capas()
     tipo = unificada.classificar_termo(q) if q else "nome"
     if tipo in ("cusa", "contentId"):                               # pesquisa por identificador no mesmo campo
         loc = unificada.localizar(q, vdoc, wd)
@@ -124,7 +136,13 @@ def listar_jogos(dados: Dados, q: str, com_versoes: bool, limite: int) -> dict:
             itens.append({"nome": t["nome"] if t else rs[0]["jogo"], "ano": (t or {}).get("lancamento"), "fonte": (t or {}).get("fonte", "versoes"),
                           "fonteNome": fontes.get((t or {}).get("fonte"), {}).get("nome") or "registros de versão", "qid": qid, **_contagem(rs)})
     elif idx.get("titulos"):
-        base = busca.buscar(idx, q) if q else [t for t in idx["titulos"] if _qid_de(t) in por_qid]
+        if q:
+            r = dados.motor().buscar(q, limite=100000)
+            base = r["itens"]
+            sugestoes = [{"nome": t["nome"], "qid": _qid_de(t)} for t in r["sugestoes"]]
+            via = "apelido" if r["via"] else ""
+        else:
+            base = [t for t in idx["titulos"] if _qid_de(t) in por_qid]
         for t in base:
             qid = _qid_de(t)
             rs = por_qid.get(qid, []) if qid else []
@@ -138,8 +156,14 @@ def listar_jogos(dados: Dados, q: str, com_versoes: bool, limite: int) -> dict:
         for qid, rs in por_qid.items():
             if (not nq or all(w in busca.norm(rs[0].get("jogo")) for w in nq.split())):
                 itens.append({"nome": rs[0]["jogo"], "ano": None, "fonte": "versoes", "fonteNome": "registros de versão", "qid": qid, **_contagem(rs)})
+    for it in itens:
+        it["capa"] = capas.info_publica(cp, it["qid"]) if it.get("qid") else None
+        if it["capa"]:
+            it["capa"] = {k: it["capa"][k] for k in ("url", "tipo")}
     total = len(itens)
-    return {"total": total, "mostrando": min(total, limite), "itens": itens[:limite], "aviso": aviso, "tipoBusca": tipo}
+    pagina = itens[offset:offset + limite]
+    return {"total": total, "mostrando": len(pagina), "offset": offset, "temMais": offset + len(pagina) < total, "itens": pagina, "aviso": aviso,
+            "tipoBusca": tipo, "sugestoes": sugestoes, "viaApelido": via == "apelido"}
 
 
 MOTIVOS_CURTOS = {"o Wikidata atribui o mesmo CUSA a mais de um jogo": "mesmo CUSA em mais de um jogo",
@@ -193,7 +217,7 @@ def detalhar_jogo(dados: Dados, qid: str, cusa: str, regiao: str, idioma: str) -
         lista = ", ".join(c["cusa"] for c in conflitos[:4]) + (f" (+{len(conflitos) - 4})" if len(conflitos) > 4 else "")
         avisos.append(f"{len(conflitos)} CUSA(s) em conflito no Wikidata, NÃO associados a este jogo: {lista}.")
     visiveis, omitidos = versoes.consultar({"versoes": rs}, cusa=cusa or None, regiao=regiao or None, idioma=idioma or None)
-    return {"jogo": {"nome": nome, "qid": qid, "ano": (t or {}).get("lancamento"), "url": (t or {}).get("url") or ""},
+    return {"capa": capas.info_publica(dados.capas(), qid), "jogo": {"nome": nome, "qid": qid, "ano": (t or {}).get("lancamento"), "url": (t or {}).get("url") or ""},
             "total": len(rs), "cusasDistintos": len({r["cusa"] for r in rs}), "registros": visiveis, "omitidos": omitidos,
             "origens": {"curado": sum(1 for r in rs if r.get("origem") == "curado"), "wikidata": sum(1 for r in rs if r.get("origem") == "wikidata")},
             "filtros": {"cusa": cusa, "regiao": regiao, "idioma": idioma}, "avisos": avisos, "conflitos": conflitos,
@@ -242,11 +266,18 @@ class Handler(BaseHTTPRequestHandler):
                 nome, ctype = ROTAS_ESTATICAS[rota]
                 return self._enviar(200, (ASSETS / nome).read_bytes(), ctype, head)
             dados: Dados = self.server.dados
+            if rota.startswith("/capa/"):                               # só por Q-id validado; o arquivo vem do índice de capas, nunca do caminho da URL
+                _qs(u.query, set())
+                qid = rota[6:]
+                ach = capas.caminho_da_capa(dados.dir_capas, dados.capas(), qid) if QID_RE.match(qid) else None
+                if not ach:
+                    return self._json(404, {"erro": "sem imagem local para este jogo"}, head)
+                return self._enviar(200, ach[0].read_bytes(), ach[1], head, {"Cache-Control": "private, max-age=3600"})
             if rota == "/api/estado":
                 _qs(u.query, set())
                 return self._json(200, estatisticas(dados), head)
             if rota == "/api/jogos":
-                p = _qs(u.query, {"q", "com_versoes", "limite"})
+                p = _qs(u.query, {"q", "com_versoes", "limite", "offset"})
                 q = _texto(p.get("q", ""), "q", 100)
                 cv = p.get("com_versoes", "")
                 if cv not in ("", "0", "1"):
@@ -254,9 +285,12 @@ class Handler(BaseHTTPRequestHandler):
                 lim = p.get("limite", "50")
                 if not lim.isdigit() or not 1 <= int(lim) <= LIMITE_MAX:
                     raise ParametroInvalido(f"limite deve ser de 1 a {LIMITE_MAX}")
+                off = p.get("offset", "0")
+                if not off.isdigit() or int(off) > 100000:
+                    raise ParametroInvalido("offset inválido")
                 if not q and cv != "1":
                     raise ParametroInvalido("informe parte do nome ou use com_versoes=1")
-                return self._json(200, listar_jogos(dados, q, cv == "1", int(lim)), head)
+                return self._json(200, listar_jogos(dados, q, cv == "1", int(lim), int(off)), head)
             if rota == "/api/jogo":
                 p = _qs(u.query, {"qid", "cusa", "regiao", "idioma"})
                 qid = p.get("qid", "")
@@ -292,12 +326,13 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def criar_servidor(porta: int = PORTA_PADRAO, indice: str = busca.INDICE_PADRAO, arq_versoes: str = versoes.VERSOES_PADRAO, host: str = HOST,
-                   arq_cusas: str = cusas.DADOS_PADRAO, arq_auditoria: str = auditoria.AUDITORIA_PADRAO) -> ThreadingHTTPServer:
+                   arq_cusas: str = cusas.DADOS_PADRAO, arq_auditoria: str = auditoria.AUDITORIA_PADRAO,
+                   dir_capas: str = capas.DIR_PADRAO, arq_apelidos: str = busca_inteligente.APELIDOS_PADRAO) -> ThreadingHTTPServer:
     if host != HOST:
         raise ValueError("o painel só pode escutar em 127.0.0.1")
     if not (porta == 0 or 1024 <= porta <= 65535):
         raise ValueError("porta deve ser 0 (qualquer) ou de 1024 a 65535")
-    dados = Dados(indice, arq_versoes, arq_cusas, arq_auditoria)
+    dados = Dados(indice, arq_versoes, arq_cusas, arq_auditoria, dir_capas, arq_apelidos)
     erros = versoes.validar_doc(dados.versoes())
     if erros:
         raise ValueError(f"o arquivo de versões tem {len(erros)} problema(s); rode: python -m ps4store.versoes --validar")
@@ -316,9 +351,11 @@ def main(argv=None) -> int:
     ap.add_argument("--versoes", default=versoes.VERSOES_PADRAO)
     ap.add_argument("--cusas", default=cusas.DADOS_PADRAO, help="CUSAs alegados no Wikidata (gerados por ps4store.cusas)")
     ap.add_argument("--auditoria", default=auditoria.AUDITORIA_PADRAO, help="relatório de conflitos (gerado por ps4store.auditoria; opcional)")
+    ap.add_argument("--capas", default=capas.DIR_PADRAO, help="pasta das miniaturas (gerada por ps4store.capas; opcional)")
+    ap.add_argument("--apelidos", default=busca_inteligente.APELIDOS_PADRAO)
     a = ap.parse_args(argv)
     try:
-        srv = criar_servidor(a.porta, a.indice, a.versoes, arq_cusas=a.cusas, arq_auditoria=a.auditoria)
+        srv = criar_servidor(a.porta, a.indice, a.versoes, arq_cusas=a.cusas, arq_auditoria=a.auditoria, dir_capas=a.capas, arq_apelidos=a.apelidos)
     except OSError as e:
         print(f"ERRO  não foi possível abrir a porta {a.porta} em 127.0.0.1 ({e.strerror or type(e).__name__}). Já há um painel rodando? Use --porta OUTRA.", file=sys.stderr)
         return 2

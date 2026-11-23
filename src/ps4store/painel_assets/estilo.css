@@ -1,8 +1,7 @@
-:root{--bg:#f4f5f7;--card:#fff;--tx:#14171c;--mut:#5b6573;--bd:#d9dde3;--ac:#0b4fd1;--ok:#0a7d33;--okbg:#e3f6ea;--warn:#8a5a00;--warnbg:#fff2d6;--erro:#a32121}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1318;--card:#181e26;--tx:#eef1f5;--mut:#98a3b3;--bd:#2a323d;--ac:#8db0ff;--ok:#5fd68a;--okbg:#12301f;--warn:#f0c26a;--warnbg:#3a2d10;--erro:#ff8f8f}}
+:root{color-scheme:dark;--bg:#0b0e13;--card:#151b24;--tx:#eef1f5;--mut:#98a3b3;--bd:#262f3b;--ac:#5b8cff;--ok:#5fd68a;--okbg:#12301f;--warn:#f0c26a;--warnbg:#3a2d10;--erro:#ff8f8f}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-header,main,footer{max-width:760px;margin:0 auto;padding:12px 16px}
+header,main,footer{max-width:1100px;margin:0 auto;padding:12px 16px}
 h1{font-size:1.35rem;margin:6px 0 0}h2{font-size:1.15rem;margin:8px 0}
 .sub,.dica,footer,.msg{color:var(--mut);font-size:.85rem}
 .rotulo{display:block;font-weight:600;margin:10px 0 4px}
@@ -11,7 +10,7 @@ input,select,button{font:inherit;min-height:46px;border-radius:10px;border:1px s
 input[type=search]{flex:1;min-width:0}
 button{cursor:pointer}
 .primario{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
-@media (prefers-color-scheme:dark){.primario{color:#0b1220}}
+.primario{color:#0b1220}
 .secundario{width:100%;margin:10px 0}
 details{margin:10px 0;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:4px 12px}
 summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:600}
@@ -25,8 +24,7 @@ summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weig
 .nome{font-weight:650;overflow-wrap:anywhere}
 .meta{color:var(--mut);font-size:.85rem;margin-top:2px;overflow-wrap:anywhere}
 .badge{display:inline-block;font-size:.78rem;padding:3px 9px;border-radius:999px;margin:4px 6px 0 0;background:var(--bd);color:var(--tx)}
-.badge.ok{background:var(--okbg);color:var(--ok)}.badge.aviso{background:var(--warnbg);color:var(--warn)}.badge.wd{background:#e1ebff;color:#0b3fa8}
-@media (prefers-color-scheme:dark){.badge.wd{background:#16284f;color:#8db0ff}}
+.badge.ok{background:var(--okbg);color:var(--ok)}.badge.aviso{background:var(--warnbg);color:var(--warn)}.badge.wd{background:#16284f;color:#8db0ff}
 dl{margin:8px 0 0;display:grid;grid-template-columns:1fr;gap:6px}
 dt{font-size:.78rem;color:var(--mut);margin-top:6px}dd{margin:0;overflow-wrap:anywhere}
 @media (min-width:560px){dl{grid-template-columns:170px 1fr}dt{margin-top:0}}
@@ -43,3 +41,24 @@ footer{border-top:1px solid var(--bd);margin-top:16px}
 details.conflitos{margin:10px 0}
 details.conflitos ul{margin:6px 0 10px;padding-left:18px;font-size:.88rem}
 details.conflitos li{margin:4px 0;overflow-wrap:anywhere}
+
+/* 5G: catálogo em grade */
+.grade-jogos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card.jogo{margin:0;padding:0;overflow:hidden;display:flex;flex-direction:column}
+.card.jogo .info{padding:8px 10px 10px}
+.card.jogo .nome{font-size:.92rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card.jogo:hover,.card.jogo:focus-visible{outline:2px solid var(--ac)}
+.capa{position:relative;aspect-ratio:3/4;background:linear-gradient(160deg,#1d2736,#10151d);overflow:hidden}
+.capa img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.capa .placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:700;color:#3b4a60}
+.selo{position:absolute;left:6px;bottom:6px;font-size:.68rem;padding:2px 7px;border-radius:999px;background:rgba(0,0,0,.7);color:#dfe6f2}
+.selo.vazio{color:var(--mut)}
+.hero{display:flex;gap:14px;align-items:flex-start;margin:6px 0 10px}
+.hero .capa.grande{flex:0 0 38%;max-width:240px;border-radius:12px}
+.hero .info{flex:1;min-width:0}
+details.atribuicao{margin:8px 0;padding:2px 10px}
+.sugestoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.sugestao{min-height:40px;border-radius:999px;color:var(--ac);font-weight:600}
+@media (max-width:420px){.hero{flex-direction:column}.hero .capa.grande{flex:none;width:55%}}
+.contadores{display:flex;overflow-x:auto;gap:8px;scrollbar-width:none}.contadores li{flex:0 0 auto;min-width:104px}
+@media (min-width:560px){.grade-jogos{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}

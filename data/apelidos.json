@@ -1,0 +1,12 @@
+{
+  "_nota": "Apelidos comuns -> jogo. O vínculo é EXPLÍCITO: 'alvo' é o nome exato (normalizado) do jogo no índice; só vale se esse nome corresponder a UM único Q-id do índice (ou, se 'qid' for informado, ao Q-id informado com esse nome). Nome ausente ou ambíguo = apelido não aplicado (nunca por semelhança). Não altera Q-ids nem CUSAs.",
+  "apelidos": [
+    {"apelidos": ["GTA V", "GTA 5", "GTAV", "GTA5", "Grand Theft Auto 5"], "alvo": "Grand Theft Auto V"},
+    {"apelidos": ["RDR2", "Red Dead 2"], "alvo": "Red Dead Redemption 2"},
+    {"apelidos": ["CP2077", "Cyberpunk"], "alvo": "Cyberpunk 2077"},
+    {"apelidos": ["Witcher 3", "TW3"], "alvo": "The Witcher 3: Wild Hunt"},
+    {"apelidos": ["TLOU", "TLOU 1"], "alvo": "The Last of Us"},
+    {"apelidos": ["BOTW"], "alvo": "The Legend of Zelda: Breath of the Wild"},
+    {"apelidos": ["GoW", "GoW 2018"], "alvo": "God of War"}
+  ]
+}

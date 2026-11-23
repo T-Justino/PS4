@@ -25,36 +25,78 @@ function link(url, texto) {
   return a;
 }
 
-function mostrarLista(dados) {
+const TIPO_CAPA = { capa: "capa", ilustrativa: "imagem ilustrativa" };
+function inicial(nome) { const m = (nome || "?").match(/[A-Za-z0-9À-ÿ]/); return m ? m[0].toUpperCase() : "?"; }
+function imagem(capa, nome, cls) {
+  const box = el("div", "capa " + (cls || ""));
+  const ph = el("div", "placeholder", inicial(nome));
+  ph.setAttribute("aria-hidden", "true");
+  box.appendChild(ph);
+  if (capa && /^\/capa\/Q[0-9]+$/.test(capa.url || "")) {
+    const img = document.createElement("img");
+    img.loading = "lazy"; img.decoding = "async"; img.alt = (TIPO_CAPA[capa.tipo] || "imagem") + " de " + nome; img.src = capa.url;
+    img.addEventListener("error", () => img.remove());
+    box.appendChild(img);
+    box.appendChild(el("span", "selo", TIPO_CAPA[capa.tipo] || "imagem"));
+  } else box.appendChild(el("span", "selo vazio", "sem imagem"));
+  return box;
+}
+
+let ultimaBusca = null, carregados = 0;
+function cartaoJogo(it) {
+  const li = el("li", "card jogo" + (it.qid ? " clicavel" : ""));
+  li.appendChild(imagem(it.capa, it.nome));
+  const info = el("div", "info");
+  info.appendChild(el("div", "nome", it.nome + (it.ano ? " (" + it.ano + ")" : "")));
+  info.appendChild(el("div", "meta", "Fonte: " + (it.fonteNome || it.fonte || "desconhecida") + (it.qid ? " · " + it.qid : " · sem Q-id")));
+  if (!it.qid) info.appendChild(el("span", "badge", "sem Q-id: não dá para vincular versões"));
+  else if (!it.nRegistros) info.appendChild(el("span", "badge", "sem versões cadastradas"));
+  else {
+    info.appendChild(el("span", "badge ok", it.nRegistros + " registro(s) · " + it.nCusas + " CUSA(s)"));
+    if (it.nWikidata) info.appendChild(el("span", "badge wd", it.nWikidata + " alegado(s) no Wikidata"));
+  }
+  li.appendChild(info);
+  if (it.qid) { li.tabIndex = 0; li.addEventListener("click", () => abrirJogo(it.qid)); li.addEventListener("keydown", (e) => { if (e.key === "Enter") abrirJogo(it.qid); }); }
+  return li;
+}
+
+function mostrarLista(dados, anexar) {
   const ul = $("lista");
-  ul.replaceChildren();
-  $("msg-lista").textContent = dados.total + " jogo(s)" + (dados.mostrando < dados.total ? " (mostrando " + dados.mostrando + ")" : "") + (dados.aviso ? " · " + dados.aviso : "");
-  dados.itens.forEach((it) => {
-    const li = el("li", "card" + (it.qid ? " clicavel" : ""));
-    li.appendChild(el("div", "nome", it.nome + (it.ano ? " (" + it.ano + ")" : "")));
-    li.appendChild(el("div", "meta", "Fonte: " + (it.fonteNome || it.fonte || "desconhecida") + (it.qid ? " · " + it.qid : " · sem Q-id")));
-    if (!it.qid) li.appendChild(el("span", "badge", "sem Q-id: não dá para vincular versões"));
-    else if (!it.nRegistros) li.appendChild(el("span", "badge", "sem versões cadastradas"));
-    else {
-      li.appendChild(el("span", "badge ok", it.nRegistros + " registro(s) · " + it.nCusas + " CUSA(s)"));
-      if (it.nWikidata) li.appendChild(el("span", "badge wd", it.nWikidata + " alegado(s) no Wikidata"));
-    }
-    if (it.qid) { li.tabIndex = 0; li.addEventListener("click", () => abrirJogo(it.qid)); li.addEventListener("keydown", (e) => { if (e.key === "Enter") abrirJogo(it.qid); }); }
-    ul.appendChild(li);
+  if (!anexar) ul.replaceChildren();
+  carregados = dados.offset + dados.itens.length;
+  $("msg-lista").textContent = dados.total + " jogo(s)" + (carregados < dados.total ? " (mostrando " + carregados + ")" : "") + (dados.viaApelido ? " · apelido conhecido, vínculo explícito" : "") + (dados.aviso ? " · " + dados.aviso : "");
+  dados.itens.forEach((it) => ul.appendChild(cartaoJogo(it)));
+  $("mais").hidden = !dados.temMais;
+}
+
+function mostrarSugestoes(lista) {
+  const box = $("sugestoes");
+  box.replaceChildren();
+  box.hidden = !lista.length;
+  if (!lista.length) return;
+  box.appendChild(el("span", "meta", "Nenhum resultado exato. Você quis dizer:"));
+  lista.forEach((s) => {
+    const b = el("button", "sugestao", s.nome); b.type = "button";
+    b.addEventListener("click", () => { $("q").value = s.nome; buscar(false); });
+    box.appendChild(b);
   });
 }
 
-async function buscar(soVersoes) {
+async function buscar(soVersoes, anexar) {
   const q = $("q").value.trim();
-  $("msg-lista").textContent = "buscando…";
+  if (!anexar) { ultimaBusca = { q: q, sv: soVersoes }; carregados = 0; $("msg-lista").textContent = "buscando…"; $("mais").hidden = true; }
+  const alvo = ultimaBusca;
   try {
-    const d = await api("/api/jogos", { q: q, com_versoes: soVersoes ? "1" : "" });
-    mostrarLista(d);
-    if (!d.itens.length) $("msg-lista").textContent = q ? "Nenhum jogo encontrado para \"" + q + "\"." : "Nenhum jogo com versões cadastradas.";
+    const d = await api("/api/jogos", { q: alvo.q, com_versoes: alvo.sv ? "1" : "", limite: 48, offset: anexar ? carregados : "" });
+    mostrarLista(d, anexar);
+    if (!anexar) {
+      mostrarSugestoes(d.sugestoes || []);
+      if (!d.itens.length) $("msg-lista").textContent = alvo.q ? "Nenhum jogo encontrado para \"" + alvo.q + "\"." : "Nenhum jogo com versões cadastradas.";
+    }
   } catch (e) {
-    $("lista").replaceChildren();
+    $("lista").replaceChildren(); $("mais").hidden = true; $("sugestoes").hidden = true;
     $("msg-lista").textContent = "";
-    const p = el("p", "erro", e.message); $("lista").appendChild(p);
+    $("lista").appendChild(el("p", "erro", e.message));
   }
 }
 
@@ -103,10 +145,23 @@ function mostrarJogo(d) {
   const box = $("jogo");
   box.replaceChildren();
   const j = d.jogo;
-  box.appendChild(el("h2", null, j.nome + (j.ano ? " (" + j.ano + ")" : "")));
+  const hero = el("div", "hero");
+  hero.appendChild(imagem(d.capa, j.nome, "grande"));
+  const ht = el("div", "info");
+  ht.appendChild(el("h2", null, j.nome + (j.ano ? " (" + j.ano + ")" : "")));
   const meta = el("div", "meta"); meta.appendChild(document.createTextNode("Wikidata " + j.qid + " · "));
   if (j.url) meta.appendChild(link(j.url, "página de referência"));
-  box.appendChild(meta);
+  ht.appendChild(meta);
+  if (d.capa) {
+    const at = el("details", "atribuicao");
+    at.appendChild(el("summary", null, (TIPO_CAPA[d.capa.tipo] || "imagem") + " · origem e licença"));
+    at.appendChild(el("p", "meta", d.capa.atribuicao || ""));
+    if (d.capa.tipo !== "capa") at.appendChild(el("p", "meta", "Imagem ilustrativa: NÃO é a capa oficial do produto."));
+    const p = el("p", "meta"); p.appendChild(link(d.capa.paginaUrl, "página do arquivo no Commons")); at.appendChild(p);
+    ht.appendChild(at);
+  } else ht.appendChild(el("p", "meta", "Sem imagem local (placeholder). Nenhuma imagem foi inventada."));
+  hero.appendChild(ht);
+  box.appendChild(hero);
   d.avisos.forEach((a) => box.appendChild(el("div", "aviso-box", a)));
   if (d.conflitos && d.conflitos.length) {
     const det = el("details", "conflitos");
@@ -169,6 +224,7 @@ async function estado() {
 $("form-busca").addEventListener("submit", (ev) => { ev.preventDefault(); voltar(); buscar(false); });
 $("so-versoes").addEventListener("click", () => { voltar(); buscar(true); });
 $("voltar").addEventListener("click", voltar);
+$("mais").addEventListener("click", () => buscar(false, true));
 ["f-cusa", "f-regiao", "f-idioma"].forEach((id) => $(id).addEventListener("change", () => { if (jogoAtual) abrirJogo(jogoAtual, true); }));
 window.addEventListener("hashchange", () => { const h = window.location.hash.slice(1); if (/^Q[0-9]+$/.test(h) && h !== jogoAtual) abrirJogo(h); else if (!h && jogoAtual) voltar(); });
 estado();

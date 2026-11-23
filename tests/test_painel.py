@@ -58,7 +58,7 @@ class Cli:
 
 @pytest.fixture
 def srv(tmp_path):
-    s = painel.criar_servidor(0, faz_indice(tmp_path), SEMENTE, arq_cusas=SEM_WD)
+    s = painel.criar_servidor(0, faz_indice(tmp_path), SEMENTE, arq_cusas=SEM_WD, dir_capas=str(tmp_path / "capas-vazio"), arq_apelidos=str(ROOT / "data" / "apelidos.json"))
     threading.Thread(target=s.serve_forever, daemon=True).start()
     yield Cli(s)
     s.shutdown()
@@ -146,7 +146,7 @@ def test_busca_por_nome_sem_acentos_com_ano_fonte_e_contagem_de_versoes(srv):
     vr = next(i for i in j["itens"] if i["qid"] == "Q990700002")
     assert vr["nRegistros"] == 0 and vr["ano"] is None
     assert srv.get("/api/jogos?q=pokemon")[2]["itens"][0]["nome"] == "Pokémon Café Mix"
-    assert srv.get("/api/jogos?q=zelda")[2] == {"total": 0, "mostrando": 0, "itens": [], "aviso": "", "tipoBusca": "nome"}
+    assert srv.get("/api/jogos?q=zelda")[2] == {"total": 0, "mostrando": 0, "offset": 0, "temMais": False, "itens": [], "aviso": "", "tipoBusca": "nome", "sugestoes": [], "viaApelido": False}
     j2 = srv.get("/api/jogos?q=sem+qid")[2]
     assert j2["itens"][0]["qid"] is None and j2["itens"][0]["nRegistros"] == 0                           # sem Q-id: sem vínculo
 

@@ -31,3 +31,11 @@ Funciona offline com os dados já importados (`local/busca-indice.json` e `data/
 
 ## Limites
 Só busca e consulta de versões (os dados são os da 5B: 3 registros de Batman: Arkham Knight, todos "citado"). Não integra downloads, SSPI nem o resolvedor.
+
+## 5G · Catálogo visual, capas e busca inteligente
+
+- **Interface**: tema escuro, grade de cards (2 colunas em ~390 px), imagem com carregamento tardío (`loading=lazy`), placeholder com a inicial quando não há imagem, "Mostrar mais" (48 por vez, `offset`), contadores compactos, detalhe com imagem + origem/licença recolhível.
+- **Imagens** (comando separado, é o único que usa rede): `python -m ps4store.capas --amostra 30 --jogos "batman,cyberpunk"` (`--status` resume, sem rede). Fonte: Wikidata P18 → metadados do Wikimedia Commons. Só entram CC0, domínio público, CC BY e CC BY-SA, com autor quando exigido; NC/ND/GFDL/uso justo/desconhecida são rejeitadas e registradas em `local/capas/indice.json` (`semImagem`). Miniatura ≤ 400 KB, validada pelos bytes. Rótulos: **capa** (categoria "cover" no Commons), **imagem ilustrativa** (não é capa oficial), **sem imagem** (placeholder). `local/capas/` não vai para o Git.
+- **Rota** `GET /capa/<Qid>`: só Q-id válido; o arquivo vem do índice de capas (nome `Q123.ext` dentro da pasta), nunca do caminho da URL.
+- **Busca**: exata primeiro; parcial, sem acento/pontuação; apelidos em `data/apelidos.json` (só com vínculo explícito a UM Q-id do índice; ambíguo ou ausente = não aplica); sem resultado → até 5 sugestões por similaridade (você escolhe; nada é trocado sozinho). Texto parecido nunca altera Q-id nem CUSA.
+- API: `/api/jogos` ganhou `offset`, `temMais`, `sugestoes`, `viaApelido`, `capa` por item; `/api/jogo` ganhou `capa` (com atribuição).
