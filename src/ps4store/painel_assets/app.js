@@ -179,6 +179,47 @@ function blocoPtbr(loc) {
   return c;
 }
 
+function secaoBusca(qid, caixaAnalise) {
+  const c = el("section", "card link-box");
+  c.appendChild(el("div", "nome", "Links nas fontes cadastradas"));
+  c.appendChild(el("div", "meta", "Consulta só as fontes de config/fontes-links.json (homebrew e distribuição autorizada), pelo CUSA, Content ID e nome exato. Nada é baixado."));
+  const bt = el("button", "primario", "Buscar links"); bt.type = "button"; bt.id = "buscar-links";
+  const out = el("div", "link-resultado"); out.id = "links-encontrados";
+  c.appendChild(bt); c.appendChild(out);
+  bt.addEventListener("click", async () => {
+    bt.disabled = true; out.replaceChildren(el("p", "msg", "consultando as fontes…"));
+    try {
+      const u = new URL("/api/links", window.location.origin); u.searchParams.set("qid", qid);
+      const r = await fetch(u.toString(), { headers: { Accept: "application/json", "X-PS4Store": "1" } });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.erro || ("erro " + r.status));
+      out.replaceChildren(el("p", "msg", d.texto));
+      d.resultados.forEach((x) => {
+        const k = el("div", "card");
+        k.appendChild(el("div", "nome", x.arquivo));
+        k.appendChild(el("span", "badge " + (x.autorizado ? "ok" : "aviso"), x.autorizado ? "distribuição autorizada" : "link externo não verificado"));
+        k.appendChild(el("span", "badge", x.formato));
+        const dl = el("dl");
+        campo(dl, "Origem", x.origem, false);
+        campo(dl, "Tipo", x.tipo, false);
+        campo(dl, "Versão", x.versao || "", !x.versao);
+        if (x.tamanho) campo(dl, "Tamanho", (x.tamanho / 1e6).toFixed(1) + " MB", false);
+        campo(dl, "Correspondência", x.correspondencia.texto, false);
+        campo(dl, "Verificação", x.verificacao, false);
+        campo(dl, "Autorização", x.autorizacao, false);
+        k.appendChild(dl);
+        const an = el("button", "secundario", "Analisar e preparar para SSPI"); an.type = "button";
+        an.addEventListener("click", () => { const i = $("link-url"); if (i) i.value = x.url; const cx = caixaAnalise(); cx.scrollIntoView({ block: "start" }); analisarLink(x.url, qid, cx, an); });
+        k.appendChild(an);
+        out.appendChild(k);
+      });
+      d.fontes.forEach((f) => out.appendChild(el("div", "meta", "fonte " + f.fonte + ": " + f.achados + " de " + f.itens + " · " + f.origem)));
+    } catch (e) { out.replaceChildren(el("p", "erro", e.message)); }
+    bt.disabled = false;
+  });
+  return c;
+}
+
 function secaoLink(qid) {
   const c = el("section", "card link-box");
   c.appendChild(el("div", "nome", "Analisar link e preparar para o SSPI"));
@@ -276,6 +317,7 @@ function mostrarJogo(d) {
     box.appendChild(det);
   }
   if (!d.total) {
+    box.appendChild(secaoBusca(j.qid, () => $("link-resultado")));
     box.appendChild(secaoLink(j.qid));
     box.appendChild(el("div", "card", "Nenhuma versão CUSA cadastrada para " + j.qid + ". Isso NÃO quer dizer que o jogo não tenha CUSA: só que ainda não há registro com fonte. Nada foi inventado."));
     return;
@@ -289,6 +331,7 @@ function mostrarJogo(d) {
   box.appendChild(bt);
   if (!d.registros.length) box.appendChild(el("div", "card", "Nenhum registro passa nos filtros" + (d.omitidos ? " (" + d.omitidos + " sem o campo conhecido ficaram de fora: o valor desconhecido não é presumido)" : "") + ". Limpe os filtros para ver todos."));
   d.registros.forEach((r) => box.appendChild(cartaoVersao(r, todasFontes)));
+  box.appendChild(secaoBusca(j.qid, () => $("link-resultado")));
   box.appendChild(secaoLink(j.qid));
   if (d.omitidos && d.registros.length) box.appendChild(el("p", "msg", d.omitidos + " registro(s) sem o campo filtrado ficaram de fora: o valor desconhecido não é presumido."));
 }

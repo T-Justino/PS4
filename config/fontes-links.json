@@ -1,0 +1,16 @@
+{
+ "schema": "ps4store.fontes-links/v1",
+ "_nota": "Fontes consultadas pelo botão 'Buscar links'. Só catálogos/APIs estruturados (conectores de discover.py), nunca buscador genérico nem raspagem. 'autorizacao' preenchida = distribuição autorizada com evidência; null = link externo NÃO verificado quanto à permissão (mostrado como tal). Campos de busca de cada fonte: titleId (ID do catálogo), nome (nome do app no catálogo), arquivo (CUSA/Content ID no nome do arquivo). Para acrescentar uma fonte, use os mesmos tipos (pkg-zone-catalog, github-releases, github-contents) e registre a base da autorização.",
+ "fontes": [
+  {"id": "pkg-zone", "nome": "PKG-Zone (catálogo de homebrew)", "tipo": "pkg-zone-catalog", "base_url": "https://pkg-zone.com", "campos": ["titleId", "nome"],
+   "autorizacao": null, "nota": "distribuidor público de homebrew; a licença de cada app não está registrada aqui"},
+  {"id": "projeto", "nome": "PS4 Store BR (releases do próprio projeto)", "tipo": "github-releases", "repo": "T-Justino/PS4", "campos": ["arquivo"],
+   "autorizacao": "software do autor do projeto"},
+  {"id": "projeto-pkgs", "nome": "PS4 Store BR (pasta pkgs do projeto)", "tipo": "github-contents", "repo": "T-Justino/PS4", "path": "pkgs", "campos": ["arquivo"],
+   "autorizacao": "software do autor do projeto"},
+  {"id": "apollo", "nome": "Apollo Save Tool (releases do autor)", "tipo": "github-releases", "repo": "bucanero/apollo-ps4", "campos": ["arquivo", "nome"], "nomeApp": "Apollo Save Tool",
+   "autorizacao": "releases públicas do próprio desenvolvedor (GPL-3.0)"},
+  {"id": "ps4-store-app", "nome": "LightningMods PS4-Store (releases)", "tipo": "github-releases", "repo": "LightningMods/PS4-Store", "campos": ["arquivo", "nome"], "nomeApp": "PS4 Store",
+   "autorizacao": null, "nota": "releases do repositório; permissão de redistribuição não registrada aqui"}
+ ]
+}

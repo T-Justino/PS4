@@ -18,7 +18,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from . import analise_link, auditoria, busca, busca_inteligente, capas, cusas, metadados, unificada, versoes
+from . import analise_link, auditoria, descoberta_links, busca, busca_inteligente, capas, cusas, metadados, unificada, versoes
 
 HOST = "127.0.0.1"
 PORTA_PADRAO = 8765
@@ -48,6 +48,7 @@ class Dados:
         self.indice_path, self.versoes_path, self.cusas_path, self.auditoria_path = indice, arq_versoes, arq_cusas, arq_auditoria
         self.dir_capas, self.apelidos_path, self.metadados_path, self.oficiais_path = dir_capas, arq_apelidos, arq_metadados, arq_oficiais
         self.trava_link = threading.Lock()                          # uma análise de link por vez
+        self.cache_links: dict = {}                                 # catálogos das fontes de links (memória; o arquivo local só é lido)
         self._lock = threading.Lock()
         self._cache: dict[str, tuple[float, dict]] = {}
         self._interesse: deque[str] = deque(maxlen=200)             # só Q-ids, só em memória (nada é gravado): fila de prioridade para o importador de capas
@@ -326,6 +327,26 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json(429, {"erro": "já há uma análise em andamento"}, head)
                 try:
                     r = analise_link.analisar(url, qid, dados.versoes(), dados.wikidata(), getattr(self.server, "rede_links", None), getattr(self.server, "hosts_links", None))
+                finally:
+                    dados.trava_link.release()
+                return self._json(200, r, head)
+            if rota == "/api/links":                                    # descoberta nas fontes cadastradas (rede; pedido explícito do usuário)
+                if self.headers.get("X-PS4Store") != "1":
+                    return self._json(403, {"erro": "pedido sem o cabeçalho do painel"}, head)
+                p = _qs(u.query, {"qid"})
+                qid = p.get("qid", "")
+                if not QID_RE.match(qid):
+                    raise ParametroInvalido("qid inválido")
+                jogo = descoberta_links.jogo_do_indice(qid, dados.indice(), dados.versoes(), dados.wikidata())
+                if not jogo:
+                    return self._json(404, {"erro": "jogo não encontrado"}, head)
+                if not dados.trava_link.acquire(blocking=False):
+                    return self._json(429, {"erro": "já há uma consulta em andamento"}, head)
+                try:
+                    for k, v in descoberta_links.carregar_cache(getattr(self.server, "cache_links_arq", descoberta_links.CACHE_PADRAO)).items():
+                        dados.cache_links.setdefault(k, v)
+                    fontes = descoberta_links.carregar_fontes(getattr(self.server, "fontes_links", descoberta_links.FONTES_PADRAO))
+                    r = descoberta_links.descobrir(jogo, fontes, getattr(self.server, "rede_descoberta", None) or descoberta_links.UrllibNet(timeout=20), dados.cache_links)
                 finally:
                     dados.trava_link.release()
                 return self._json(200, r, head)
