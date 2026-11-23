@@ -55,6 +55,7 @@ function cartaoJogo(it) {
     info.appendChild(el("span", "badge ok", it.nRegistros + " registro(s) · " + it.nCusas + " CUSA(s)"));
     if (it.nWikidata) info.appendChild(el("span", "badge wd", it.nWikidata + " alegado(s) no Wikidata"));
   }
+  if (it.ptbr && it.ptbr.length) info.appendChild(el("span", "badge ptbr", "PT-BR" + (it.ptbr.includes("audio") ? " · áudio" : "")));
   li.appendChild(info);
   if (it.qid) { li.tabIndex = 0; li.addEventListener("click", () => abrirJogo(it.qid)); li.addEventListener("keydown", (e) => { if (e.key === "Enter") abrirJogo(it.qid); }); }
   return li;
@@ -84,14 +85,14 @@ function mostrarSugestoes(lista) {
 
 async function buscar(soVersoes, anexar) {
   const q = $("q").value.trim();
-  if (!anexar) { ultimaBusca = { q: q, sv: soVersoes }; carregados = 0; $("msg-lista").textContent = "buscando…"; $("mais").hidden = true; }
+  if (!anexar) { ultimaBusca = { q: q, sv: soVersoes, pb: $("f-ptbr").value }; carregados = 0; $("msg-lista").textContent = "buscando…"; $("mais").hidden = true; }
   const alvo = ultimaBusca;
   try {
-    const d = await api("/api/jogos", { q: alvo.q, com_versoes: alvo.sv ? "1" : "", limite: 48, offset: anexar ? carregados : "" });
+    const d = await api("/api/jogos", { q: alvo.q, com_versoes: alvo.sv ? "1" : "", ptbr: alvo.pb, limite: 48, offset: anexar ? carregados : "" });
     mostrarLista(d, anexar);
     if (!anexar) {
       mostrarSugestoes(d.sugestoes || []);
-      if (!d.itens.length) $("msg-lista").textContent = alvo.q ? "Nenhum jogo encontrado para \"" + alvo.q + "\"." : "Nenhum jogo com versões cadastradas.";
+      if (!d.itens.length) $("msg-lista").textContent = alvo.q ? "Nenhum jogo encontrado para \"" + alvo.q + "\"" + (alvo.pb ? " com o filtro PT-BR." : ".") : (alvo.pb ? "Nenhum jogo com PT-BR informado nas fontes consultadas (jogos sem dado continuam na busca geral)." : "Nenhum jogo com versões cadastradas.");
     }
   } catch (e) {
     $("lista").replaceChildren(); $("mais").hidden = true; $("sugestoes").hidden = true;
@@ -127,7 +128,17 @@ function cartaoVersao(r, todasFontes) {
   const id = campo(dl, "Idiomas", (r.idiomas || []).join(", "), !(r.idiomas && r.idiomas.length));
   if (r.idiomas && r.idiomas.length) id.appendChild(el("div", "meta", "base: " + (r.idiomasBase || "?")));
   else id.textContent = "desconhecidos (a região não define o idioma)", id.className = "desc";
-  campo(dl, "Versão do pacote", r.versao, !r.versao);
+  campo(dl, "Versão do pacote (registro)", r.versao, !r.versao);
+  const a = r.atualizacao;
+  if (!a) campo(dl, "Atualização (patch)", "", true).textContent = "não consultada (rode ps4store.metadados)";
+  else if (a.status === "ok") {
+    const dd = campo(dl, "Atualização mais recente (patch)", a.versao + (a.tamanhoBytes ? " · " + (a.tamanhoBytes / 1e9).toFixed(2) + " GB" : ""), false);
+    dd.appendChild(el("div", "meta", "versão do patch ≠ versão do jogo-base ≠ versão do PKG · " + a.fonte + " · " + (a.consultadoEm || "").slice(0, 10) + (a.grau !== "oficial" ? " · " + a.grau : "")));
+    if (a.contentId) dd.appendChild(el("div", "meta", "o XML da Sony descreve o produto " + a.contentId + (r.contentId && r.contentId !== a.contentId ? " (diferente do Content ID deste registro: o patch pode não ser desta edição/região)" : "")));
+    const fw = campo(dl, "Firmware exigido pelo patch", a.firmwareMinimo || "", !a.firmwareMinimo);
+    if (a.firmwareMinimo) fw.appendChild(el("div", a.firmwareAcimaDe900 ? "aviso-box" : "meta", a.firmwareAcimaDe900 ? "ACIMA de 9.00: este patch não instala no 9.00 (requisito declarado pela Sony)" : "requisito declarado ≤ 9.00; isso NÃO garante compatibilidade"));
+    if (a.historico && a.historico.length) campo(dl, "Versões vistas antes (local)", a.historico.map((h) => h.versao).join(", "), false);
+  } else campo(dl, "Atualização (patch)", a.status === "sem-atualizacao" ? "nenhuma listada pela Sony (" + (a.consultadoEm || "").slice(0, 10) + ")" : "desconhecida (" + (a.erro || a.status) + ")", a.status !== "sem-atualizacao");
   if (r.lojas && r.lojas.length) campo(dl, "Lojas onde aparece", r.lojas.join(", "), false);
   const fontes = todasFontes ? r.evidencias : r.evidencias.slice(0, 1);
   fontes.forEach((x) => { const dd = campo(dl, "Fonte", "", false); dd.appendChild(link(x.url, x.fonte)); if (x.trecho) dd.appendChild(el("div", "meta", x.trecho)); });
@@ -138,6 +149,87 @@ function cartaoVersao(r, todasFontes) {
   if (todasFontes && r.nota) campo(dl, "Nota", r.nota, false);
   c.appendChild(dl);
   return c;
+}
+
+const PARTE = { audio: "Áudio", texto: "Texto/interface", legendas: "Legendas", tela: "Texto ou legendas (tela)" };
+const STATUS_PT = { confirmado: "confirmado", "nao-listado": "não consta na lista da fonte", desconhecido: "desconhecido" };
+function blocoPtbr(loc) {
+  const c = el("section", "card ptbr-box");
+  c.appendChild(el("div", "nome", "Português do Brasil"));
+  c.appendChild(el("div", "meta", loc.resumo));
+  const dl = el("dl");
+  ["audio", "texto", "legendas", "tela"].forEach((p) => {
+    const s = loc.partes[p];
+    const dd = campo(dl, PARTE[p], STATUS_PT[s.status], s.status === "desconhecido");
+    if (s.status === "confirmado") dd.className = "ok-txt";
+    s.fontes.slice(0, 2).forEach((f) => dd.appendChild(el("div", "meta", f.fonte + " · " + f.grau + (f.consultadoEm ? " · " + f.consultadoEm.slice(0, 10) : ""))));
+  });
+  if (loc.semParte.length) campo(dl, "PT-BR sem parte", "informado sem dizer se é áudio, texto ou legenda", false).appendChild(el("div", "meta", loc.semParte.map((f) => f.fonte).join("; ")));
+  if (loc.ptSemVariante.length) campo(dl, "Português (sem variante)", "não classificado como PT-BR", false);
+  if (loc.ptPT.length) campo(dl, "Português europeu", "informado (pt-PT ≠ pt-BR)", false);
+  c.appendChild(dl);
+  c.appendChild(el("p", "meta", "A região do jogo não define o idioma. Sem fonte, fica desconhecido."));
+  return c;
+}
+
+function secaoLink(qid) {
+  const c = el("section", "card link-box");
+  c.appendChild(el("div", "nome", "Analisar link e preparar para o SSPI"));
+  c.appendChild(el("div", "meta", "Página ou link direto (PKG/RAR). Hosts permitidos: config/resolver-hosts.json. Nada é baixado: só os primeiros bytes."));
+  const lin = el("div", "linha");
+  const inp = el("input"); inp.type = "url"; inp.id = "link-url"; inp.maxLength = 2048; inp.placeholder = "https://…"; inp.autocapitalize = "off"; inp.spellcheck = false;
+  const bt = el("button", "primario", "Analisar"); bt.type = "button"; bt.id = "link-analisar";
+  lin.appendChild(inp); lin.appendChild(bt); c.appendChild(lin);
+  const out = el("div", "link-resultado"); out.id = "link-resultado"; c.appendChild(out);
+  bt.addEventListener("click", () => analisarLink(inp.value.trim(), qid, out, bt));
+  return c;
+}
+
+async function analisarLink(url, qid, out, bt) {
+  if (!url) return;
+  bt.disabled = true; out.replaceChildren(el("p", "msg", "analisando… (pode levar alguns segundos)"));
+  try {
+    const u = new URL("/api/link", window.location.origin); u.searchParams.set("url", url); if (qid) u.searchParams.set("qid", qid);
+    const r = await fetch(u.toString(), { headers: { Accept: "application/json", "X-PS4Store": "1" } });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.erro || ("erro " + r.status));
+    out.replaceChildren(el("p", "msg", d.texto));
+    (d.arquivos || []).forEach((a) => {
+      const k = el("div", "card");
+      k.appendChild(el("div", "nome", a.arquivo || a.url));
+      const id = a.identificacao || {};
+      const dl = el("dl");
+      campo(dl, "Tipo", id.tipo || a.formato || "desconhecido", !(id.tipo || a.formato));
+      campo(dl, "CUSA", id.cusa || "", !id.cusa);
+      campo(dl, "Content ID", id.contentId || "", !id.contentId);
+      campo(dl, "Versão", [id.versaoApp ? "app " + id.versaoApp : "", id.versaoPkg ? "pkg " + id.versaoPkg : "", id.versao ? id.versao + " (nome)" : ""].filter(Boolean).join(" · "), !(id.versaoApp || id.versaoPkg || id.versao));
+      if (a.tamanhoBytes) campo(dl, "Tamanho", (a.tamanhoBytes / 1e6).toFixed(1) + " MB", false);
+      campo(dl, "Base", id.base || "", !id.base);
+      k.appendChild(dl);
+      const cmp = a.comparacao || {};
+      k.appendChild(el("div", cmp.resultado === "corresponde" ? "badge ok" : (cmp.resultado === "diferente" || cmp.resultado === "conflito" ? "aviso-box" : "meta"), cmp.texto || ""));
+      out.appendChild(k);
+    });
+    (d.naoArquivos || []).forEach((n) => out.appendChild(el("div", "meta", n.status + ": " + (n.motivo || ""))));
+    const s = d.sspi;
+    if (s) {
+      s.blocos.forEach((b) => {
+        const k = el("div", "card");
+        k.appendChild(el("div", "nome", (b.pronto ? "PRONTO para o SSPI · " : "NÃO pronto · ") + b.titulo));
+        b.bloqueio.forEach((x) => k.appendChild(el("div", "aviso-box", x)));
+        b.avisos.forEach((x) => k.appendChild(el("div", "meta", x)));
+        if (b.pronto) {
+          const pre = el("pre", "urls", b.urls.join("\n")); k.appendChild(pre);
+          const cp = el("button", "secundario", "Copiar para colar no SSPI"); cp.type = "button";
+          cp.addEventListener("click", async () => { try { await navigator.clipboard.writeText(b.urls.join("\n")); cp.textContent = "Copiado"; } catch (e) { cp.textContent = "Copie manualmente o texto acima"; } });
+          k.appendChild(cp);
+        }
+        out.appendChild(k);
+      });
+      (s.naoEnviar || []).forEach((n) => out.appendChild(el("div", "meta", "não enviar: " + n.url + " · " + n.motivo)));
+    }
+  } catch (e) { out.replaceChildren(el("p", "erro", e.message)); }
+  bt.disabled = false;
 }
 
 let todasFontes = false;
@@ -162,6 +254,7 @@ function mostrarJogo(d) {
   } else ht.appendChild(el("p", "meta", "Sem imagem local (placeholder). Nenhuma imagem foi inventada."));
   hero.appendChild(ht);
   box.appendChild(hero);
+  if (d.localizacao) box.appendChild(blocoPtbr(d.localizacao));
   d.avisos.forEach((a) => box.appendChild(el("div", "aviso-box", a)));
   if (d.conflitos && d.conflitos.length) {
     const det = el("details", "conflitos");
@@ -176,6 +269,7 @@ function mostrarJogo(d) {
     box.appendChild(det);
   }
   if (!d.total) {
+    box.appendChild(secaoLink(j.qid));
     box.appendChild(el("div", "card", "Nenhuma versão CUSA cadastrada para " + j.qid + ". Isso NÃO quer dizer que o jogo não tenha CUSA: só que ainda não há registro com fonte. Nada foi inventado."));
     return;
   }
@@ -188,6 +282,7 @@ function mostrarJogo(d) {
   box.appendChild(bt);
   if (!d.registros.length) box.appendChild(el("div", "card", "Nenhum registro passa nos filtros" + (d.omitidos ? " (" + d.omitidos + " sem o campo conhecido ficaram de fora: o valor desconhecido não é presumido)" : "") + ". Limpe os filtros para ver todos."));
   d.registros.forEach((r) => box.appendChild(cartaoVersao(r, todasFontes)));
+  box.appendChild(secaoLink(j.qid));
   if (d.omitidos && d.registros.length) box.appendChild(el("p", "msg", d.omitidos + " registro(s) sem o campo filtrado ficaram de fora: o valor desconhecido não é presumido."));
 }
 
@@ -223,6 +318,7 @@ async function estado() {
 
 $("form-busca").addEventListener("submit", (ev) => { ev.preventDefault(); voltar(); buscar(false); });
 $("so-versoes").addEventListener("click", () => { voltar(); buscar(true); });
+$("f-ptbr").addEventListener("change", () => { voltar(); buscar(false); });
 $("voltar").addEventListener("click", voltar);
 $("mais").addEventListener("click", () => buscar(false, true));
 ["f-cusa", "f-regiao", "f-idioma"].forEach((id) => $(id).addEventListener("change", () => { if (jogoAtual) abrirJogo(jogoAtual, true); }));

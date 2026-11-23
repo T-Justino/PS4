@@ -96,7 +96,7 @@ def srv_capas(tmp_path):
     imgs = {"Q15891648": "Arkham.png"}
     capas.importar([("Q15891648", "Batman: Arkham Knight")], fetch_falso(imgs, [pagina("File:Arkham.png", cats=["Category:Video game covers"])]), str(d), pausa=0)
     (tmp_path / "segredo.txt").write_text("segredo")
-    s = painel.criar_servidor(0, faz_indice(tmp_path), SEMENTE, arq_cusas=SEM_WD, dir_capas=str(d), arq_apelidos=str(ROOT / "data" / "apelidos.json"))
+    s = painel.criar_servidor(0, faz_indice(tmp_path), SEMENTE, arq_cusas=SEM_WD, dir_capas=str(d), arq_apelidos=str(ROOT / "data" / "apelidos.json"), arq_metadados="/nao/existe/meta.json")
     threading.Thread(target=s.serve_forever, daemon=True).start()
     yield Cli(s)
     s.shutdown()

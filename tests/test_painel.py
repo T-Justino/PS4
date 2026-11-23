@@ -58,7 +58,7 @@ class Cli:
 
 @pytest.fixture
 def srv(tmp_path):
-    s = painel.criar_servidor(0, faz_indice(tmp_path), SEMENTE, arq_cusas=SEM_WD, dir_capas=str(tmp_path / "capas-vazio"), arq_apelidos=str(ROOT / "data" / "apelidos.json"))
+    s = painel.criar_servidor(0, faz_indice(tmp_path), SEMENTE, arq_cusas=SEM_WD, dir_capas=str(tmp_path / "capas-vazio"), arq_apelidos=str(ROOT / "data" / "apelidos.json"), arq_metadados="/nao/existe/meta.json")
     threading.Thread(target=s.serve_forever, daemon=True).start()
     yield Cli(s)
     s.shutdown()
@@ -438,7 +438,7 @@ def test_interface_pesquisa_por_cusa_e_exibe_origem_wikidata(navegador, srv_wd):
     pg.wait_for_selector("#jogo .card")
     t = pg.inner_text("#jogo")
     assert "WIKIDATA: alegado, NÃO verificado em fonte oficial" in t and "(1 curado(s), 0" not in t and "0 curado(s), 1 alegado(s) no Wikidata" in t
-    assert "Edição\ndesconhecido" in t and "Região\ndesconhecido" in t and "desconhecidos (a região não define o idioma)" in t and "Versão do pacote\ndesconhecido" in t
+    assert "Edição\ndesconhecido" in t and "Região\ndesconhecido" in t and "desconhecidos (a região não define o idioma)" in t and "Versão do pacote (registro)\ndesconhecido" in t
     pg.click("#voltar")
     pg.fill("#q", "batman")
     pg.click("button.primario")
