@@ -41,7 +41,7 @@ def rodar(args, respostas, tmp_path=None, **kw):
 
 
 def base(tmp_path, **kw):
-    return ["--indice", indice(tmp_path, kw.get("itens")), "--versoes", kw.get("versoes", SEMENTE)]
+    return ["--indice", indice(tmp_path, kw.get("itens")), "--versoes", kw.get("versoes", SEMENTE), "--cusas", "/nao/existe/cusas.json"]
 
 
 # ---------- fluxo completo ----------
@@ -92,7 +92,7 @@ def test_nome_igual_com_outro_qid_nao_herda_versoes(tmp_path):
 def test_sem_resultados_e_indice_ausente(tmp_path):
     rc, out = rodar(base(tmp_path), ["zelda", "q"])
     assert 'Nenhum jogo encontrado para "zelda"' in out
-    vazio = ["--indice", str(tmp_path / "nao-existe.json"), "--versoes", SEMENTE]
+    vazio = ["--indice", str(tmp_path / "nao-existe.json"), "--versoes", SEMENTE, "--cusas", "/nao/existe/cusas.json"]
     rc, out = rodar(vazio, ["batman arkham", "1", "q"])
     assert "AVISO  índice de busca vazio ou ausente" in out and "lista só com jogos que têm versões cadastradas" in out and "CUSA00133" in out
 
@@ -200,11 +200,47 @@ def test_limite_de_lista_e_arquivos_invalidos(tmp_path):
     assert "40 jogo(s) para \"batman\" (mostrando 5)" in out and " 5. Batman" in out and " 6. Batman" not in out
     ruim = tmp_path / "ruim.json"
     ruim.write_text(json.dumps({"schema": versoes.SCHEMA, "versoes": [{"qid": "x", "cusa": "CUSA1"}]}), encoding="utf-8")
-    assert jogos.executar(["--indice", indice(tmp_path), "--versoes", str(ruim)], entrada=lambda p="": "q", saida=lambda *a: None) == 2
+    assert jogos.executar(["--indice", indice(tmp_path), "--versoes", str(ruim), "--cusas", "/nao/existe/cusas.json"], entrada=lambda p="": "q", saida=lambda *a: None) == 2
     (tmp_path / "lixo.json").write_text("{}", encoding="utf-8")
     assert jogos.executar(["--indice", str(tmp_path / "lixo.json")], entrada=lambda p="": "q", saida=lambda *a: None) == 2
 
 
 def test_modulo_usa_so_busca_e_versoes_e_nao_importa_resolvedor_nem_colar():
     fonte = (ROOT / "src" / "ps4store" / "jogos.py").read_text(encoding="utf-8")
-    assert "from . import busca, versoes" in fonte and "resolver" not in fonte.replace("resolvedor", "") and "colar" not in fonte and "browser" not in fonte
+    assert "from . import busca, cusas, unificada, versoes" in fonte and "resolver" not in fonte.replace("resolvedor", "") and "colar" not in fonte and "browser" not in fonte
+
+
+# ---------- CUSAs do Wikidata no fluxo interativo ----------
+def com_wd(tmp_path):
+    from ps4store import cusas
+    jogos_ = [{"nome": "Batman: Arkham Knight", "url": "https://x.invalid/a", "idFonte": f"wikidata:{QID_BAK}"},
+              {"nome": "Grand Theft Auto V", "url": "https://x.invalid/g", "idFonte": "wikidata:Q990950001"},
+              {"nome": "Conflito A", "url": "https://x.invalid/c", "idFonte": "wikidata:Q990950006"}, {"nome": "Conflito B", "url": "https://x.invalid/d", "idFonte": "wikidata:Q990950007"}]
+    ip = indice(tmp_path, jogos_)
+    cache = {"P5971": {"rotulo": "Europe PlayStation Store ID", "consultadoEm": "2026-11-23", "linhas": [
+        ["Q990950001", "CUSA90001"], ["Q990950001", "EP0000-CUSA90002_00-ABCDEFGHIJKLMNOP"], ["Q990950006", "CUSA90099"], ["Q990950007", "CUSA90099"]]}}
+    doc = cusas.construir(cache, busca.carregar_indice(ip), versoes.carregar(SEMENTE), "2026-11-23")
+    p = tmp_path / "wd.json"
+    p.write_text(json.dumps(doc), encoding="utf-8")
+    return ["--indice", ip, "--versoes", SEMENTE, "--cusas", str(p)]
+
+
+def test_busca_por_cusa_do_wikidata_mostra_o_jogo_e_a_origem(tmp_path):
+    rc, out = rodar(com_wd(tmp_path), ["CUSA90001", "1", "q"])
+    assert "CUSA90001 é um CUSA (identificador do título)" in out and "Grand Theft Auto V" in out
+    assert "Status: WIKIDATA: CUSA alegado, NÃO verificado em fonte oficial" in out
+    assert out.count("Edição: desconhecida") == 2 and out.count("Região: desconhecida") == 2 and "Idiomas: desconhecidos" in out and "CITADO" not in out.split("== Grand")[1]
+    assert "Content ID: EP0000-CUSA90002_00-ABCDEFGHIJKLMNOP" in out
+
+
+def test_busca_por_content_id_do_wikidata_e_cusa_em_conflito(tmp_path):
+    a = com_wd(tmp_path)
+    rc, out = rodar(a, ["EP0000-CUSA90002_00-ABCDEFGHIJKLMNOP", "1", "q"])
+    assert "é um Content ID (identifica um produto/edição), não um CUSA. O CUSA contido nele é CUSA90002." in out and "Grand Theft Auto V" in out
+    rc, out = rodar(a, ["CUSA90099", "q"])
+    assert "ATENÇÃO: CUSA90099 é um CUSA em CONFLITO no Wikidata" in out and "Nenhum jogo encontrado" in out
+
+
+def test_nome_mostra_contagem_com_wikidata_e_curado_nao_duplica(tmp_path):
+    rc, out = rodar(com_wd(tmp_path), ["batman", "1", "q"])
+    assert "[wikidata:Q15891648]  · 3 registro(s), 2 CUSA(s) distinto(s)" in out and "Status: CITADO" in out and "Também no Wikidata" not in out      # sem dado do Wikidata para o Batman neste cenário

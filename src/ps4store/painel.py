@@ -16,7 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from . import busca, versoes
+from . import busca, cusas, unificada, versoes
 
 HOST = "127.0.0.1"
 PORTA_PADRAO = 8765
@@ -40,8 +40,8 @@ class ParametroInvalido(ValueError):
 class Dados:
     """Índice de busca + versões, recarregados quando o arquivo muda (mtime). Leitura apenas."""
 
-    def __init__(self, indice: str, arq_versoes: str):
-        self.indice_path, self.versoes_path = indice, arq_versoes
+    def __init__(self, indice: str, arq_versoes: str, arq_cusas: str = cusas.DADOS_PADRAO):
+        self.indice_path, self.versoes_path, self.cusas_path = indice, arq_versoes, arq_cusas
         self._lock = threading.Lock()
         self._cache: dict[str, tuple[float, dict]] = {}
 
@@ -63,6 +63,9 @@ class Dados:
 
     def versoes(self) -> dict:
         return self._carregar("v", self.versoes_path, versoes.carregar)
+
+    def wikidata(self) -> dict:
+        return self._carregar("w", self.cusas_path, cusas.carregar_dados)
 
 
 def _qs(query: str, permitidos: set[str]) -> dict[str, str]:
@@ -97,13 +100,27 @@ def _qid_de(t: dict) -> str | None:
     return i.split(":", 1)[1] if i.startswith("wikidata:") else None
 
 
+def _contagem(rs: list[dict]) -> dict:
+    return {"nRegistros": len(rs), "nCusas": len({r["cusa"] for r in rs}), "nWikidata": sum(1 for r in rs if r.get("origem") == "wikidata")}
+
+
 def listar_jogos(dados: Dados, q: str, com_versoes: bool, limite: int) -> dict:
-    idx, vdoc = dados.indice(), dados.versoes()
-    por_qid = _agrupar(vdoc)
+    idx, vdoc, wd = dados.indice(), dados.versoes(), dados.wikidata()
+    por_qid = unificada.agrupar(vdoc, wd)
     fontes = idx.get("fontes", {})
+    nomes = {_qid_de(t): t for t in idx.get("titulos", []) if _qid_de(t)}
     itens: list[dict] = []
     aviso = ""
-    if idx.get("titulos"):
+    tipo = unificada.classificar_termo(q) if q else "nome"
+    if tipo in ("cusa", "contentId"):                               # pesquisa por identificador no mesmo campo
+        loc = unificada.localizar(q, vdoc, wd)
+        aviso = loc["nota"]
+        for qid in loc["qids"]:
+            t = nomes.get(qid)
+            rs = por_qid.get(qid, [])
+            itens.append({"nome": t["nome"] if t else rs[0]["jogo"], "ano": (t or {}).get("lancamento"), "fonte": (t or {}).get("fonte", "versoes"),
+                          "fonteNome": fontes.get((t or {}).get("fonte"), {}).get("nome") or "registros de versão", "qid": qid, **_contagem(rs)})
+    elif idx.get("titulos"):
         base = busca.buscar(idx, q) if q else [t for t in idx["titulos"] if _qid_de(t) in por_qid]
         for t in base:
             qid = _qid_de(t)
@@ -111,21 +128,20 @@ def listar_jogos(dados: Dados, q: str, com_versoes: bool, limite: int) -> dict:
             if com_versoes and not rs:
                 continue
             itens.append({"nome": t["nome"], "ano": t.get("lancamento"), "fonte": t.get("fonte"), "fonteNome": fontes.get(t.get("fonte"), {}).get("nome"),
-                          "qid": qid, "nRegistros": len(rs), "nCusas": len({r["cusa"] for r in rs})})
+                          "qid": qid, **_contagem(rs)})
     else:
         aviso = "índice de busca vazio ou ausente: só jogos com versões cadastradas"
         nq = busca.norm(q)
         for qid, rs in por_qid.items():
             if (not nq or all(w in busca.norm(rs[0].get("jogo")) for w in nq.split())):
-                itens.append({"nome": rs[0]["jogo"], "ano": None, "fonte": "versoes", "fonteNome": "registros de versão", "qid": qid,
-                              "nRegistros": len(rs), "nCusas": len({r["cusa"] for r in rs})})
+                itens.append({"nome": rs[0]["jogo"], "ano": None, "fonte": "versoes", "fonteNome": "registros de versão", "qid": qid, **_contagem(rs)})
     total = len(itens)
-    return {"total": total, "mostrando": min(total, limite), "itens": itens[:limite], "aviso": aviso}
+    return {"total": total, "mostrando": min(total, limite), "itens": itens[:limite], "aviso": aviso, "tipoBusca": tipo}
 
 
 def detalhar_jogo(dados: Dados, qid: str, cusa: str, regiao: str, idioma: str) -> dict | None:
-    idx, vdoc = dados.indice(), dados.versoes()
-    rs = _agrupar(vdoc).get(qid, [])
+    idx, vdoc, wd = dados.indice(), dados.versoes(), dados.wikidata()
+    rs = unificada.registros_do_jogo(qid, vdoc, wd)
     t = next((x for x in idx.get("titulos", []) if x.get("idFonte") == f"wikidata:{qid}"), None)
     if t is None and not rs:
         return None
@@ -136,14 +152,17 @@ def detalhar_jogo(dados: Dados, qid: str, cusa: str, regiao: str, idioma: str) -
     elif t is None:
         avisos.append(f"O Q-id {qid} NÃO existe no índice local: confira o vínculo antes de confiar nestes CUSAs.")
     for r in rs:
-        if t is not None and busca.norm(r.get("jogo")) != busca.norm(t["nome"]):
+        if r.get("origem") == "curado" and t is not None and busca.norm(r.get("jogo")) != busca.norm(t["nome"]):
             avisos.append(f"O registro {r['cusa']} foi cadastrado como \"{r['jogo']}\" para este Q-id: confira o vínculo.")
             break
+    for c in unificada.conflitos_do_jogo(qid, wd):
+        avisos.append(f"CONFLITO para revisão: o CUSA {c['cusa']} ({c['motivo']}); não foi associado a este jogo.")
     visiveis, omitidos = versoes.consultar({"versoes": rs}, cusa=cusa or None, regiao=regiao or None, idioma=idioma or None)
     return {"jogo": {"nome": nome, "qid": qid, "ano": (t or {}).get("lancamento"), "url": (t or {}).get("url") or ""},
             "total": len(rs), "cusasDistintos": len({r["cusa"] for r in rs}), "registros": visiveis, "omitidos": omitidos,
+            "origens": {"curado": sum(1 for r in rs if r.get("origem") == "curado"), "wikidata": sum(1 for r in rs if r.get("origem") == "wikidata")},
             "filtros": {"cusa": cusa, "regiao": regiao, "idioma": idioma}, "avisos": avisos,
-            "temJogoBase": any(r.get("escopo") == "jogo-base" for r in rs)}
+            "temJogoBase": any(r.get("escopo") == "jogo-base" for r in rs if r.get("origem") == "curado")}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -191,6 +210,7 @@ class Handler(BaseHTTPRequestHandler):
             if rota == "/api/estado":
                 _qs(u.query, set())
                 return self._json(200, {"jogosNoIndice": len(dados.indice().get("titulos", [])), "registrosDeVersao": len(dados.versoes().get("versoes", [])),
+                                        "cusasWikidata": len(dados.wikidata().get("registros", [])), "conflitosWikidata": len(dados.wikidata().get("conflitos", [])),
                                         "somenteLeitura": True}, head)
             if rota == "/api/jogos":
                 p = _qs(u.query, {"q", "com_versoes", "limite"})
@@ -238,16 +258,18 @@ class Handler(BaseHTTPRequestHandler):
     do_POST = do_PUT = do_DELETE = do_PATCH = do_OPTIONS = _nao_permitido
 
 
-def criar_servidor(porta: int = PORTA_PADRAO, indice: str = busca.INDICE_PADRAO, arq_versoes: str = versoes.VERSOES_PADRAO, host: str = HOST) -> ThreadingHTTPServer:
+def criar_servidor(porta: int = PORTA_PADRAO, indice: str = busca.INDICE_PADRAO, arq_versoes: str = versoes.VERSOES_PADRAO, host: str = HOST,
+                   arq_cusas: str = cusas.DADOS_PADRAO) -> ThreadingHTTPServer:
     if host != HOST:
         raise ValueError("o painel só pode escutar em 127.0.0.1")
     if not (porta == 0 or 1024 <= porta <= 65535):
         raise ValueError("porta deve ser 0 (qualquer) ou de 1024 a 65535")
-    dados = Dados(indice, arq_versoes)
+    dados = Dados(indice, arq_versoes, arq_cusas)
     erros = versoes.validar_doc(dados.versoes())
     if erros:
         raise ValueError(f"o arquivo de versões tem {len(erros)} problema(s); rode: python -m ps4store.versoes --validar")
     dados.indice()                                              # falha cedo se o índice estiver corrompido (ausente é aceito)
+    dados.wikidata()                                            # idem para os CUSAs do Wikidata (ausente é aceito)
     srv = ThreadingHTTPServer((HOST, porta), Handler)
     srv.daemon_threads = True
     srv.dados = dados
@@ -259,9 +281,10 @@ def main(argv=None) -> int:
     ap.add_argument("--porta", type=int, default=PORTA_PADRAO)
     ap.add_argument("--indice", default=busca.INDICE_PADRAO)
     ap.add_argument("--versoes", default=versoes.VERSOES_PADRAO)
+    ap.add_argument("--cusas", default=cusas.DADOS_PADRAO, help="CUSAs alegados no Wikidata (gerados por ps4store.cusas)")
     a = ap.parse_args(argv)
     try:
-        srv = criar_servidor(a.porta, a.indice, a.versoes)
+        srv = criar_servidor(a.porta, a.indice, a.versoes, arq_cusas=a.cusas)
     except OSError as e:
         print(f"ERRO  não foi possível abrir a porta {a.porta} em 127.0.0.1 ({e.strerror or type(e).__name__}). Já há um painel rodando? Use --porta OUTRA.", file=sys.stderr)
         return 2

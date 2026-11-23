@@ -9,7 +9,7 @@ import argparse
 import re
 import sys
 
-from . import busca, versoes
+from . import busca, cusas, unificada, versoes
 
 CUSA_RE = versoes.CUSA_RE
 LIMITE_LISTA = 30
@@ -54,6 +54,8 @@ def linha_resultado(n: int, item: dict, por_qid: dict[str, list[dict]]) -> str:
 
 
 def rotulo_status(r: dict) -> str:
+    if r.get("origem") == "wikidata":
+        return "WIKIDATA: CUSA alegado, NÃO verificado em fonte oficial"
     if r.get("status") == "confirmado":
         c = r.get("confirmacao") or {}
         return f"CONFIRMADO por {c.get('por', '?')} em {c.get('em', '?')}"
@@ -63,7 +65,8 @@ def rotulo_status(r: dict) -> str:
 def blocos_versao(r: dict, todas_as_fontes: bool = False) -> list[str]:
     reg = r.get("regiao")
     out = [f"  {r['cusa']}   (CUSA: identificador do título)"]
-    out.append(f"    Content ID: {r['contentId']}   (identifica este produto/edição; NÃO é o CUSA)" if r.get("contentId") else "    Content ID: desconhecido")
+    cids = r.get("contentIds") or ([r["contentId"]] if r.get("contentId") else [])
+    out.append(f"    Content ID: {', '.join(cids)}   (identifica este produto/edição; NÃO é o CUSA)" if cids else "    Content ID: desconhecido")
     out.append(f"    Edição: {r['edicao']}   (registro de edição/produto da loja, não de jogo-base)" if r.get("edicao") else "    Edição: desconhecida")
     out.append(f"    Região: {reg['codigo']}   (base: {reg['base']})" if reg else "    Região: desconhecida")
     if r.get("idiomas"):
@@ -75,6 +78,8 @@ def blocos_versao(r: dict, todas_as_fontes: bool = False) -> list[str]:
     ev = r.get("evidencias", [])
     for x in (ev if todas_as_fontes else ev[:1]):
         out.append(f"    Fonte: {x['fonte']}  {x['url']}")
+    for x in r.get("corroboradoPorWikidata", []):
+        out.append(f"    Também no Wikidata: {x['fonte']}  {x['url']}")
     if todas_as_fontes and r.get("nota"):
         out.append(f"    Nota: {r['nota']}")
     return out
@@ -147,6 +152,7 @@ def executar(argv=None, entrada=input, saida=print) -> int:
     ap.add_argument("termo", nargs="*", help="nome (opcional; sem ele o programa pergunta)")
     ap.add_argument("--indice", default=busca.INDICE_PADRAO)
     ap.add_argument("--versoes", default=versoes.VERSOES_PADRAO)
+    ap.add_argument("--cusas", default=cusas.DADOS_PADRAO, help="CUSAs alegados no Wikidata (ps4store.cusas)")
     ap.add_argument("--cusa")
     ap.add_argument("--regiao")
     ap.add_argument("--idioma")
@@ -157,6 +163,7 @@ def executar(argv=None, entrada=input, saida=print) -> int:
     try:
         indice = busca.carregar_indice(a.indice)
         vdoc = versoes.carregar(a.versoes)
+        wd = cusas.carregar_dados(a.cusas)
     except (OSError, ValueError) as e:
         print(f"ERRO  {e}", file=sys.stderr)
         return 2
@@ -164,7 +171,7 @@ def executar(argv=None, entrada=input, saida=print) -> int:
     if erros:
         print(f"ERRO  o arquivo de versões tem {len(erros)} problema(s); rode: python -m ps4store.versoes --validar", file=sys.stderr)
         return 2
-    por_qid = indexar_versoes(vdoc)
+    por_qid = unificada.agrupar(vdoc, wd)
     filtros = {"cusa": a.cusa.upper() if a.cusa else None, "regiao": a.regiao, "idioma": a.idioma}
     fontes = a.evidencias
     if not indice.get("titulos"):
@@ -203,20 +210,18 @@ def executar(argv=None, entrada=input, saida=print) -> int:
             if termo is None or termo.lower() in ("", "q", "sair"):
                 return 0
         up = termo.upper()
-        if versoes.CONTENT_ID_RE.match(up):                        # o usuário digitou um Content ID: explica e mostra, sem confundir com CUSA
-            achados = [r for r in vdoc["versoes"] if (r.get("contentId") or "").upper() == up]
-            m = versoes.CONTENT_ID_RE.match(up)
-            saida(f"\"{termo}\" é um Content ID (identifica um produto/edição), não um CUSA. O CUSA contido nele é {m.group(2)}.")
-            itens = [{"nome": r["jogo"], "idFonte": f"wikidata:{r['qid']}", "url": ""} for r in achados]
-            if not achados:
+        if unificada.classificar_termo(termo) == "contentId":        # o usuário digitou um Content ID: explica e mostra, sem confundir com CUSA
+            loc = unificada.localizar(termo, vdoc, wd)
+            saida(f"\"{termo}\" é um Content ID (identifica um produto/edição), não um CUSA. O CUSA contido nele é {versoes.CONTENT_ID_RE.match(up).group(2)}.")
+            itens = [{"nome": por_qid[q][0]["jogo"], "idFonte": f"wikidata:{q}", "url": ""} for q in loc["qids"]]
+            if not itens:
                 saida("Nenhum registro cadastrado com este Content ID.")
-        elif CUSA_RE.match(up):                                    # o usuário digitou um CUSA: lista os jogos que têm registro com ele
-            qs = []
-            for r in vdoc["versoes"]:
-                if r["cusa"] == up and r["qid"] not in qs:
-                    qs.append(r["qid"])
-            itens = [{"nome": next(x["jogo"] for x in vdoc["versoes"] if x["qid"] == q), "idFonte": f"wikidata:{q}", "url": ""} for q in qs]
+        elif unificada.classificar_termo(termo) == "cusa":           # o usuário digitou um CUSA: lista os jogos que têm esse CUSA (curado ou Wikidata)
+            loc = unificada.localizar(termo, vdoc, wd)
+            itens = [{"nome": por_qid[q][0]["jogo"], "idFonte": f"wikidata:{q}", "url": ""} for q in loc["qids"]]
             saida(f"\n{up} é um CUSA (identificador do título)." + ("" if itens else " Nenhum registro cadastrado com ele."))
+            if loc.get("conflito"):
+                saida("ATENÇÃO: " + loc["nota"])
         else:
             itens, so_versoes = resultados_para(termo, indice, vdoc)
             if so_versoes and itens:

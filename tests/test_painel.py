@@ -13,6 +13,7 @@ from ps4store import busca, painel, versoes
 ROOT = Path(__file__).resolve().parents[1]
 SEMENTE = str(ROOT / "data" / "versoes-cusa.json")
 FONTES = str(ROOT / "config" / "busca-fontes.json")
+SEM_WD = "/nao/existe/cusas-wikidata.json"        # os testes não podem depender de local/ do usuário
 
 
 def faz_indice(tmp_path, itens=None):
@@ -57,7 +58,7 @@ class Cli:
 
 @pytest.fixture
 def srv(tmp_path):
-    s = painel.criar_servidor(0, faz_indice(tmp_path), SEMENTE)
+    s = painel.criar_servidor(0, faz_indice(tmp_path), SEMENTE, arq_cusas=SEM_WD)
     threading.Thread(target=s.serve_forever, daemon=True).start()
     yield Cli(s)
     s.shutdown()
@@ -90,7 +91,7 @@ def test_somente_leitura_metodos_de_escrita_sao_recusados(srv, metodo):
 def test_nao_escreve_em_disco_e_dados_nao_mudam(tmp_path):
     idx = faz_indice(tmp_path)
     antes = (Path(idx).read_bytes(), Path(SEMENTE).read_bytes())
-    s = painel.criar_servidor(0, idx, SEMENTE)
+    s = painel.criar_servidor(0, idx, SEMENTE, arq_cusas=SEM_WD)
     threading.Thread(target=s.serve_forever, daemon=True).start()
     c = Cli(s)
     for p in ("/", "/api/estado", "/api/jogos?q=batman", "/api/jogo?qid=Q15891648"):
@@ -145,7 +146,7 @@ def test_busca_por_nome_sem_acentos_com_ano_fonte_e_contagem_de_versoes(srv):
     vr = next(i for i in j["itens"] if i["qid"] == "Q990700002")
     assert vr["nRegistros"] == 0 and vr["ano"] is None
     assert srv.get("/api/jogos?q=pokemon")[2]["itens"][0]["nome"] == "Pokémon Café Mix"
-    assert srv.get("/api/jogos?q=zelda")[2] == {"total": 0, "mostrando": 0, "itens": [], "aviso": ""}
+    assert srv.get("/api/jogos?q=zelda")[2] == {"total": 0, "mostrando": 0, "itens": [], "aviso": "", "tipoBusca": "nome"}
     j2 = srv.get("/api/jogos?q=sem+qid")[2]
     assert j2["itens"][0]["qid"] is None and j2["itens"][0]["nRegistros"] == 0                           # sem Q-id: sem vínculo
 
@@ -192,7 +193,7 @@ def test_jogo_sem_versoes_e_jogo_inexistente(srv):
 
 def test_nome_igual_com_outro_qid_nao_herda_versoes(tmp_path):
     idx = faz_indice(tmp_path, [{"nome": "Batman: Arkham Knight", "url": "https://x.invalid/a", "idFonte": "wikidata:Q990700099"}])
-    s = painel.criar_servidor(0, idx, SEMENTE)
+    s = painel.criar_servidor(0, idx, SEMENTE, arq_cusas=SEM_WD)
     threading.Thread(target=s.serve_forever, daemon=True).start()
     c = Cli(s)
     j = c.get("/api/jogos?q=arkham")[2]
@@ -205,7 +206,7 @@ def test_nome_igual_com_outro_qid_nao_herda_versoes(tmp_path):
 
 
 def test_indice_ausente_usa_so_rotulos_das_versoes_e_avisa(tmp_path):
-    s = painel.criar_servidor(0, str(tmp_path / "nao-existe.json"), SEMENTE)
+    s = painel.criar_servidor(0, str(tmp_path / "nao-existe.json"), SEMENTE, arq_cusas=SEM_WD)
     threading.Thread(target=s.serve_forever, daemon=True).start()
     c = Cli(s)
     j = c.get("/api/jogos?q=arkham")[2]
@@ -218,7 +219,7 @@ def test_indice_ausente_usa_so_rotulos_das_versoes_e_avisa(tmp_path):
 
 def test_dados_atualizados_no_disco_sao_vistos_sem_reiniciar(tmp_path):
     idx = faz_indice(tmp_path)
-    s = painel.criar_servidor(0, idx, SEMENTE)
+    s = painel.criar_servidor(0, idx, SEMENTE, arq_cusas=SEM_WD)
     threading.Thread(target=s.serve_forever, daemon=True).start()
     c = Cli(s)
     assert c.get("/api/jogos?q=zelda")[2]["total"] == 0
@@ -327,7 +328,7 @@ def test_interface_fluxo_completo_no_celular(navegador, srv, tmp_path):
 
 def test_interface_nome_malicioso_e_exibido_como_texto_e_so_links_https(navegador, tmp_path):
     itens = [{"nome": "<img src=x onerror=window.__xss=1> Batman", "url": "https://exemplo.invalid/x", "idFonte": "wikidata:Q990700777"}]
-    s = painel.criar_servidor(0, faz_indice(tmp_path, itens), SEMENTE)
+    s = painel.criar_servidor(0, faz_indice(tmp_path, itens), SEMENTE, arq_cusas=SEM_WD)
     threading.Thread(target=s.serve_forever, daemon=True).start()
     pg = navegador.new_page()
     pg.goto(f"http://127.0.0.1:{s.server_address[1]}/")
@@ -341,3 +342,105 @@ def test_interface_nome_malicioso_e_exibido_como_texto_e_so_links_https(navegado
     pg.close()
     s.shutdown()
     s.server_close()
+
+
+# ---------- CUSAs do Wikidata no painel: pesquisa unificada (nome, CUSA, Content ID) ----------
+def faz_wd(tmp_path):
+    from ps4store import cusas
+    idx = busca.indice_vazio()
+    jogos = [("Q15891648", "Batman: Arkham Knight"), ("Q990900001", "Grand Theft Auto V"), ("Q990900002", "Cyberpunk 2077"), ("Q990900006", "Conflito A"),
+             ("Q990900007", "Conflito B")]
+    busca.importar(idx, busca.carregar_fontes(FONTES), "wikidata", [{"nome": n, "url": f"https://www.wikidata.org/wiki/{q}", "idFonte": f"wikidata:{q}"} for q, n in jogos])
+    cache = {"P5971": {"rotulo": "Europe PlayStation Store ID", "consultadoEm": "2026-11-23", "linhas": [
+        ["Q15891648", "EP1018-CUSA00135_00-BAKPREMIUMED0000"], ["Q990900001", "CUSA90001"], ["Q990900002", "EP0000-CUSA90003_00-ABCDEFGHIJKLMNOP"],
+        ["Q990900006", "CUSA90099"], ["Q990900007", "CUSA90099"]]}}
+    doc = cusas.construir(cache, idx, versoes.carregar(SEMENTE), "2026-11-23")
+    p = tmp_path / "cusas-wd.json"
+    p.write_text(json.dumps(doc), encoding="utf-8")
+    ip = tmp_path / "idx-wd.json"
+    busca.salvar_indice(idx, str(ip))
+    return str(ip), str(p)
+
+
+@pytest.fixture
+def srv_wd(tmp_path):
+    ip, wd = faz_wd(tmp_path)
+    s = painel.criar_servidor(0, ip, SEMENTE, arq_cusas=wd)
+    threading.Thread(target=s.serve_forever, daemon=True).start()
+    yield Cli(s)
+    s.shutdown()
+    s.server_close()
+
+
+def test_pesquisa_por_cusa_no_mesmo_campo_acha_o_jogo_do_wikidata(srv_wd):
+    s, _, j = srv_wd.get("/api/jogos?q=cusa90001")
+    assert s == 200 and j["tipoBusca"] == "cusa" and [i["nome"] for i in j["itens"]] == ["Grand Theft Auto V"] and j["itens"][0]["nWikidata"] == 1
+    assert "CUSA90001 reconhecido como CUSA" in j["aviso"]
+    j = srv_wd.get("/api/jogos?q=CUSA00133")[2]                                           # CUSA curado continua achando
+    assert [i["qid"] for i in j["itens"]] == ["Q15891648"] and j["itens"][0]["nWikidata"] == 0
+
+
+def test_pesquisa_por_content_id_completo_curado_ou_do_wikidata(srv_wd):
+    j = srv_wd.get("/api/jogos?q=UP1018-CUSA00133_00-B000000000001563")[2]
+    assert j["tipoBusca"] == "contentId" and [i["qid"] for i in j["itens"]] == ["Q15891648"] and "Content ID" in j["aviso"] and "CUSA00133" in j["aviso"]
+    j = srv_wd.get("/api/jogos?q=ep0000-cusa90003_00-abcdefghijklmnop")[2]
+    assert [i["nome"] for i in j["itens"]] == ["Cyberpunk 2077"]
+    assert srv_wd.get("/api/jogos?q=UP1018-CUSA09999_00-ABCDEFGHIJKLMNOP")[2]["total"] == 0
+
+
+def test_cusa_em_conflito_nao_associa_a_nenhum_jogo_e_avisa(srv_wd):
+    j = srv_wd.get("/api/jogos?q=CUSA90099")[2]
+    assert j["total"] == 0 and "CONFLITO" in j["aviso"]
+    d = srv_wd.get("/api/jogo?qid=Q990900006")[2]
+    assert d["total"] == 0 and any("CONFLITO para revisão" in a and "CUSA90099" in a for a in d["avisos"])
+
+
+def test_busca_por_nome_continua_livre_e_mostra_contagem_do_wikidata(srv_wd):
+    j = srv_wd.get("/api/jogos?q=cyberpunk")[2]
+    assert j["tipoBusca"] == "nome" and j["itens"][0]["nRegistros"] == 1 and j["itens"][0]["nWikidata"] == 1
+    assert srv_wd.get("/api/jogos?q=batman")[2]["itens"][0]["nRegistros"] == 3                 # CUSA00135 do Wikidata já era curado: sem duplicata
+
+
+def test_detalhe_do_wikidata_origem_status_e_desconhecidos(srv_wd):
+    d = srv_wd.get("/api/jogo?qid=Q990900001")[2]
+    assert d["total"] == 1 and d["origens"] == {"curado": 0, "wikidata": 1}
+    r = d["registros"][0]
+    assert r["origem"] == "wikidata" and r["status"] == "wikidata" and r["verificadoEmFonteOficial"] is False
+    assert r["regiao"] is None and r["idiomas"] is None and r["edicao"] is None and r["versao"] is None and r["contentIds"] == []
+    assert r["evidencias"][0]["url"] == "https://www.wikidata.org/wiki/Q990900001" and "P5971" in r["evidencias"][0]["fonte"] and r["evidencias"][0]["obtidoEm"] == "2026-11-23"
+    assert srv_wd.get("/api/jogo?qid=Q990900001&regiao=EU")[2]["registros"] == []                # região desconhecida não casa com filtro
+    assert srv_wd.get("/api/jogo?qid=Q990900001&regiao=EU")[2]["omitidos"] == 1
+    assert [x["cusa"] for x in srv_wd.get("/api/jogo?qid=Q990900001&cusa=CUSA90001")[2]["registros"]] == ["CUSA90001"]
+    c = srv_wd.get("/api/jogo?qid=Q990900002")[2]["registros"][0]
+    assert c["contentIds"] == ["EP0000-CUSA90003_00-ABCDEFGHIJKLMNOP"] and c["contentId"] == c["contentIds"][0] and c["cusa"] == "CUSA90003"
+
+
+def test_registro_curado_ganha_corroboracao_sem_perder_origem_nem_status(srv_wd):
+    d = srv_wd.get("/api/jogo?qid=Q15891648")[2]
+    assert d["total"] == 3 and d["origens"] == {"curado": 3, "wikidata": 0}
+    eu = next(r for r in d["registros"] if r["cusa"] == "CUSA00135")
+    assert eu["origem"] == "curado" and eu["status"] == "citado" and eu["corroboradoPorWikidata"][0]["fonte"].startswith("Wikidata (P5971")
+    assert srv_wd.get("/api/estado")[2]["cusasWikidata"] == 3 and srv_wd.get("/api/estado")[2]["conflitosWikidata"] == 1
+
+
+def test_interface_pesquisa_por_cusa_e_exibe_origem_wikidata(navegador, srv_wd):
+    pg = navegador.new_page(viewport={"width": 390, "height": 844})
+    pg.goto(f"http://127.0.0.1:{srv_wd.port}/")
+    assert "Nome do jogo, CUSA ou Content ID" in pg.inner_text("#vista-lista")
+    pg.fill("#q", "CUSA90001")
+    pg.click("button.primario")
+    pg.wait_for_selector("#lista li")
+    assert "Grand Theft Auto V" in pg.inner_text("#lista") and "1 alegado(s) no Wikidata" in pg.inner_text("#lista") and "CUSA90001 reconhecido como CUSA" in pg.inner_text("#msg-lista")
+    pg.locator("#lista li").first.click()
+    pg.wait_for_selector("#jogo .card")
+    t = pg.inner_text("#jogo")
+    assert "WIKIDATA: alegado, NÃO verificado em fonte oficial" in t and "(1 curado(s), 0" not in t and "0 curado(s), 1 alegado(s) no Wikidata" in t
+    assert "Edição\ndesconhecido" in t and "Região\ndesconhecido" in t and "desconhecidos (a região não define o idioma)" in t and "Versão do pacote\ndesconhecido" in t
+    pg.click("#voltar")
+    pg.fill("#q", "batman")
+    pg.click("button.primario")
+    pg.wait_for_selector("#lista li")
+    pg.locator("#lista li").first.click()
+    pg.wait_for_selector("#jogo .card")
+    assert "Também no Wikidata" in pg.inner_text("#jogo") and "CITADO: fonte vista, página não conferida" in pg.inner_text("#jogo")
+    pg.close()

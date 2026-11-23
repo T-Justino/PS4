@@ -35,7 +35,10 @@ function mostrarLista(dados) {
     li.appendChild(el("div", "meta", "Fonte: " + (it.fonteNome || it.fonte || "desconhecida") + (it.qid ? " · " + it.qid : " · sem Q-id")));
     if (!it.qid) li.appendChild(el("span", "badge", "sem Q-id: não dá para vincular versões"));
     else if (!it.nRegistros) li.appendChild(el("span", "badge", "sem versões cadastradas"));
-    else li.appendChild(el("span", "badge ok", it.nRegistros + " registro(s) · " + it.nCusas + " CUSA(s)"));
+    else {
+      li.appendChild(el("span", "badge ok", it.nRegistros + " registro(s) · " + it.nCusas + " CUSA(s)"));
+      if (it.nWikidata) li.appendChild(el("span", "badge wd", it.nWikidata + " alegado(s) no Wikidata"));
+    }
     if (it.qid) { li.tabIndex = 0; li.addEventListener("click", () => abrirJogo(it.qid)); li.addEventListener("keydown", (e) => { if (e.key === "Enter") abrirJogo(it.qid); }); }
     ul.appendChild(li);
   });
@@ -66,12 +69,15 @@ function cartaoVersao(r, todasFontes) {
   const c = el("div", "card");
   c.appendChild(el("div", "nome", r.cusa));
   c.appendChild(el("div", "meta", "CUSA: identificador do título"));
+  const wd = r.origem === "wikidata";
   const conf = r.status === "confirmado";
   const cf = r.confirmacao || {};
-  c.appendChild(el("span", "badge " + (conf ? "ok" : "aviso"), conf ? "CONFIRMADO por " + (cf.por || "?") + " em " + (cf.em || "?") : "CITADO: fonte vista, página não conferida"));
+  if (wd) c.appendChild(el("span", "badge wd", "WIKIDATA: alegado, NÃO verificado em fonte oficial"));
+  else c.appendChild(el("span", "badge " + (conf ? "ok" : "aviso"), conf ? "CONFIRMADO por " + (cf.por || "?") + " em " + (cf.em || "?") : "CITADO: fonte vista, página não conferida"));
   const dl = el("dl");
-  const cid = campo(dl, "Content ID", r.contentId, !r.contentId);
-  if (r.contentId) cid.appendChild(el("div", "meta", "identifica este produto/edição; NÃO é o CUSA"));
+  const cids = (r.contentIds && r.contentIds.length) ? r.contentIds : (r.contentId ? [r.contentId] : []);
+  const cid = campo(dl, cids.length > 1 ? "Content IDs" : "Content ID", cids.join(", "), !cids.length);
+  if (cids.length) cid.appendChild(el("div", "meta", "identifica este produto/edição; NÃO é o CUSA" + (wd ? " (valor informado no Wikidata)" : "")));
   const ed = campo(dl, "Edição", r.edicao, !r.edicao);
   if (r.edicao) ed.appendChild(el("div", "meta", "registro de edição/produto da loja, não de jogo-base"));
   const rg = campo(dl, "Região", r.regiao ? r.regiao.codigo : "", !r.regiao);
@@ -83,6 +89,10 @@ function cartaoVersao(r, todasFontes) {
   if (r.lojas && r.lojas.length) campo(dl, "Lojas onde aparece", r.lojas.join(", "), false);
   const fontes = todasFontes ? r.evidencias : r.evidencias.slice(0, 1);
   fontes.forEach((x) => { const dd = campo(dl, "Fonte", "", false); dd.appendChild(link(x.url, x.fonte)); if (x.trecho) dd.appendChild(el("div", "meta", x.trecho)); });
+  if (r.corroboradoPorWikidata && r.corroboradoPorWikidata.length) {
+    const dd = campo(dl, "Também no Wikidata", "", false);
+    r.corroboradoPorWikidata.forEach((x) => { const d = el("div", "meta"); d.appendChild(link(x.url, x.fonte)); d.appendChild(document.createTextNode(" · " + (x.trecho || ""))); dd.appendChild(d); });
+  }
   if (todasFontes && r.nota) campo(dl, "Nota", r.nota, false);
   c.appendChild(dl);
   return c;
@@ -103,7 +113,8 @@ function mostrarJogo(d) {
     return;
   }
   const f = d.filtros, ativos = Object.keys(f).filter((k) => f[k]).map((k) => k + "=" + f[k]);
-  box.appendChild(el("p", "msg", d.total + " registro(s) de versão, " + d.cusasDistintos + " CUSA(s) distinto(s) · filtros: " + (ativos.length ? ativos.join(", ") : "nenhum (todos os registros)")));
+  const org = d.origens || {};
+  box.appendChild(el("p", "msg", d.total + " registro(s) (" + (org.curado || 0) + " curado(s), " + (org.wikidata || 0) + " alegado(s) no Wikidata), " + d.cusasDistintos + " CUSA(s) distinto(s) · filtros: " + (ativos.length ? ativos.join(", ") : "nenhum (todos os registros)")));
   if (!d.temJogoBase) box.appendChild(el("div", "aviso-box", "Nenhum registro está marcado como jogo-base: o que aparece são produtos/edições da loja."));
   const bt = el("button", "secundario", todasFontes ? "Mostrar só a primeira fonte" : "Mostrar todas as fontes e notas");
   bt.type = "button"; bt.addEventListener("click", () => { todasFontes = !todasFontes; abrirJogo(j.qid, true); });
@@ -132,7 +143,7 @@ function voltar() {
 async function estado() {
   try {
     const e = await api("/api/estado");
-    $("estado").textContent = e.jogosNoIndice + " jogos no índice · " + e.registrosDeVersao + " registro(s) de versão";
+    $("estado").textContent = e.jogosNoIndice + " jogos no índice · " + e.registrosDeVersao + " registro(s) de versão" + (e.cusasWikidata ? " · " + e.cusasWikidata + " CUSA(s) do Wikidata" : "");
     if (!e.jogosNoIndice) $("msg-lista").textContent = "Índice de busca vazio: só aparecem jogos com versões cadastradas (gere o índice com ps4store.wikidata --atualizar).";
   } catch (e) { $("estado").textContent = "sem resposta do servidor"; }
 }
