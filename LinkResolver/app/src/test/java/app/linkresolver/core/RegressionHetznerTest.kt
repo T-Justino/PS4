@@ -36,7 +36,7 @@ class RegressionHetznerTest {
         assertEquals(104_857_600L, r.sizeBytes); assertEquals("application/octet-stream", r.mimeType)
         assertEquals(1, f.navigated.size)
         assertTrue(r.evidence.any { it.startsWith("HEAD 200") })
-        assertEquals(70, r.candidateScore)
+        assertEquals(80, r.candidateScore)   // 70 + 10: o texto do link é um nome de arquivo (v0.4.2)
     }
 
     @Test fun inconclusiveProbeNeverNavigatesToBinaryAndKeepsLink() {
@@ -47,7 +47,7 @@ class RegressionHetznerTest {
         assertEquals(ResultState.UNVERIFIED_CANDIDATE, r.state)
         assertEquals(1, f.navigated.size)                 // NÃO navegou até o .bin
         assertEquals(f100, r.url)                         // link preservado (copiável)
-        assertEquals(70, r.candidateScore)
+        assertEquals(80, r.candidateScore)   // 70 + 10: o texto do link é um nome de arquivo (v0.4.2)
         assertTrue(r.message.contains("NÃO verificado"))
         assertTrue(r.errorInfo!!.startsWith("RESPOSTA_VAZIA"))
         assertTrue(r.diagnostics.any { it.contains("chrome-h2 HEAD") })

@@ -732,7 +732,8 @@ class ResolverEngine(
         }
 
         val pageHost = UrlSafety.host(scan.url) ?: UrlSafety.host(startUrl ?: "") ?: ""
-        val scored = scan.candidates
+        val derived = derivedRawCandidate(scan)
+        val scored = (if (derived != null) scan.candidates + derived else scan.candidates)
             .map { DownloadHeuristics.score(it, pageHost, policy) }
             .sortedByDescending { it.score }
         lastScored = scored
@@ -753,7 +754,8 @@ class ResolverEngine(
         }
         listener.onCandidates(allCandsSorted())
         updateCurrentPage(scan.title)
-        step(StepKind.SCAN, scan.url, "${scored.size} candidato(s); melhor pontuação=${scored.firstOrNull()?.score ?: "-"}" +
+        if (derived != null) step(StepKind.SCAN, scan.url, "GitHub não expôs o link Raw: derivando de /blob/ → ${UrlSafety.redact(derived.url!!)}")
+        step(StepKind.SCAN, scan.url, "${scored.size} candidato(s)" + (if (scan.totalCandidates > scored.size) " (de ${scan.totalCandidates} na página, priorizados)" else "") + "; melhor pontuação=${scored.firstOrNull()?.score ?: "-"}" +
             (if (lastIntermediate) "; página intermediária" else "") + (if (scan.waitHint) "; indica espera" else "") +
             (if (scan.countdownSec > 0) "; contagem ${scan.countdownSec}s" else "") + (if (scored.any { it.raw.disabled }) "; botão desabilitado" else "") +
             (if (scored.any { it.raw.dynamic }) "; elementos dinâmicos" else ""))
@@ -772,6 +774,18 @@ class ResolverEngine(
         chooseAndFollow()
     }
 
+    /**
+     * Página de visualização do GitHub (/blob/…/x.smc) sem link Raw próprio (a UI pode hidratar tarde): depois da
+     * 1ª varredura, deriva o endereço Raw. Sempre preferimos o link fornecido pelo próprio GitHub.
+     */
+    private fun derivedRawCandidate(scan: PageScan): RawCandidate? {
+        if (scansOnPage < 2) return null
+        if (DownloadHeuristics.extensionOf(scan.url) !in DownloadHeuristics.FILE_EXTENSIONS) return null
+        if (scan.candidates.any { it.url != null && GithubUrls.isRawLink(it.url) }) return null
+        val raw = GithubUrls.derivedRaw(scan.url) ?: return null
+        return RawCandidate(raw, "Raw (derivado de /blob/)", "a", "derived-raw", false, "", "", null, true)
+    }
+
     private fun isStepLike(c: ScoredCandidate) =
         c.raw.source == "meta-refresh" || c.raw.source == "js-redirect" || DownloadHeuristics.isStepText(c.raw.text)
 
@@ -787,7 +801,13 @@ class ResolverEngine(
                 return
             }
         }
-        val unvisited = usable.filter { (visits[UrlSafety.loopKey(it.url!!)] ?: 0) == 0 && !it.raw.disabled && UrlSafety.loopKey(it.url!!) !in confirmedKeys }
+        // Numa página de visualização de arquivo (GitHub /blob/) o objetivo é o link Raw: links para OUTROS arquivos
+        // (árvore lateral) não competem com ele, mesmo antes de o link Raw aparecer.
+        val onViewPage = GithubUrls.isBlobView(lastScanUrl)
+        val unvisited = usable.filter {
+            (visits[UrlSafety.loopKey(it.url!!)] ?: 0) == 0 && !it.raw.disabled && UrlSafety.loopKey(it.url!!) !in confirmedKeys &&
+                !(onViewPage && it.linkClass == LinkClass.FILE_VIEW_PAGE)
+        }
         var next = unvisited.firstOrNull { it.score >= limits.autoScoreThreshold }
         var tag = ""
         if (next == null && lastIntermediate) {
@@ -828,8 +848,10 @@ class ResolverEngine(
         if (clickable.size > 1) { humanClick(null, "ambíguo"); return }
         if (pendingClick != null) return // aguardando o efeito do clique automático
 
+        val selfKey = UrlSafety.loopKey(lastScanUrl)
         val revisit = usable.filter {
-            (visits[UrlSafety.loopKey(it.url!!)] ?: 0) > 0 &&
+            (visits[UrlSafety.loopKey(it.url!!)] ?: 0) > 0 && UrlSafety.loopKey(it.url!!) != selfKey &&   // link para a própria página não é loop
+                !(onViewPage && it.linkClass == LinkClass.FILE_VIEW_PAGE) &&
                 (it.score >= limits.autoScoreThreshold || (lastIntermediate && isStepLike(it) && it.score >= limits.tier2MinScore))
         }
         if (revisit.isNotEmpty()) {
@@ -1093,7 +1115,8 @@ class ResolverEngine(
         val all = allCandsSorted().filter { it.safe && !it.ad && it.url != null }
         val file = all.firstOrNull { it.linkClass == LinkClass.FILE_CANDIDATE && it.score > 0 }
         val page = all.firstOrNull {
-            it.linkClass == LinkClass.PAGE && it.score >= limits.tier2MinScore && (visits[UrlSafety.loopKey(it.url!!)] ?: 0) == 0
+            (it.linkClass == LinkClass.PAGE || it.linkClass == LinkClass.FILE_VIEW_PAGE) && it.score >= limits.tier2MinScore &&
+                (visits[UrlSafety.loopKey(it.url!!)] ?: 0) == 0
         }
         val bestUrl = (file ?: page)?.url
         when {
@@ -1121,6 +1144,7 @@ class ResolverEngine(
                 !it.safe -> "inseguro (ignorado)"
                 key != null && (visits[key] ?: 0) > 0 -> "página visitada"
                 it.linkClass == LinkClass.FILE_CANDIDATE -> "candidato de download — não verificado"
+                it.linkClass == LinkClass.FILE_VIEW_PAGE -> "página de visualização (GitHub /blob/): ainda sem o link Raw"
                 it.score < limits.autoScoreThreshold -> "não seguido (pontuação baixa)"
                 else -> "não seguido"
             }

@@ -58,7 +58,7 @@ out.challenge=ch;out.hint=hint;
 /* ---- candidatos ---- */
 var n=0,seen={};
 function add(e,url,source,dl){
- if(out.cands.length>=150)return;
+ if(out.cands.length>=1500)return;
  var t=txt(e);var key=(url||'')+'|'+t+'|'+source;if(seen[key])return;seen[key]=1;
  var id=null;
  if(!url||source==='button'||true){id=String(++n);try{e.setAttribute('data-lr-id',id)}catch(x){}}
@@ -104,6 +104,20 @@ out.cd=cdn;
 out.wo=false;var sc2=document.querySelectorAll('script:not([src])');for(var si=0;si<sc2.length&&si<30;si++){if(/window\.open\s*\(/.test((sc2[si].textContent||'').slice(0,30000))){out.wo=true;break}}
 out.ad=/(casino|cassino|bet365|apostas?|aposte|b[oô]nus de|ganhe\s+(um\s+)?pr[eê]mio|voc[eê] ganhou|you('ve| have)? won|claim your|click here to claim|vpn gr[aá]tis|free vpn|xxx|viagra)/.test(body);
 out.wait=/(aguarde|please wait|redirecionando|redirecting|seu download (come|inici)|your download (will|is)|gerando (seu )?link|generating (your )?link|countdown|contagem regressiva|segundos|seconds)/.test(body);
+/* prioridade ANTES do corte: arquivos/Raw/download sobem; nada relevante do fim da página se perde */
+var EXTS='|zip|rar|7z|tar|gz|tgz|bz2|xz|zst|iso|img|bin|pkg|exe|msi|dmg|apk|aab|deb|rpm|appimage|jar|pdf|epub|mobi|djvu|doc|docx|xls|xlsx|ppt|pptx|csv|mp3|flac|wav|ogg|mp4|mkv|avi|mov|webm|part01|001|smc|sfc|fig|swc|nes|unf|fds|gba|gb|gbc|sgb|n64|z64|v64|nds|dsi|3ds|cia|sms|gg|gen|smd|32x|pce|sgx|a26|a78|j64|ngp|ngc|ws|wsc|vb|col|rom|chd|cso|pbp|wad|nsp|xci|';
+function pri(c,i){var u=c.url||'',p=0,m=u.split('#')[0].split('?')[0],mm=m.match(/\.([A-Za-z0-9]{2,8})$/),ext=mm?mm[1].toLowerCase():'';
+ var blob=/^https?:\/\/(www\.)?github\.com\/[^\/]+\/[^\/]+\/blob\//i.test(u);
+ var raw=/^https?:\/\/(raw\.githubusercontent\.com\/|(www\.)?github\.com\/[^\/]+\/[^\/]+\/(raw|releases\/download)\/)/i.test(u);
+ if(raw)p+=100;if(c.dl)p+=80;if(ext&&EXTS.indexOf('|'+ext+'|')>=0)p+=blob?70:90;
+ if(/(download|baixar|descargar|\braw\b)/i.test(c.text))p+=40;if(/download|\/dl\//i.test(u))p+=20;
+ if(c.source==='meta-refresh'||c.source==='js-redirect')p+=60;if(c.source!=='href')p+=10;if(c.vis)p+=1;if(c.dis)p-=30;return p*1000-i}
+out.total=out.cands.length;
+if(out.cands.length>150){for(var qi=0;qi<out.cands.length;qi++)out.cands[qi].__p=pri(out.cands[qi],qi);
+ /* candidatos de ARQUIVO (prioridade >= 70) nunca são cortados enquanto couberem em 500; os demais, até 150 por relevância */
+ var fl=[],ot=[];for(var qk=0;qk<out.cands.length;qk++){(out.cands[qk].__p>=70000?fl:ot).push(out.cands[qk])}
+ ot.sort(function(a,b){return b.__p-a.__p});out.cands=fl.slice(0,500).concat(ot.slice(0,150));
+ for(var qj=0;qj<out.cands.length;qj++)delete out.cands[qj].__p}
 return JSON.stringify(out)
 }catch(err){return JSON.stringify({url:location.href,title:'',cands:[],challenge:null,hint:'erro: '+err})}
 })()
@@ -164,6 +178,7 @@ return JSON.stringify(out)
                 adLike = o.optBoolean("ad", false),
                 countdownSec = o.optInt("cd", 0),
                 opensWindows = o.optBoolean("wo", false),
+                totalCandidates = o.optInt("total", list.size),
             )
         } catch (e: Exception) {
             null

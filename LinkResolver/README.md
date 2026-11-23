@@ -22,7 +22,7 @@ A versão e o commit aparecem no rodapé do app (`BuildConfig.VERSION_NAME` / `G
    URLs com cara de arquivo são validadas (cliente **OkHttp**) por **HEAD** (ou **GET com `Range: bytes=0-0`**) antes de navegar — só cabeçalhos, sem baixar o corpo, sem cookies, com checagem de IP interno a cada salto. O `DownloadListener` é evidência adicional. Páginas de erro do navegador (`chrome-error://`) nunca são analisadas. *Copiar URL* copia a URL completa (se tiver token/assinatura, o app avisa e marca a área de transferência como sensível no Android 13+).
 
 ## Como testar
-**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 126 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
+**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 140 testes (+1 teste real de rede, opcional) (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
 
 **Manuais no aparelho** (o app só aceita HTTPS público; `localhost`/IPs privados são bloqueados de propósito, então hospede `testpages/` em HTTPS — p.ex. GitHub Pages — ou use um túnel HTTPS):
 | Página | Esperado |
@@ -128,3 +128,13 @@ Bug do teste real (`v4/tabs/start.html`): depois de **Arquivo confirmado**, alte
 - **`window.open` exige gesto humano:** páginas cujos scripts chamam `window.open` (ou botões/links que abrem guia) **nunca recebem clique automático**; o app destaca o botão direto e espera o toque.
 - **DOM ≠ nova guia:** uma alteração do DOM não retoma a espera nem conta como "guia aberta"; só a guia criada (ou uma navegação) prova o efeito.
 - Guias abertas/fechadas depois do fim não alteram resultado, caminho nem estado.
+
+
+## v0.4.2 — repositórios GitHub e ROMs
+Problema real (`https://github.com/retrobrews/snes-games`): 150 candidatos (`astrohawk.smc`, `blt.sfc`, `bucket.smc`…) todos com pontuação 10 e resultado "Nenhum candidato". Causas: `.smc`/`.sfc`… não eram extensões de arquivo, as URLs `/blob/` são páginas HTML de visualização, e o scanner cortava a lista nos primeiros 150 elementos do DOM.
+- **Extensões de ROM:** `smc sfc fig swc nes unf fds gba gb gbc sgb n64 z64 v64 nds dsi 3ds cia sms gg gen smd 32x pce sgx a26 a78 j64 ngp ngc ws wsc vb col rom chd cso pbp wad nsp xci` (`.md` fica de fora: é Markdown).
+- **`/blob/` ≠ arquivo:** `GithubUrls` reconhece `github.com/<dono>/<repo>/blob/<ref>/<caminho>` como **página de visualização** (classe *página de visualização de arquivo*), mesmo terminando em `.smc`; nunca vira "candidato de download" nem "arquivo confirmado". Pontuação: +45 pela extensão conhecida, +10 se o texto do link é um nome de arquivo, +5 por contexto de listagem; `README.md`, pastas (`/tree/`) etc. continuam baixos.
+- **Link Raw:** na página de visualização o app usa o link **que o próprio GitHub mostra** (`Raw file content`, `Download raw file`, `View raw` → `/raw/…`). Se, depois da 1ª varredura, o GitHub não expôs nenhum, o app **deriva** `…/blob/…` → `…/raw/…` (o GitHub responde 302 para `raw.githubusercontent.com`). Links para outros arquivos da árvore lateral não competem enquanto o Raw não aparece.
+- **Confirmação:** a URL Raw é verificada por **HEAD/Range** (OkHttp); o 302 para `raw.githubusercontent.com` (domínio novo) **pede confirmação humana**; só `application/octet-stream` etc. confirma — HTML (`text/html`) não. Extensão sozinha nunca confirma.
+- **Prioridade antes do corte:** o scanner agora coleta até 1500 elementos, ordena por relevância (extensão, Raw/download, `download`, redirecionamentos) e mantém **todos os candidatos de arquivo** (até 500) + os 150 demais mais relevantes: nada relevante no fim da página se perde. Nomes de ROM como "Super Bet Win.smc" não são tratados como propaganda; anúncios continuam ignorados.
+- **Teste real:** o workflow *LinkResolver live GitHub check* varre `retrobrews/snes-games` de verdade (Chromium) e roda o motor completo com HEAD/Range reais até a URL Raw (`LiveGithubTest`); o relatório fica no resumo do job e no artifact `live-github-scans`.

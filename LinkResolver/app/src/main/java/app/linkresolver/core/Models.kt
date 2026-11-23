@@ -27,6 +27,8 @@ enum class ChallengeKind(val label: String) {
 /** Classificação de um link na jornada. */
 enum class LinkClass(val label: String) {
     PAGE("página intermediária"),
+    /** Página HTML de visualização de um arquivo (ex.: GitHub /blob/…/x.smc): o arquivo real está no link Raw. */
+    FILE_VIEW_PAGE("página de visualização de arquivo"),
     FILE_CANDIDATE("candidato de download"),
     CONFIRMED_FILE("arquivo confirmado"),
 }
@@ -127,7 +129,11 @@ data class ScoredCandidate(
     val url: String? get() = raw.url
     /** Candidato de download (URL/atributo de arquivo) ou página intermediária. */
     val linkClass: LinkClass
-        get() = if (url != null && (DownloadHeuristics.looksLikeFileUrl(url!!) || raw.downloadAttr)) LinkClass.FILE_CANDIDATE else LinkClass.PAGE
+        get() = when {
+            url != null && GithubUrls.isBlobView(url!!) -> if (DownloadHeuristics.extensionOf(url!!) in DownloadHeuristics.FILE_EXTENSIONS) LinkClass.FILE_VIEW_PAGE else LinkClass.PAGE
+            url != null && (DownloadHeuristics.looksLikeFileUrl(url!!) || raw.downloadAttr) -> LinkClass.FILE_CANDIDATE
+            else -> LinkClass.PAGE
+        }
 }
 
 data class PageScan(
@@ -144,6 +150,8 @@ data class PageScan(
     val countdownSec: Int = 0,
     /** Algum script da página chama window.open (botões podem exigir gesto humano real). */
     val opensWindows: Boolean = false,
+    /** Total de candidatos encontrados na página (antes do corte por prioridade). */
+    val totalCandidates: Int = 0,
 )
 
 data class DownloadInfo(

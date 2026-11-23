@@ -11,7 +11,19 @@ object DownloadHeuristics {
         "pdf", "epub", "mobi", "djvu", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "csv",
         "mp3", "flac", "wav", "ogg", "mp4", "mkv", "avi", "mov", "webm",
         "part01", "001",
+        // ROMs e imagens de jogos retro (".md" fica de fora: é Markdown)
+        "smc", "sfc", "fig", "swc", "nes", "unf", "fds", "gba", "gb", "gbc", "sgb", "n64", "z64", "v64",
+        "nds", "dsi", "3ds", "cia", "sms", "gg", "gen", "smd", "32x", "pce", "sgx", "a26", "a78", "j64",
+        "ngp", "ngc", "ws", "wsc", "vb", "col", "rom", "chd", "cso", "pbp", "wad", "nsp", "xci",
     )
+
+    private val FILE_LIST_CONTEXT = Regex("""(?i)(directory-row|file-name|filename|js-navigation-open|react-directory|file-list|filelist|listing)""")
+    private val RAW_WORDS = Regex("""(?i)\b(raw|view\s+raw|raw\s+file\s+content|download\s+raw\s+file)\b""")
+    private val FILENAME_TEXT = Regex("""^[\p{L}\p{N}_\-. ()\[\]!&',+~]{1,120}\.([A-Za-z0-9]{1,8})$""")
+
+    /** O texto do link é um nome de arquivo com extensão conhecida (ex.: "astrohawk.smc"). */
+    fun isFileNameText(text: String): Boolean =
+        FILENAME_TEXT.matchEntire(text.trim())?.groupValues?.get(1)?.lowercase(Locale.ROOT) in FILE_EXTENSIONS
 
     private val DOWNLOAD_WORDS = Regex(
         """(?i)\b(download|baixar|baixe|descargar|descarga|t[eé]l[eé]charger|herunterladen|scarica|get\s+(the\s+)?file|direct\s+link|link\s+direto|obter\s+link|get\s+link|gerar\s+link|generate\s+link|start\s+download|iniciar\s+download|free\s+download|download\s+now|baixar\s+agora)\b"""
@@ -46,7 +58,8 @@ object DownloadHeuristics {
         return last.substringAfterLast('.').lowercase(Locale.ROOT).takeIf { it.length in 2..8 }
     }
 
-    fun looksLikeFileUrl(url: String): Boolean = extensionOf(url) in FILE_EXTENSIONS
+    /** URL de arquivo pela extensão. Páginas /blob/ do GitHub NÃO contam: são HTML de visualização. */
+    fun looksLikeFileUrl(url: String): Boolean = !GithubUrls.isBlobView(url) && extensionOf(url) in FILE_EXTENSIONS
 
     fun score(raw: RawCandidate, pageHost: String, policy: DomainPolicy): ScoredCandidate {
         val reasons = mutableListOf<String>()
@@ -67,19 +80,32 @@ object DownloadHeuristics {
                 if (DomainPolicy.registrable(host) == DomainPolicy.registrable(pageHost)) { score += 10; reasons += "mesmo site" }
                 else if (!trusted) { score -= 10; reasons += "domínio externo" }
             }
-            if (looksLikeFileUrl(url)) { score += 60; reasons += "extensão de arquivo (.${extensionOf(url)})" }
+            val blob = GithubUrls.parseBlob(url)
+            if (blob != null) {
+                val ext = extensionOf(url)
+                if (ext in FILE_EXTENSIONS) { score += 45; reasons += "página de visualização do GitHub (/blob/) de arquivo .$ext — o arquivo real é o link Raw" }
+                else reasons += "página de visualização do GitHub (/blob/)"
+            } else if (looksLikeFileUrl(url)) { score += 60; reasons += "extensão de arquivo (.${extensionOf(url)})" }
             else if (URL_HINT.containsMatchIn(url)) { score += 15; reasons += "padrão de download na URL" }
+            if (GithubUrls.isRawLink(url)) { score += 50; reasons += "link Raw do GitHub" }
+            else if (GithubUrls.isReleaseAsset(url)) { score += 30; reasons += "asset de release do GitHub" }
         }
         if (raw.downloadAttr) { score += 50; reasons += "atributo download" }
         val text = raw.text.lowercase()
+        val fileNameText = isFileNameText(raw.text)
         if (DOWNLOAD_WORDS.containsMatchIn(text)) { score += 30; reasons += "texto de download" }
         else if (STEP_WORDS.containsMatchIn(text)) { score += 12; reasons += "texto de etapa" }
-        if (NEGATIVE_WORDS.containsMatchIn(text)) { score -= 35; reasons += "texto suspeito/propaganda" }
+        if (RAW_WORDS.containsMatchIn(text) && url != null && GithubUrls.isRawLink(url)) { score += 20; reasons += "botão Raw do GitHub" }
+        if (fileNameText) { score += 10; reasons += "o texto do link é um nome de arquivo" }
+        // nomes de ROM como "Super Bet Win.smc" não são propaganda: o filtro de palavras suspeitas não se aplica a nomes de arquivo
+        if (!fileNameText && NEGATIVE_WORDS.containsMatchIn(text)) { score -= 35; reasons += "texto suspeito/propaganda" }
+        if (FILE_LIST_CONTEXT.containsMatchIn(raw.context)) { score += 5; reasons += "item de listagem de arquivos" }
         if (AD_CONTEXT.containsMatchIn(raw.context)) { score -= 50; reasons += "contexto de anúncio" }
         if (raw.rel.contains("sponsored") || raw.rel.contains("nofollow") && raw.rel.contains("noopener") && !raw.downloadAttr) {
             score -= 15; reasons += "rel patrocinado/nofollow"
         }
         if (raw.source == "data-attr" || raw.source == "onclick") { score += 5; reasons += "URL em atributo de script" }
+        if (raw.source == "derived-raw") reasons += "derivado de /blob/ (o GitHub não expôs o link Raw)"
         if (raw.source == "meta-refresh") { score += 55; reasons += "redirecionamento automático da página (meta refresh)" }
         if (raw.source == "js-redirect") { score += 55; reasons += "redirecionamento automático da página (JavaScript)" }
         if (!raw.visible) { score -= 25; reasons += "elemento oculto" }
