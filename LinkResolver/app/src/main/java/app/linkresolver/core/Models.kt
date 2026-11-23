@@ -22,6 +22,41 @@ enum class ChallengeKind(val label: String) {
     LOGIN("autenticação/login"),
 }
 
+/** Classificação de um link na jornada. */
+enum class LinkClass(val label: String) {
+    PAGE("página intermediária"),
+    FILE_CANDIDATE("candidato de download"),
+    CONFIRMED_FILE("arquivo confirmado"),
+}
+
+enum class PathKind(val label: String) {
+    START("INÍCIO"), PAGE("PÁGINA"), HTTP_REDIRECT("REDIRECIONAMENTO HTTP"), JS_REDIRECT("REDIRECIONAMENTO JS"),
+    META_REFRESH("META REFRESH"), NAVIGATION("NAVEGAÇÃO"), FILE("ARQUIVO"),
+}
+
+/** Um nó do caminho percorrido (página, salto de redirecionamento ou arquivo). */
+data class PathEntry(
+    val index: Int,
+    val kind: PathKind,
+    /** URL higienizada. */
+    val url: String?,
+    /** Como a automação/navegador chegou aqui. */
+    val arrival: String,
+    val linkClass: LinkClass?,
+    /** Motivo da decisão automática tomada nesta página. */
+    val decision: String?,
+    val code: Int? = null,
+    val title: String? = null,
+) {
+    fun format(): String = buildString {
+        append(index).append(". [").append(kind.label).append(code?.let { " $it" } ?: "").append("] ").append(url ?: "—")
+        title?.takeIf { it.isNotBlank() }?.let { append("  «").append(it.take(60)).append("»") }
+        append("\n     chegou por: ").append(arrival)
+        linkClass?.let { append("\n     classe: ").append(it.label) }
+        decision?.let { append("\n     decisão: ").append(it) }
+    }
+}
+
 enum class StepKind { START, NAVIGATE, REDIRECT, PAGE, SCAN, FOLLOW, POPUP, DOWNLOAD, CHALLENGE, RESUME, CONFIRM, BLOCKED, ERROR, END }
 
 /** Limites do motor de navegação. */
@@ -31,7 +66,11 @@ data class Limits(
     val maxStepMs: Long = 45_000,
     val maxHumanWaitMs: Long = 10 * 60_000,
     val maxDomains: Int = 4,
-    val maxVisitsPerUrl: Int = 3,
+    val maxVisitsPerUrl: Int = 2,
+    val maxPages: Int = 15,
+    val maxStagnantPages: Int = 2,
+    val tier2MinScore: Int = 20,
+    val maxIntermediateCandidates: Int = 10,
     val maxRedirectsPerStep: Int = 10,
     val maxScanAttempts: Int = 4,
     val autoScoreThreshold: Int = 40,
@@ -65,6 +104,9 @@ data class ScoredCandidate(
     val ad: Boolean,
 ) {
     val url: String? get() = raw.url
+    /** Candidato de download (URL/atributo de arquivo) ou página intermediária. */
+    val linkClass: LinkClass
+        get() = if (url != null && (DownloadHeuristics.looksLikeFileUrl(url!!) || raw.downloadAttr)) LinkClass.FILE_CANDIDATE else LinkClass.PAGE
 }
 
 data class PageScan(
@@ -73,6 +115,8 @@ data class PageScan(
     val candidates: List<RawCandidate>,
     val challenge: ChallengeKind?,
     val challengeHint: String?,
+    /** Página indica espera/contagem regressiva/geração de link. */
+    val waitHint: Boolean = false,
 )
 
 data class DownloadInfo(
@@ -95,6 +139,9 @@ data class CandidateSummary(
     val text: String,
     val score: Int,
     val status: String,
+    /** URL completa (para copiar). Nunca vai para logs. */
+    val url: String? = null,
+    val kind: LinkClass = LinkClass.PAGE,
 )
 
 data class ResolveResult(
@@ -116,4 +163,5 @@ data class ResolveResult(
     /** Diagnóstico de erros/sondagens, já higienizado. */
     val diagnostics: List<String> = emptyList(),
     val errorInfo: String? = null,
+    val path: List<PathEntry> = emptyList(),
 )

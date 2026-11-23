@@ -24,7 +24,7 @@ class ResolverEngineTest {
 
     private var now = 0L
     private fun engine(f: Fake, limits: Limits = Limits()) = ResolverEngine(limits, { now }, f)
-    private fun c(url: String?, text: String, dl: Boolean = false) = RawCandidate(url, text, "a", "href", dl, "", "", null, true)
+    private fun c(url: String?, text: String, dl: Boolean = false, src: String = "href") = RawCandidate(url, text, "a", src, dl, "", "", null, true)
     private fun scan(url: String, vararg cs: RawCandidate, ch: ChallengeKind? = null) =
         PageScan(url, "t", cs.toList(), ch, null)
 
@@ -40,6 +40,8 @@ class ResolverEngineTest {
         e.start("https://site.com/page")
         assertEquals(listOf("https://site.com/page"), f.navigated)
         e.onScan(scan("https://site.com/page", c("https://site.com/get/123", "Download"), c("https://ads.doubleclick.net/x", "Download now")))
+        assertEquals(listOf("https://site.com/get/123"), f.probes)          // verificação OkHttp antes de navegar
+        e.onProbeResult("https://site.com/get/123", ProbeResult.Page("https://site.com/get/123", 200, "text/html"))
         assertEquals("https://site.com/get/123", f.navigated.last())
         e.onDownload(DownloadInfo("https://cdn.site.com/f.zip?token=SECRET", "application/zip", null, 5_000))
         val r = f.result!!
@@ -97,7 +99,7 @@ class ResolverEngineTest {
         assertEquals(1, f.navigated.size)
         e.onScan(scan("https://site.com/", c("https://site.com/get/a", "Download")))
         assertEquals(EngineState.RUNNING, e.state)
-        assertEquals("https://site.com/get/a", f.navigated.last())
+        assertEquals("https://site.com/get/a", f.probes.last())
     }
 
     @Test fun loginThenDownloadRequiresSession() {
@@ -132,20 +134,24 @@ class ResolverEngineTest {
     @Test fun timeoutYieldsIntermediateWhenCandidateKnown() {
         val f = Fake(); val e = engine(f, Limits(maxStepMs = 5_000))
         e.start("https://site.com/")
-        e.onScan(scan("https://site.com/", c("https://site.com/get/1", "Continuar")))
+        e.onScan(scan("https://site.com/", c("https://site.com/about/info", "Prosseguir", src = "data-attr"),
+            *Array(11) { i -> c("https://site.com/misc/$i", "x") }))
         now = 6_000; e.tick()
         assertEquals(ResultState.INTERMEDIATE_LINK, f.result?.state)
-        assertEquals("https://site.com/get/1", f.result?.url)
+        assertEquals("https://site.com/about/info", f.result?.url)
     }
 
     @Test fun depthLimit() {
         val f = Fake(); val e = engine(f, Limits(maxDepth = 2))
         e.start("https://site.com/0")
         e.onScan(scan("https://site.com/0", c("https://site.com/dl/1", "Download")))
+        e.onProbeResult("https://site.com/dl/1", ProbeResult.Page("https://site.com/dl/1", 200, "text/html"))
         e.onScan(scan("https://site.com/dl/1", c("https://site.com/dl/2", "Download")))
+        e.onProbeResult("https://site.com/dl/2", ProbeResult.Page("https://site.com/dl/2", 200, "text/html"))
         e.onScan(scan("https://site.com/dl/2", c("https://site.com/dl/3", "Download")))
         assertEquals(ResultState.INTERMEDIATE_LINK, f.result?.state)
-        assertEquals(2, f.navigated.size - 1)
+        assertEquals("https://site.com/dl/3", f.result?.url)
+        assertEquals(2, f.probes.size)
     }
 
     @Test fun loopDetection() {

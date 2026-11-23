@@ -22,7 +22,7 @@ A versão e o commit aparecem no rodapé do app (`BuildConfig.VERSION_NAME` / `G
    URLs com cara de arquivo são validadas (cliente **OkHttp**) por **HEAD** (ou **GET com `Range: bytes=0-0`**) antes de navegar — só cabeçalhos, sem baixar o corpo, sem cookies, com checagem de IP interno a cada salto. O `DownloadListener` é evidência adicional. Páginas de erro do navegador (`chrome-error://`) nunca são analisadas. *Copiar URL* copia a URL completa (se tiver token/assinatura, o app avisa e marca a área de transferência como sensível no Android 13+).
 
 ## Como testar
-**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 56 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
+**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 82 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
 
 **Manuais no aparelho** (o app só aceita HTTPS público; `localhost`/IPs privados são bloqueados de propósito, então hospede `testpages/` em HTTPS — p.ex. GitHub Pages — ou use um túnel HTTPS):
 | Página | Esperado |
@@ -67,3 +67,27 @@ Limites ajustáveis em `core/Models.kt` (`Limits`).
 - Validação inconclusiva **não** navega até o binário: o resultado vira *Candidato não verificado* (ou *Exige sessão*, em 401/403), com o link preservado e botão **Copiar** (aba Candidatos e aba Resultado).
 - Redirecionamento do arquivo para domínio novo pede a mesma confirmação de domínio e revalida.
 - Diagnóstico (aba Resultado/Histórico): DNS, TCP, TLS (versão/cifra), protocolo, HTTP, timeout, redirecionamentos — sem IPs, cookies, cabeçalhos nem valores de query.
+
+## v0.3.0 — resolvedor de redirecionamentos em múltiplas etapas
+- **Caminho percorrido** (aba Resultado): cada página/salto/arquivo, *como* se chegou lá (URL inicial, redirecionamento HTTP, meta refresh, JavaScript, decisão automática, escolha manual) e o **motivo da decisão** (pontuação + sinais). Classes: *página intermediária*, *candidato de download*, *arquivo confirmado*.
+- **Redirecionamentos HTTP 301/302/303/307/308:** todo candidato seguido é verificado antes por OkHttp (HEAD/Range 0-0), que registra o **código real** de cada salto; o WebView só informa que houve redirect (não expõe o código). Redirecionamento para domínio novo pede confirmação humana. Se a verificação encontra um arquivo, confirma sem navegar.
+- **Meta refresh e JavaScript:** o scanner lê `<meta http-equiv=refresh>` e `location.href=/replace/assign` de scripts inline (somente leitura) e os trata como candidatos de alta pontuação.
+- **Páginas intermediárias:** páginas com poucos links ou texto de espera ("aguarde", contagem) seguem o link de etapa (Continuar/Próximo/Download), esperando mais tempo quando indicam contagem regressiva. Domínio desconhecido continua passando pela confirmação humana.
+- **Loops e limites:** 3ª visita à mesma URL, caminho que só leva a páginas já visitadas, 2 páginas sem nenhuma URL nova, 15 páginas, profundidade 6, tempos e domínios — todos interrompem e preservam os candidatos.
+- Em qualquer falha os links encontrados (todas as páginas) ficam na aba **Candidatos**, com botão **Copiar** e status "não verificado".
+
+### Páginas de teste (HTTPS)
+Publicadas pelo workflow *LinkResolver test pages* na branch `gh-pages` (GitHub Pages: *Settings → Pages → Deploy from a branch → gh-pages / root*, uma única vez). Base: `https://t-justino.github.io/PS4/v3/` — menu em `…/v3/index.html`.
+
+| Teste | URL inicial | Esperado |
+|---|---|---|
+| A→B→C→arquivo | `https://t-justino.github.io/PS4/v3/abc/a.html` | Arquivo confirmado; caminho de 3 páginas; não navega até o `.bin` |
+| Meta refresh | `https://t-justino.github.io/PS4/v3/meta/start.html` | segue o destino do meta refresh |
+| Redirecionamento JS | `https://t-justino.github.io/PS4/v3/js/start.html` | segue o destino do `location.href` |
+| HTTP 301/302/303/307/308 | `https://t-justino.github.io/PS4/v3/http/301.html` (idem 302, 303, 307, 308) | pede confirmação para `httpbingo.org`; registra o código HTTP; confirma o arquivo |
+| Loop | `https://t-justino.github.io/PS4/v3/loop/a.html` | Bloqueado: loop detectado |
+| Sem link válido | `https://t-justino.github.io/PS4/v3/dead/start.html` | Nenhum candidato; "política de privacidade" preservada para cópia |
+| 4 etapas | `https://t-justino.github.io/PS4/v3/long/1.html` | Arquivo confirmado após 4 páginas |
+| Anúncios | `https://t-justino.github.io/PS4/v3/ads/start.html` | ignora anúncios e segue "Continuar" |
+
+Os redirecionamentos HTTP reais vêm do servidor público `https://httpbingo.org/redirect-to?url=…&status_code=…` (HTTPS). As páginas estáticas e o arquivo (`files/teste.bin`, 200 KB) vêm do GitHub Pages.

@@ -308,9 +308,13 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
             result.errorInfo?.let { append("\n\nErro: ").append(it) }
             if (result.evidence.isNotEmpty()) append("\n\nEvidências:\n").append(result.evidence.joinToString("\n") { "• $it" })
             if (result.diagnostics.isNotEmpty()) append("\n\nDiagnóstico:\n").append(result.diagnostics.joinToString("\n") { "• $it" })
+            if (result.path.isNotEmpty()) {
+                append("\n\nCaminho percorrido (${result.path.size}):\n")
+                append(result.path.joinToString("\n") { it.format() })
+            }
             if (result.candidates.isNotEmpty()) {
                 append("\n\nCandidatos (${result.candidates.size}):\n")
-                append(result.candidates.joinToString("\n") { "• [${it.score}] ${it.text.ifBlank { "(sem texto)" }} — ${it.displayUrl} — ${it.status}" })
+                append(result.candidates.joinToString("\n") { "• [${it.score}] ${it.kind.label}: ${it.text.ifBlank { "(sem texto)" }} — ${it.displayUrl} — ${it.status}" })
             }
         }
         val sdf = timeFmt
@@ -324,7 +328,7 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
     override fun requestProbe(url: String, trustedDomains: Set<String>) {
         probeExecutor.execute {
             val rep = probe.probe(url, trustedDomains)
-            handler.post { if (!isDestroyed) engine.onProbeResult(url, rep.result, rep.diagnostics) }
+            handler.post { if (!isDestroyed) engine.onProbeResult(url, rep.result, rep.diagnostics, rep.hops) }
         }
     }
 
@@ -340,8 +344,8 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
 
     // ------------------------------------------------------------------ TabManager.Callbacks
 
-    override fun onNavigationRequest(tab: BrowserTab, url: String, redirect: Boolean): NavDecision {
-        val d = engine.onNavigationRequest(url, redirect)
+    override fun onNavigationRequest(tab: BrowserTab, url: String, redirect: Boolean, hasGesture: Boolean): NavDecision {
+        val d = engine.onNavigationRequest(url, redirect, hasGesture)
         if (d == NavDecision.ASK) navTab = tab
         return d
     }

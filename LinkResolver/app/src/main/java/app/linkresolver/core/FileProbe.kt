@@ -40,7 +40,10 @@ sealed class ProbeResult {
     data class Blocked(val reason: String) : ProbeResult()
 }
 
-data class ProbeReport(val result: ProbeResult, val diagnostics: List<String>)
+/** Salto de redirecionamento HTTP observado (código real 301/302/303/307/308). */
+data class RedirectHop(val code: Int, val from: String, val to: String)
+
+data class ProbeReport(val result: ProbeResult, val diagnostics: List<String>, val hops: List<RedirectHop> = emptyList())
 
 interface FileProbe {
     /** Bloqueante: chamar fora da thread principal. [trustedDomains] = domínios registráveis confiáveis. */
@@ -87,7 +90,7 @@ class HttpFileProbe(
         list
     }
 
-    private class Holder { var blockedHost: String? = null }
+    private class Holder { var blockedHost: String? = null; val hops = mutableListOf<RedirectHop>() }
 
     private sealed class Hop {
         class Done(val r: ProbeResult) : Hop()
@@ -108,14 +111,14 @@ class HttpFileProbe(
                 val g = run(p, url, trustedDomains, "GET", diag, holder)
                 if (g is ProbeResult.NetworkError && head is ProbeResult.HttpError) head else g
             } else head
-            if (r !is ProbeResult.NetworkError) return ProbeReport(r, diag)
+            if (r !is ProbeResult.NetworkError) return ProbeReport(r, diag, holder.hops.toList())
             failures += r
         }
         val summary = failures.joinToString("; ") { it.category }.ifEmpty { "sem tentativas" }
         val last = failures.lastOrNull()
         return ProbeReport(
             ProbeResult.NetworkError("todas as tentativas falharam ($summary): ${last?.message ?: ""}".trim(), last?.category ?: "IO"),
-            diag,
+            diag, holder.hops.toList(),
         )
     }
 
@@ -124,6 +127,7 @@ class HttpFileProbe(
         diag: MutableList<String>, holder: Holder,
     ): ProbeResult {
         var cur = start
+        holder.hops.clear()
         for (hop in 0..maxRedirects) {
             val v = urlCheck(cur)
             if (v is UrlSafety.Verdict.Rejected) return ProbeResult.Blocked("URL recusada: ${v.reason}")
@@ -178,6 +182,7 @@ class HttpFileProbe(
                 is Hop.Done -> return outcome.r
                 is Hop.Redirect -> {
                     diag += "[$tag] redirecionamento ${outcome.code} → ${UrlSafety.host(outcome.next) ?: "?"}"
+                    holder.hops += RedirectHop(outcome.code, cur, outcome.next)
                     cur = outcome.next
                 }
             }

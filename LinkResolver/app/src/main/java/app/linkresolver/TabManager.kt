@@ -39,7 +39,7 @@ class TabManager(
     private val cb: Callbacks,
 ) {
     interface Callbacks {
-        fun onNavigationRequest(tab: BrowserTab, url: String, redirect: Boolean): NavDecision
+        fun onNavigationRequest(tab: BrowserTab, url: String, redirect: Boolean, hasGesture: Boolean): NavDecision
         fun onPageStarted(tab: BrowserTab, url: String)
         fun onPageFinished(tab: BrowserTab, url: String)
         fun onProgress(tab: BrowserTab, percent: Int)
@@ -140,7 +140,7 @@ class TabManager(
     private inner class Client(val tab: BrowserTab) : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             if (!request.isForMainFrame) return false
-            return cb.onNavigationRequest(tab, request.url.toString(), request.isRedirect) != NavDecision.ALLOW
+            return cb.onNavigationRequest(tab, request.url.toString(), request.isRedirect, request.hasGesture()) != NavDecision.ALLOW
         }
 
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {

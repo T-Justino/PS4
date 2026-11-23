@@ -80,9 +80,13 @@ object DownloadHeuristics {
             score -= 15; reasons += "rel patrocinado/nofollow"
         }
         if (raw.source == "data-attr" || raw.source == "onclick") { score += 5; reasons += "URL em atributo de script" }
+        if (raw.source == "meta-refresh") { score += 55; reasons += "redirecionamento automático da página (meta refresh)" }
+        if (raw.source == "js-redirect") { score += 55; reasons += "redirecionamento automático da página (JavaScript)" }
         if (!raw.visible) { score -= 25; reasons += "elemento oculto" }
         return ScoredCandidate(raw, score, reasons, safe, trusted, ad)
     }
+
+    fun isStepText(text: String): Boolean = STEP_WORDS.containsMatchIn(text) || DOWNLOAD_WORDS.containsMatchIn(text)
 
     // ---------- classificação de download ----------
 

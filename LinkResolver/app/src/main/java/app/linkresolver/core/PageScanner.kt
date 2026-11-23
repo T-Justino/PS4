@@ -14,7 +14,7 @@ object PageScanner {
     const val SCRIPT = """
 (function(){
 try{
-var out={url:location.href,title:document.title||'',cands:[],challenge:null,hint:null};
+var out={url:location.href,title:document.title||'',cands:[],challenge:null,hint:null,wait:false};
 function abs(u){try{return new URL(u,location.href).href}catch(e){return null}}
 function vis(e){try{var r=e.getBoundingClientRect();var s=getComputedStyle(e);
  return r.width>2&&r.height>2&&s.visibility!=='hidden'&&s.display!=='none'&&s.opacity!=='0'}catch(x){return false}}
@@ -63,7 +63,15 @@ for(var m=0;m<els.length;m++){var e=els[m];var found=false;
  if(!found&&e.tagName!=='A'&&/(download|baixar|descargar|continue|continuar|get link|obter|gerar|iniciar)/i.test(txt(e)))add(e,null,'button',false)}
 var mt=document.querySelector('meta[http-equiv="refresh" i]');
 if(mt){var c2=mt.getAttribute('content')||'';var mr=c2.match(/url\s*=\s*['"]?([^'";]+)/i);
- if(mr){var u4=abs(mr[1].trim());if(u4)add(mt,u4,'meta-refresh',false)}}
+ if(mr){var u4=abs(mr[1].trim());if(u4){add(mt,u4,'meta-refresh',false);out.cands[out.cands.length-1].vis=true;out.cands[out.cands.length-1].text='(meta refresh '+(parseInt(c2,10)||0)+'s)'}}}
+/* redirecionamentos por JavaScript (somente leitura do texto dos <script> inline) */
+var scs=document.querySelectorAll('script:not([src])');var jr=0;
+var jsre=[/(?:window\.|document\.|top\.|self\.)?location(?:\.href)?\s*=(?!=)\s*['"]([^'"]+)['"]/g,/location\.(?:replace|assign)\(\s*['"]([^'"]+)['"]\s*\)/g];
+for(var q=0;q<scs.length&&q<20&&jr<5;q++){var st=(scs[q].textContent||'').slice(0,20000);
+ for(var w=0;w<jsre.length;w++){jsre[w].lastIndex=0;var jm;
+  while((jm=jsre[w].exec(st))&&jr<5){var u5=abs(jm[1]);if(u5&&/^https?:/i.test(u5)&&u5!==location.href){
+   var key5=u5+'|js';if(!seen[key5]){seen[key5]=1;out.cands.push({url:u5,text:'(redirecionamento JavaScript)',tag:'script',source:'js-redirect',dl:false,rel:'',ctx:'',id:null,vis:true});jr++}}}}}
+out.wait=/(aguarde|please wait|redirecionando|redirecting|seu download (come|inici)|your download (will|is)|gerando (seu )?link|generating (your )?link|countdown|contagem regressiva|segundos|seconds)/.test(body);
 return JSON.stringify(out)
 }catch(err){return JSON.stringify({url:location.href,title:'',cands:[],challenge:null,hint:'erro: '+err})}
 })()
@@ -105,6 +113,7 @@ return JSON.stringify(out)
                 candidates = list,
                 challenge = kind,
                 challengeHint = o.optString("hint", "").takeIf { !o.isNull("hint") && it.isNotEmpty() },
+                waitHint = o.optBoolean("wait", false),
             )
         } catch (e: Exception) {
             null

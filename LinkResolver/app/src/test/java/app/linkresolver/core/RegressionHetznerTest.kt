@@ -60,6 +60,7 @@ class RegressionHetznerTest {
         val f = Fake(); val e = ResolverEngine(Limits(), { now }, f)
         e.start(site)
         e.onScan(PageScan(site, "Hetzner", listOf(RawCandidate("https://fsn1-speed.hetzner.com/files/", "Download files", "a", "href", false, "", "", null, true)), null, null))
+        e.onProbeResult("https://fsn1-speed.hetzner.com/files/", ProbeResult.Page("https://fsn1-speed.hetzner.com/files/", 200, "text/html"))
         assertEquals("https://fsn1-speed.hetzner.com/files/", f.navigated.last())
         val rescansBefore = f.rescans
         e.onPageStarted("https://fsn1-speed.hetzner.com/files/")

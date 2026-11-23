@@ -43,7 +43,7 @@ class CandidateAdapter(
             c.trusted -> "confiável"
             else -> "domínio novo"
         }
-        h.b.candTitle.text = "[${c.score}] ${c.raw.text.ifBlank { "(sem texto)" }}  · $badge"
+        h.b.candTitle.text = "[${c.score}] ${c.raw.text.ifBlank { "(sem texto)" }}  · ${c.linkClass.label} · $badge"
         h.b.candUrl.text = c.url?.let { UrlSafety.redact(it) } ?: "(sem URL — botão de script, ${c.raw.tag})"
         val status = statuses.getOrNull(position) ?: "não verificado"
         h.b.candReasons.text = "Status: $status\n" + c.reasons.joinToString(" • ").ifEmpty { "sem sinais" }
