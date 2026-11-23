@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Link Resolver</string>
+    <string name="url_hint">URL da página (https://…)</string>
+    <string name="btn_analyze">Analisar</string>
+    <string name="btn_stop">Parar</string>
+    <string name="btn_resume">Já resolvi — verificar</string>
+    <string name="btn_clear_session">Limpar sessão</string>
+    <string name="tab_browser">Navegador</string>
+    <string name="tab_candidates">Candidatos</string>
+    <string name="tab_log">Histórico</string>
+    <string name="tab_result">Resultado</string>
+    <string name="status_idle">Informe uma URL https e toque em Analisar.</string>
+    <string name="no_candidates">Nenhum candidato ainda. A varredura roda após cada página carregar.</string>
+    <string name="no_result">Sem resultado ainda.</string>
+    <string name="btn_copy">Copiar URL</string>
+    <string name="btn_new">Nova análise</string>
+    <string name="btn_follow">Seguir</string>
+    <string name="btn_click">Clicar</string>
+    <string name="copied">URL copiada</string>
+    <string name="confirm_title">Domínio desconhecido</string>
+    <string name="confirm_allow_domain">Permitir domínio</string>
+    <string name="confirm_once">Só desta vez</string>
+    <string name="confirm_deny">Negar</string>
+</resources>
