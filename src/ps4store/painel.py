@@ -43,9 +43,10 @@ class Dados:
     """Índice de busca + versões, recarregados quando o arquivo muda (mtime). Leitura apenas."""
 
     def __init__(self, indice: str, arq_versoes: str, arq_cusas: str = cusas.DADOS_PADRAO, arq_auditoria: str = auditoria.AUDITORIA_PADRAO,
-                 dir_capas: str = capas.DIR_PADRAO, arq_apelidos: str = busca_inteligente.APELIDOS_PADRAO, arq_metadados: str = metadados.ARQ_PADRAO):
+                 dir_capas: str = capas.DIR_PADRAO, arq_apelidos: str = busca_inteligente.APELIDOS_PADRAO, arq_metadados: str = metadados.ARQ_PADRAO,
+                 arq_oficiais: str = metadados.OFICIAIS_PADRAO):
         self.indice_path, self.versoes_path, self.cusas_path, self.auditoria_path = indice, arq_versoes, arq_cusas, arq_auditoria
-        self.dir_capas, self.apelidos_path, self.metadados_path = dir_capas, arq_apelidos, arq_metadados
+        self.dir_capas, self.apelidos_path, self.metadados_path, self.oficiais_path = dir_capas, arq_apelidos, arq_metadados, arq_oficiais
         self.trava_link = threading.Lock()                          # uma análise de link por vez
         self._lock = threading.Lock()
         self._cache: dict[str, tuple[float, dict]] = {}
@@ -88,6 +89,9 @@ class Dados:
 
     def metadados(self) -> dict:
         return self._carregar("md", self.metadados_path, metadados.carregar)
+
+    def oficiais(self) -> dict:
+        return self._carregar("of", self.oficiais_path, metadados.carregar_oficiais)
 
     def capas(self) -> dict:
         return self._carregar("c", str(Path(self.dir_capas) / "indice.json"), lambda _c: capas.carregar_indice(self.dir_capas))
@@ -175,12 +179,14 @@ def listar_jogos(dados: Dados, q: str, com_versoes: bool, limite: int, offset: i
         for qid, rs in por_qid.items():
             if (not nq or all(w in busca.norm(rs[0].get("jogo")) for w in nq.split())):
                 itens.append({"nome": rs[0]["jogo"], "ano": None, "fonte": "versoes", "fonteNome": "registros de versão", "qid": qid, **_contagem(rs)})
-    md = dados.metadados()
+    md, ofi = dados.metadados(), dados.oficiais()
+    locs = {}
     for it in itens:
-        loc = metadados.localizacao(it["qid"], por_qid.get(it["qid"], []), md) if it.get("qid") else None
-        it["ptbr"] = (loc["confirmadas"] + (["sem-parte"] if loc["semParte"] else [])) if loc else []
+        if it.get("qid"):
+            locs[it["qid"]] = metadados.localizacao(it["qid"], por_qid.get(it["qid"], []), md, ofi)
+        it["ptbr"] = metadados.selos_ptbr(locs[it["qid"]]) if it.get("qid") else []
     if ptbr:
-        itens = [it for it in itens if it.get("qid") and metadados.filtro_ptbr(metadados.localizacao(it["qid"], por_qid.get(it["qid"], []), md), ptbr)]
+        itens = [it for it in itens if it.get("qid") and metadados.filtro_ptbr(locs[it["qid"]], ptbr)]
     for it in itens:
         it["capa"] = capas.info_publica(cp, it["qid"]) if it.get("qid") else None
         if it["capa"]:
@@ -244,13 +250,16 @@ def detalhar_jogo(dados: Dados, qid: str, cusa: str, regiao: str, idioma: str) -
         lista = ", ".join(c["cusa"] for c in conflitos[:4]) + (f" (+{len(conflitos) - 4})" if len(conflitos) > 4 else "")
         avisos.append(f"{len(conflitos)} CUSA(s) em conflito no Wikidata, NÃO associados a este jogo: {lista}.")
     visiveis, omitidos = versoes.consultar({"versoes": rs}, cusa=cusa or None, regiao=regiao or None, idioma=idioma or None)
-    md = dados.metadados()
-    visiveis = [dict(r, atualizacao=md["atualizacoes"].get(r["cusa"])) for r in visiveis]
+    md, ofi = dados.metadados(), dados.oficiais()
+    por_cusa_of: dict[str, list] = {}
+    for prod in ofi.get("produtos", []):
+        por_cusa_of.setdefault(prod["cusa"], []).append(prod)
+    visiveis = [dict(r, atualizacao=md["atualizacoes"].get(r["cusa"]), oficial=por_cusa_of.get(r["cusa"], [])) for r in visiveis]
     return {"capa": capas.info_publica(dados.capas(), qid), "jogo": {"nome": nome, "qid": qid, "ano": (t or {}).get("lancamento"), "url": (t or {}).get("url") or ""},
             "total": len(rs), "cusasDistintos": len({r["cusa"] for r in rs}), "registros": visiveis, "omitidos": omitidos,
             "origens": {"curado": sum(1 for r in rs if r.get("origem") == "curado"), "wikidata": sum(1 for r in rs if r.get("origem") == "wikidata")},
             "filtros": {"cusa": cusa, "regiao": regiao, "idioma": idioma}, "avisos": avisos, "conflitos": conflitos,
-            "localizacao": metadados.localizacao(qid, rs, md),
+            "localizacao": metadados.localizacao(qid, rs, md, ofi),
             "temJogoBase": any(r.get("escopo") == "jogo-base" for r in rs if r.get("origem") == "curado")}
 
 
@@ -339,8 +348,8 @@ class Handler(BaseHTTPRequestHandler):
                 if not off.isdigit() or int(off) > 100000:
                     raise ParametroInvalido("offset inválido")
                 pb = p.get("ptbr", "")
-                if pb not in ("", "qualquer", "audio", "texto"):
-                    raise ParametroInvalido("ptbr deve ser qualquer, audio ou texto")
+                if pb and pb not in metadados.MODOS_PTBR:
+                    raise ParametroInvalido("ptbr deve ser " + ", ".join(metadados.MODOS_PTBR))
                 if not q and cv != "1" and not pb:
                     raise ParametroInvalido("informe parte do nome ou use com_versoes=1")
                 return self._json(200, listar_jogos(dados, q, cv == "1", int(lim), int(off), pb), head)
@@ -383,12 +392,13 @@ class Handler(BaseHTTPRequestHandler):
 def criar_servidor(porta: int = PORTA_PADRAO, indice: str = busca.INDICE_PADRAO, arq_versoes: str = versoes.VERSOES_PADRAO, host: str = HOST,
                    arq_cusas: str = cusas.DADOS_PADRAO, arq_auditoria: str = auditoria.AUDITORIA_PADRAO,
                    dir_capas: str = capas.DIR_PADRAO, arq_apelidos: str = busca_inteligente.APELIDOS_PADRAO,
-                   arq_metadados: str = metadados.ARQ_PADRAO) -> ThreadingHTTPServer:
+                   arq_metadados: str = metadados.ARQ_PADRAO, arq_oficiais: str = metadados.OFICIAIS_PADRAO) -> ThreadingHTTPServer:
     if host != HOST:
         raise ValueError("o painel só pode escutar em 127.0.0.1")
     if not (porta == 0 or 1024 <= porta <= 65535):
         raise ValueError("porta deve ser 0 (qualquer) ou de 1024 a 65535")
-    dados = Dados(indice, arq_versoes, arq_cusas, arq_auditoria, dir_capas, arq_apelidos, arq_metadados)
+    dados = Dados(indice, arq_versoes, arq_cusas, arq_auditoria, dir_capas, arq_apelidos, arq_metadados, arq_oficiais)
+    dados.oficiais()                                            # falha cedo se o arquivo de metadados oficiais for inválido
     erros = versoes.validar_doc(dados.versoes())
     if erros:
         raise ValueError(f"o arquivo de versões tem {len(erros)} problema(s); rode: python -m ps4store.versoes --validar")

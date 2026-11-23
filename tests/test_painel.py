@@ -289,7 +289,7 @@ def test_interface_fluxo_completo_no_celular(navegador, srv, tmp_path):
     pg.goto(f"http://127.0.0.1:{srv.port}/")
     pg.locator("#estado li b").first.wait_for(timeout=8000)
     cab = pg.locator("#estado li").all_inner_texts()
-    assert [c.replace("\n", " ") for c in cab] == ["5 Jogos pesquisáveis", "1 Jogos com CUSA", "2 CUSAs distintos", "3 Registros manuais", "0 Conflitos pendentes"]
+    assert [c.replace("\n", " ") for c in cab] == ["5 Jogos pesquisáveis", "1 Jogos com CUSA", "6 CUSAs distintos", "7 Registros manuais", "0 Conflitos pendentes"]
     pg.fill("#q", "BATMAN")
     pg.click("button.primario")
     pg.wait_for_selector("#lista li")
@@ -452,10 +452,10 @@ def test_interface_pesquisa_por_cusa_e_exibe_origem_wikidata(navegador, srv_wd):
 # ---------- cabeçalho com contadores separados e avisos de conflito compactos ----------
 def test_estado_separa_jogos_com_cusa_cusas_distintos_registros_manuais_e_conflitos(srv_wd, srv):
     e = srv_wd.get("/api/estado")[2]
-    assert (e["jogosPesquisaveis"], e["jogosComCusa"], e["cusasDistintos"], e["registrosManuais"], e["registrosWikidata"], e["conflitosPendentes"]) == (5, 3, 4, 3, 3, 1)
+    assert (e["jogosPesquisaveis"], e["jogosComCusa"], e["cusasDistintos"], e["registrosManuais"], e["registrosWikidata"], e["conflitosPendentes"]) == (5, 3, 8, 7, 3, 1)
     sem = srv.get("/api/estado")[2]                                                                  # só curados: 5 jogos no índice, 1 com CUSA, 2 CUSAs, 3 manuais, 0 conflitos
-    assert (sem["jogosPesquisaveis"], sem["jogosComCusa"], sem["cusasDistintos"], sem["registrosManuais"], sem["conflitosPendentes"]) == (5, 1, 2, 3, 0)
-    assert e["jogosNoIndice"] == 5 and e["registrosDeVersao"] == 3 and e["somenteLeitura"] is True      # chaves antigas preservadas
+    assert (sem["jogosPesquisaveis"], sem["jogosComCusa"], sem["cusasDistintos"], sem["registrosManuais"], sem["conflitosPendentes"]) == (5, 1, 6, 7, 0)
+    assert e["jogosNoIndice"] == 5 and e["registrosDeVersao"] == 7 and e["somenteLeitura"] is True      # chaves antigas preservadas
 
 
 def faz_wd_com_muitos_conflitos(tmp_path, n=12):
@@ -495,7 +495,7 @@ def test_interface_mostra_conflitos_em_lista_recolhivel_e_cabecalho_novo(navegad
     pg.goto(f"http://127.0.0.1:{s.server_address[1]}/")
     pg.locator("#estado li b").first.wait_for(timeout=8000)
     cab = [c.replace("\n", " ") for c in pg.locator("#estado li").all_inner_texts()]
-    assert cab[0] == "13 Jogos pesquisáveis" and cab[1].endswith("Jogos com CUSA") and cab[3] == "3 Registros manuais" and cab[4] == "12 Conflitos pendentes"
+    assert cab[0] == "13 Jogos pesquisáveis" and cab[1].endswith("Jogos com CUSA") and cab[3] == "7 Registros manuais" and cab[4] == "12 Conflitos pendentes"
     pg.fill("#q", "middle aqui")
     pg.click("button.primario")
     pg.wait_for_selector("#lista li")

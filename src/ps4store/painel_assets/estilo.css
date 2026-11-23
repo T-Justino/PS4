@@ -71,3 +71,4 @@ details.atribuicao{margin:8px 0;padding:2px 10px}
 .link-box .linha{margin-top:8px}
 .link-box input{flex:1;min-width:0}
 pre.urls{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.8rem;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px;margin:8px 0}
+.aviso-txt{color:var(--warn);font-weight:600}

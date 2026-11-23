@@ -76,12 +76,13 @@ def test_ptbr_distingue_audio_texto_legendas_ptpt_e_sem_variante_sem_usar_regiao
     doc = metadados.vazio()
     doc["idiomas"]["Q1"] = {"fonte": "Wikidata", "grau": "alegado", "consultadoEm": "x", "url": "u", "itens": [{"tag": "pt-BR", "parte": "audio"}, {"tag": "pt", "parte": "texto"}]}
     loc = metadados.localizacao("Q1", regs, doc)
-    assert loc["confirmadas"] == ["audio"] and loc["partes"]["texto"]["status"] == "desconhecido" and loc["ptSemVariante"]       # 'pt' não vira PT-BR
-    assert metadados.filtro_ptbr(loc, "audio") and metadados.filtro_ptbr(loc, "qualquer") and not metadados.filtro_ptbr(loc, "texto")
+    assert loc["confirmadas"] == [] and loc["informadas"] == ["audio"] and loc["partes"]["audio"]["status"] == "informado" and loc["ptSemVariante"]   # Wikidata ≠ confirmado; 'pt' ≠ PT-BR
+    assert "só no Wikidata" in loc["resumo"] and metadados.filtro_ptbr(loc, "qualquer") and not metadados.filtro_ptbr(loc, "audio") and not metadados.filtro_ptbr(loc, "oficial")
+    assert metadados.selos_ptbr(loc) == ["wikidata"]
     doc2 = metadados.vazio()
     doc2["loja"]["UP1018-CUSA00133_00-B000000000001563"] = {"status": "ok", "fonte": "PlayStation Store (pt-br)", "grau": "oficial", "audio": ["en", "es"], "tela": ["pt-BR", "en"]}
     loc2 = metadados.localizacao("Q1", regs, doc2)
-    assert loc2["confirmadas"] == ["tela"] and loc2["partes"]["audio"]["status"] == "nao-listado" and metadados.filtro_ptbr(loc2, "texto")
+    assert loc2["confirmadas"] == ["tela"] and loc2["partes"]["audio"]["status"] == "nao-consta" and metadados.filtro_ptbr(loc2, "texto") and metadados.selos_ptbr(loc2) == ["oficial"]
     doc3 = metadados.vazio()
     doc3["idiomas"]["Q1"] = {"fonte": "Wikidata", "grau": "alegado", "itens": [{"tag": "pt-PT", "parte": "audio"}]}
     assert metadados.localizacao("Q1", regs, doc3)["resumo"].startswith("só português europeu") and not metadados.filtro_ptbr(metadados.localizacao("Q1", regs, doc3), "qualquer")
@@ -124,12 +125,16 @@ def test_importacao_incremental_e_preserva_curados(tmp_path):
 def srv_meta(tmp_path):
     doc = metadados.vazio()
     doc["atualizacoes"]["CUSA00133"] = metadados.consultar_sony("CUSA00133", fake({"ver.xml": (200, XML)}))
-    doc["idiomas"]["Q15891648"] = {"fonte": "Wikidata (P407 + P518)", "grau": "alegado", "consultadoEm": "2026-11-23T00:00:00+00:00", "url": "u",
-                                   "itens": [{"tag": "pt-BR", "parte": "audio"}]}
+    doc["idiomas"]["Q990700002"] = {"fonte": "Wikidata (P407 + P518)", "grau": "alegado", "consultadoEm": "2026-11-23T00:00:00+00:00", "url": "u",
+                                    "itens": [{"tag": "pt-BR", "parte": "audio"}]}
     arq = tmp_path / "meta.json"
     metadados.salvar(doc, str(arq))
+    ofi = tmp_path / "of.json"
+    ofi.write_text(json.dumps({"schema": "ps4store.oficiais/v1", "produtos": [
+        {"cusa": "CUSA00133", "escopo": "teste", "idiomas": {"audio": ["pt-BR"]}, "listaCompleta": False, "fonte": "Desenvolvedor X (simulado)", "tipo": "desenvolvedor",
+         "url": "https://exemplo.invalid/idiomas", "obtidoEm": "2026-11-23", "verificacao": "teste"}]}))
     s = painel.criar_servidor(0, faz_indice(tmp_path), SEMENTE, arq_cusas=SEM_WD, dir_capas=str(tmp_path / "c"), arq_apelidos=str(ROOT / "data" / "apelidos.json"),
-                              arq_metadados=str(arq))
+                              arq_metadados=str(arq), arq_oficiais=str(ofi))
     threading.Thread(target=s.serve_forever, daemon=True).start()
     yield Cli(s)
     s.shutdown()
@@ -138,12 +143,16 @@ def srv_meta(tmp_path):
 
 def test_painel_filtro_ptbr_e_detalhe_com_patch_e_localizacao(srv_meta):
     j = srv_meta.get("/api/jogos?q=batman")[2]
-    assert j["total"] == 3 and next(i for i in j["itens"] if i["qid"] == "Q15891648")["ptbr"] == ["audio"]       # desconhecidos seguem na busca geral
-    assert srv_meta.get("/api/jogos?q=batman&ptbr=audio")[2]["total"] == 1 and srv_meta.get("/api/jogos?q=batman&ptbr=texto")[2]["total"] == 0
-    assert srv_meta.get("/api/jogos?ptbr=qualquer")[2]["total"] == 1 and srv_meta.get("/api/jogos?ptbr=x")[0] == 400
+    assert j["total"] == 3 and next(i for i in j["itens"] if i["qid"] == "Q15891648")["ptbr"] == ["oficial", "audio"]   # desconhecidos seguem na busca geral
+    assert next(i for i in j["itens"] if i["qid"] == "Q990700002")["ptbr"] == ["wikidata"]
+    assert [i["qid"] for i in srv_meta.get("/api/jogos?q=batman&ptbr=audio")[2]["itens"]] == ["Q15891648"]            # oficial: só o CUSA com fonte do desenvolvedor
+    assert srv_meta.get("/api/jogos?q=batman&ptbr=texto")[2]["total"] == 0 and srv_meta.get("/api/jogos?q=batman&ptbr=qualquer")[2]["total"] == 2
+    assert srv_meta.get("/api/jogos?ptbr=oficial")[2]["total"] == 1 and srv_meta.get("/api/jogos?ptbr=x")[0] == 400
     d = srv_meta.get("/api/jogo?qid=Q15891648")[2]
-    assert d["localizacao"]["confirmadas"] == ["audio"] and d["localizacao"]["partes"]["texto"]["status"] == "desconhecido"
+    assert d["localizacao"]["confirmadas"] == ["audio"] and d["localizacao"]["partes"]["texto"]["status"] == "desconhecido" and "CUSA00133" in d["localizacao"]["resumo"]
+    assert d["localizacao"]["partes"]["audio"]["fontes"][0]["grau"] == "desenvolvedor"
     reg = next(r for r in d["registros"] if r["cusa"] == "CUSA00133")
+    assert reg["oficial"][0]["escopo"] == "teste" and not next(r for r in d["registros"] if r["cusa"] == "CUSA00135")["oficial"]
     assert reg["atualizacao"]["versao"] == "01.14" and reg["atualizacao"]["firmwareMinimo"] == "5.05" and reg["versao"] is None   # patch ≠ versão do registro
     assert d["total"] == 3                                                                                       # registros (e conflitos) preservados
 
@@ -245,10 +254,11 @@ def test_interface_390px_mostra_ptbr_patch_e_secao_de_link(srv_meta):
         pg.select_option("#f-ptbr", "audio")
         pg.wait_for_selector("#lista li")
         assert pg.locator("#lista li").count() == 1 and "PT-BR · áudio" in pg.locator("#lista li").first.inner_text()
+        assert "Idiomas oficiais" not in pg.locator("#lista").inner_text()                                       # card sem excesso de metadados
         pg.locator("#lista li").first.click()
         pg.locator("#jogo .ptbr-box").wait_for(timeout=8000)
         txt = pg.locator("#jogo").inner_text()
-        assert "Português do Brasil" in txt and "PT-BR confirmado: áudio" in txt and "01.14" in txt and "5.05" in txt and "NÃO garante compatibilidade" in txt
+        assert "Português do Brasil" in txt and "PT-BR confirmado por fonte oficial: áudio" in txt and "Idiomas oficiais deste CUSA" in txt and "01.14" in txt and "5.05" in txt and "NÃO garante compatibilidade" in txt
         assert txt.index("Português do Brasil") < txt.index("CUSA00133") < txt.index("Analisar link")                  # ordem pedida na SDD
         pg.fill("#link-url", "https://store.playstation.com/pt-br/product/UP1018-CUSA00133_00-B000000000001563")
         pg.click("#link-analisar")
@@ -258,3 +268,60 @@ def test_interface_390px_mostra_ptbr_patch_e_secao_de_link(srv_meta):
     finally:
         b.close()
         ctx.stop()
+
+
+
+# ---------- correções após o teste real ----------
+def _indice(nomes):
+    return {"titulos": [{"nome": n, "idFonte": f"wikidata:Q99{i:05d}", "url": ""} for i, n in enumerate(nomes, 1)]}
+
+
+def test_jogos_por_nome_exato_sem_encher_a_amostra_com_parecidos():
+    idx = _indice(["Grand Theft Auto V", "Grand Theft Auto: Vice City", "Grand Theft Auto IV", "Cyberpunk 2077", "Batman: Arkham Knight", "Batman: Arkham City", "Doom", "Doom"])
+    ap = json.loads((ROOT / "data" / "apelidos.json").read_text())["apelidos"]
+    jogos, avisos = metadados.escolher_jogos(idx, {"versoes": []}, {"registros": []}, ["grand theft auto v", "cyberpunk 2077", "batman arkham knight"], 10, apelidos=ap)
+    assert [j[1] for j in jogos] == ["Grand Theft Auto V", "Cyberpunk 2077", "Batman: Arkham Knight"] and not avisos
+    jogos, _ = metadados.escolher_jogos(idx, {"versoes": []}, {"registros": []}, ["gta v"], 10, apelidos=ap)
+    assert [j[1] for j in jogos] == ["Grand Theft Auto V"]                                                     # apelido com vínculo explícito
+    jogos, avisos = metadados.escolher_jogos(idx, {"versoes": []}, {"registros": []}, ["grand theft auto", "doom"], 10, apelidos=ap)
+    assert jogos == [] and "sem nome exato" in avisos[0] and "2 jogos com esse nome exato" in avisos[1]          # parecido/ambíguo: nada entra
+
+
+def test_erro_de_rede_ou_tls_nao_bloqueia_nova_tentativa():
+    cur = {"versoes": [{"qid": "Q1", "cusa": "CUSA00133", "jogo": "x"}]}
+    wd = {"registros": [], "conflitos": []}
+    doc = metadados.vazio()
+
+    def tls(url, m):
+        raise metadados.capas.ErroHttp(0, "tls:certificado-nao-verificado (unable to get local issuer certificate)")
+    metadados.importar([("Q1", "x")], cur, wd, doc, tls, fontes=("sony",), pausa=0)
+    a = doc["atualizacoes"]["CUSA00133"]
+    assert a["status"] == "erro" and "local issuer" in a["erro"]
+    f = fake({"ver.xml": (200, XML)})
+    metadados.importar([("Q1", "x")], cur, wd, doc, f, fontes=("sony",), pausa=0)
+    assert doc["atualizacoes"]["CUSA00133"]["status"] == "ok" and f.pedidas                                      # tentou de novo no mesmo dia
+    def http_ok(url, m):
+        if url.startswith("https"):
+            raise metadados.capas.ErroHttp(0, "tls:certificado-nao-verificado")
+        return 200, XML
+    r = metadados.consultar_sony("CUSA00133", http_ok, permitir_http=True)
+    assert r["status"] == "ok" and r["grau"] == "oficial-via-http" and r["url"].startswith("http://") and "integridade" in r["nota"]
+    assert metadados.consultar_sony("CUSA00133", http_ok)["status"] == "erro"                                    # sem a opção, HTTP não é usado
+    assert metadados.FONTES == ("sony", "wikidata") and "loja" in metadados.FONTES_VALIDAS                     # loja fora do padrão
+
+
+def test_metadados_oficiais_por_cusa_do_repositorio_e_escopo():
+    ofi = metadados.carregar_oficiais(str(ROOT / "data" / "metadados-oficiais.json"))
+    assert not metadados.validar_oficiais(ofi)
+    cur = json.loads(Path(SEMENTE).read_text())
+    regs = [dict(r, origem="curado") for r in cur["versoes"] if r["qid"] == "Q3182559"]
+    assert {r["cusa"] for r in regs} == {"CUSA16596", "CUSA16597", "CUSA16496", "CUSA20476"}
+    assert all(r["evidencias"][0]["url"].startswith("https://support.cdprojektred.com/") for r in regs)
+    loc = metadados.localizacao("Q3182559", regs, metadados.vazio(), ofi)
+    assert loc["confirmadas"] == ["audio", "texto"] and "CUSA16596" in loc["resumo"] and loc["partes"]["legendas"]["status"] == "nao-consta"
+    so_jp = [r for r in regs if r["cusa"] in ("CUSA16496", "CUSA20476")]
+    loc_jp = metadados.localizacao("Q3182559", so_jp, metadados.vazio(), ofi)
+    assert loc_jp["confirmadas"] == [] and loc_jp["partes"]["audio"]["status"] == "nao-consta" and "não consta" in loc_jp["resumo"]
+    assert metadados.localizacao("Q3182559", [], metadados.vazio(), ofi)["resumo"].startswith("desconhecido")     # sem CUSA do jogo: nada é atribuído
+    ruim = {"schema": "ps4store.oficiais/v1", "produtos": [{"cusa": "CUSA1", "escopo": "", "idiomas": {"voz": ["pt-BR"]}, "fonte": "x", "url": "http://a", "obtidoEm": "ontem"}]}
+    assert len(metadados.validar_oficiais(ruim)) >= 5

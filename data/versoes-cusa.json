@@ -62,6 +62,78 @@
          "obtidoEm": "2026-11-22", "afirma": ["cusa", "contentId", "edicao", "idiomas"]}
       ],
       "nota": "Aparece nas lojas en-id e en-hk, mas o Content ID tem prefixo UP: a região NÃO é afirmada. Mesmo CUSA00133 da edição dos EUA."
+    },
+    {
+      "qid": "Q3182559",
+      "qidEvidencia": "Q-id do Cyberpunk 2077 no índice local (informado pelo usuário no teste do Termux); o vínculo CUSA->jogo vem da página oficial da CD PROJEKT RED, que é sobre Cyberpunk 2077",
+      "jogo": "Cyberpunk 2077",
+      "cusa": "CUSA16596",
+      "contentId": null,
+      "edicao": "edição física das Américas",
+      "versao": null,
+      "regiao": null,
+      "idiomas": ["Português (Brasil)"],
+      "idiomasBase": "página oficial da CD PROJEKT RED: dublagem e texto em PT-BR nesta edição (os outros idiomas não foram transcritos)",
+      "lojas": [],
+      "status": "citado",
+      "evidencias": [
+        {"fonte": "CD PROJEKT RED · suporte oficial (pt-br)", "tipo": "desenvolvedor", "url": "https://support.cdprojektred.com/pt-br/cyberpunk/playstation/sp-technical/issue/1574/ps4-cyberpunk-2077-suporte-a-idiomas", "obtidoEm": "2026-11-23", "afirma": ["cusa", "edicao", "idiomas"], "trecho": "PS4 Cyberpunk 2077 – suporte a idiomas (CUSAs por edição/região). Conteúdo relatado pelo usuário; página não lida por esta ferramenta."}
+      ],
+      "nota": "CUSA de MÍDIA FÍSICA citado pelo desenvolvedor; não vale para todas as edições digitais. Região não convertida em código (a página fala em edição/região, não em prefixo de Content ID)."
+    },
+    {
+      "qid": "Q3182559",
+      "qidEvidencia": "Q-id do Cyberpunk 2077 no índice local (informado pelo usuário no teste do Termux); o vínculo CUSA->jogo vem da página oficial da CD PROJEKT RED, que é sobre Cyberpunk 2077",
+      "jogo": "Cyberpunk 2077",
+      "cusa": "CUSA16597",
+      "contentId": null,
+      "edicao": "edição física das Américas",
+      "versao": null,
+      "regiao": null,
+      "idiomas": ["Português (Brasil)"],
+      "idiomasBase": "página oficial da CD PROJEKT RED: dublagem e texto em PT-BR nesta edição (os outros idiomas não foram transcritos)",
+      "lojas": [],
+      "status": "citado",
+      "evidencias": [
+        {"fonte": "CD PROJEKT RED · suporte oficial (pt-br)", "tipo": "desenvolvedor", "url": "https://support.cdprojektred.com/pt-br/cyberpunk/playstation/sp-technical/issue/1574/ps4-cyberpunk-2077-suporte-a-idiomas", "obtidoEm": "2026-11-23", "afirma": ["cusa", "edicao", "idiomas"], "trecho": "PS4 Cyberpunk 2077 – suporte a idiomas (CUSAs por edição/região). Conteúdo relatado pelo usuário; página não lida por esta ferramenta."}
+      ],
+      "nota": "CUSA de MÍDIA FÍSICA citado pelo desenvolvedor; não vale para todas as edições digitais. Região não convertida em código (a página fala em edição/região, não em prefixo de Content ID)."
+    },
+    {
+      "qid": "Q3182559",
+      "qidEvidencia": "Q-id do Cyberpunk 2077 no índice local (informado pelo usuário no teste do Termux); o vínculo CUSA->jogo vem da página oficial da CD PROJEKT RED, que é sobre Cyberpunk 2077",
+      "jogo": "Cyberpunk 2077",
+      "cusa": "CUSA16496",
+      "contentId": null,
+      "edicao": "edição japonesa",
+      "versao": null,
+      "regiao": null,
+      "idiomas": ["English", "Japanese"],
+      "idiomasBase": "página oficial da CD PROJEKT RED: inglês e japonês; sem português brasileiro",
+      "lojas": [],
+      "status": "citado",
+      "evidencias": [
+        {"fonte": "CD PROJEKT RED · suporte oficial (pt-br)", "tipo": "desenvolvedor", "url": "https://support.cdprojektred.com/pt-br/cyberpunk/playstation/sp-technical/issue/1574/ps4-cyberpunk-2077-suporte-a-idiomas", "obtidoEm": "2026-11-23", "afirma": ["cusa", "edicao", "idiomas"], "trecho": "PS4 Cyberpunk 2077 – suporte a idiomas (CUSAs por edição/região). Conteúdo relatado pelo usuário; página não lida por esta ferramenta."}
+      ],
+      "nota": "CUSA de MÍDIA FÍSICA citado pelo desenvolvedor; não vale para todas as edições digitais. Região não convertida em código (a página fala em edição/região, não em prefixo de Content ID)."
+    },
+    {
+      "qid": "Q3182559",
+      "qidEvidencia": "Q-id do Cyberpunk 2077 no índice local (informado pelo usuário no teste do Termux); o vínculo CUSA->jogo vem da página oficial da CD PROJEKT RED, que é sobre Cyberpunk 2077",
+      "jogo": "Cyberpunk 2077",
+      "cusa": "CUSA20476",
+      "contentId": null,
+      "edicao": "edição japonesa",
+      "versao": null,
+      "regiao": null,
+      "idiomas": ["English", "Japanese"],
+      "idiomasBase": "página oficial da CD PROJEKT RED: inglês e japonês; sem português brasileiro",
+      "lojas": [],
+      "status": "citado",
+      "evidencias": [
+        {"fonte": "CD PROJEKT RED · suporte oficial (pt-br)", "tipo": "desenvolvedor", "url": "https://support.cdprojektred.com/pt-br/cyberpunk/playstation/sp-technical/issue/1574/ps4-cyberpunk-2077-suporte-a-idiomas", "obtidoEm": "2026-11-23", "afirma": ["cusa", "edicao", "idiomas"], "trecho": "PS4 Cyberpunk 2077 – suporte a idiomas (CUSAs por edição/região). Conteúdo relatado pelo usuário; página não lida por esta ferramenta."}
+      ],
+      "nota": "CUSA de MÍDIA FÍSICA citado pelo desenvolvedor; não vale para todas as edições digitais. Região não convertida em código (a página fala em edição/região, não em prefixo de Content ID)."
     }
   ]
 }

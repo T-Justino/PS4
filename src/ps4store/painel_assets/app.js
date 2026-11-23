@@ -55,7 +55,8 @@ function cartaoJogo(it) {
     info.appendChild(el("span", "badge ok", it.nRegistros + " registro(s) · " + it.nCusas + " CUSA(s)"));
     if (it.nWikidata) info.appendChild(el("span", "badge wd", it.nWikidata + " alegado(s) no Wikidata"));
   }
-  if (it.ptbr && it.ptbr.length) info.appendChild(el("span", "badge ptbr", "PT-BR" + (it.ptbr.includes("audio") ? " · áudio" : "")));
+  if (it.ptbr && it.ptbr.includes("oficial")) info.appendChild(el("span", "badge ptbr", "PT-BR" + (it.ptbr.includes("audio") ? " · áudio" : "")));
+  else if (it.ptbr && it.ptbr.includes("wikidata")) info.appendChild(el("span", "badge", "PT-BR? (Wikidata)"));
   li.appendChild(info);
   if (it.qid) { li.tabIndex = 0; li.addEventListener("click", () => abrirJogo(it.qid)); li.addEventListener("keydown", (e) => { if (e.key === "Enter") abrirJogo(it.qid); }); }
   return li;
@@ -129,6 +130,11 @@ function cartaoVersao(r, todasFontes) {
   if (r.idiomas && r.idiomas.length) id.appendChild(el("div", "meta", "base: " + (r.idiomasBase || "?")));
   else id.textContent = "desconhecidos (a região não define o idioma)", id.className = "desc";
   campo(dl, "Versão do pacote (registro)", r.versao, !r.versao);
+  (r.oficial || []).forEach((o) => {
+    const txt = Object.entries(o.idiomas).map(([p, l]) => ({ audio: "áudio", texto: "texto", legendas: "legendas", geral: "idiomas" }[p] || p) + ": " + l.join(", ")).join(" · ");
+    const dd = campo(dl, "Idiomas oficiais deste CUSA", txt + (o.listaCompleta ? "" : " (lista parcial)"), false);
+    dd.appendChild(el("div", "meta", o.escopo + " · " + o.fonte + " · " + o.obtidoEm + " · " + o.verificacao));
+  });
   const a = r.atualizacao;
   if (!a) campo(dl, "Atualização (patch)", "", true).textContent = "não consultada (rode ps4store.metadados)";
   else if (a.status === "ok") {
@@ -152,7 +158,7 @@ function cartaoVersao(r, todasFontes) {
 }
 
 const PARTE = { audio: "Áudio", texto: "Texto/interface", legendas: "Legendas", tela: "Texto ou legendas (tela)" };
-const STATUS_PT = { confirmado: "confirmado", "nao-listado": "não consta na lista da fonte", desconhecido: "desconhecido" };
+const STATUS_PT = { confirmado: "confirmado (fonte oficial)", informado: "só no Wikidata (geral, não verificado)", "nao-consta": "não consta na lista oficial", desconhecido: "desconhecido" };
 function blocoPtbr(loc) {
   const c = el("section", "card ptbr-box");
   c.appendChild(el("div", "nome", "Português do Brasil"));
@@ -162,7 +168,8 @@ function blocoPtbr(loc) {
     const s = loc.partes[p];
     const dd = campo(dl, PARTE[p], STATUS_PT[s.status], s.status === "desconhecido");
     if (s.status === "confirmado") dd.className = "ok-txt";
-    s.fontes.slice(0, 2).forEach((f) => dd.appendChild(el("div", "meta", f.fonte + " · " + f.grau + (f.consultadoEm ? " · " + f.consultadoEm.slice(0, 10) : ""))));
+    else if (s.status === "informado") dd.className = "aviso-txt";
+    s.fontes.slice(0, 3).forEach((f) => dd.appendChild(el("div", "meta", f.fonte + " · " + f.rotuloGrau + (f.consultadoEm ? " · " + f.consultadoEm.slice(0, 10) : ""))));
   });
   if (loc.semParte.length) campo(dl, "PT-BR sem parte", "informado sem dizer se é áudio, texto ou legenda", false).appendChild(el("div", "meta", loc.semParte.map((f) => f.fonte).join("; ")));
   if (loc.ptSemVariante.length) campo(dl, "Português (sem variante)", "não classificado como PT-BR", false);

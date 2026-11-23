@@ -1,0 +1,26 @@
+{
+ "schema": "ps4store.oficiais/v1",
+ "_nota": "Idiomas declarados por fonte OFICIAL (desenvolvedor/publicadora) para um CUSA ESPECÍFICO. Vale só para o CUSA e o escopo citados (ex.: mídia física de uma região), nunca para todas as edições. 'listaCompleta': true = a fonte lista TODOS os idiomas do produto (ausência de PT-BR vira 'não consta'); false = só o que foi transcrito. Partes: audio, texto, legendas; 'geral' = idiomas sem dizer a parte. Etiquetas: pt-BR, pt-PT, pt, en, ja... 'verificacao' diz como o conteúdo chegou aqui. Validar: python -m ps4store.metadados --validar-oficiais",
+ "produtos": [
+  {"cusa": "CUSA16596", "jogo": "Cyberpunk 2077", "escopo": "edição física das Américas", "idiomas": {"audio": ["pt-BR"], "texto": ["pt-BR"]}, "listaCompleta": false,
+   "fonte": "CD PROJEKT RED · suporte oficial (pt-br)", "tipo": "desenvolvedor",
+   "url": "https://support.cdprojektred.com/pt-br/cyberpunk/playstation/sp-technical/issue/1574/ps4-cyberpunk-2077-suporte-a-idiomas", "obtidoEm": "2026-11-23",
+   "verificacao": "conteúdo relatado pelo usuário a partir da página oficial; a página não foi lida por esta ferramenta (sem rede na sandbox)",
+   "nota": "Só a dublagem e o texto em PT-BR foram transcritos; os demais idiomas desta edição não. Não se aplica automaticamente às edições digitais."},
+  {"cusa": "CUSA16597", "jogo": "Cyberpunk 2077", "escopo": "edição física das Américas", "idiomas": {"audio": ["pt-BR"], "texto": ["pt-BR"]}, "listaCompleta": false,
+   "fonte": "CD PROJEKT RED · suporte oficial (pt-br)", "tipo": "desenvolvedor",
+   "url": "https://support.cdprojektred.com/pt-br/cyberpunk/playstation/sp-technical/issue/1574/ps4-cyberpunk-2077-suporte-a-idiomas", "obtidoEm": "2026-11-23",
+   "verificacao": "conteúdo relatado pelo usuário a partir da página oficial; a página não foi lida por esta ferramenta (sem rede na sandbox)",
+   "nota": "Só a dublagem e o texto em PT-BR foram transcritos; os demais idiomas desta edição não. Não se aplica automaticamente às edições digitais."},
+  {"cusa": "CUSA16496", "jogo": "Cyberpunk 2077", "escopo": "edição japonesa", "idiomas": {"geral": ["en", "ja"]}, "listaCompleta": true,
+   "fonte": "CD PROJEKT RED · suporte oficial (pt-br)", "tipo": "desenvolvedor",
+   "url": "https://support.cdprojektred.com/pt-br/cyberpunk/playstation/sp-technical/issue/1574/ps4-cyberpunk-2077-suporte-a-idiomas", "obtidoEm": "2026-11-23",
+   "verificacao": "conteúdo relatado pelo usuário a partir da página oficial; a página não foi lida por esta ferramenta (sem rede na sandbox)",
+   "nota": "A página lista inglês e japonês, sem português brasileiro."},
+  {"cusa": "CUSA20476", "jogo": "Cyberpunk 2077", "escopo": "edição japonesa", "idiomas": {"geral": ["en", "ja"]}, "listaCompleta": true,
+   "fonte": "CD PROJEKT RED · suporte oficial (pt-br)", "tipo": "desenvolvedor",
+   "url": "https://support.cdprojektred.com/pt-br/cyberpunk/playstation/sp-technical/issue/1574/ps4-cyberpunk-2077-suporte-a-idiomas", "obtidoEm": "2026-11-23",
+   "verificacao": "conteúdo relatado pelo usuário a partir da página oficial; a página não foi lida por esta ferramenta (sem rede na sandbox)",
+   "nota": "A página lista inglês e japonês, sem português brasileiro."}
+ ]
+}

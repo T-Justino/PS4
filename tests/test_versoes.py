@@ -221,6 +221,9 @@ def test_semente_e_valida_e_so_afirma_o_que_a_evidencia_sustenta():
     assert validar_doc(d) == []
     for r in d["versoes"]:
         assert r["status"] == "citado" and r["versao"] is None                              # nada foi aberto/confirmado; versão do pacote desconhecida
+        if r["qid"] == "Q3182559":                                                           # Cyberpunk 2077: página oficial do desenvolvedor, sem Content ID
+            assert r["contentId"] is None and all(e["tipo"] == "desenvolvedor" and e["url"].startswith("https://support.cdprojektred.com/") for e in r["evidencias"])
+            continue
         assert all(e["url"].startswith("https://store.playstation.com/") and e["tipo"] == "loja-oficial" for e in r["evidencias"])
         assert any(r["contentId"] in e["url"] for e in r["evidencias"])                      # o Content ID está na própria URL da evidência (sem digitação solta)
         assert r["contentId"].split("-")[1].split("_")[0] == r["cusa"]
@@ -228,6 +231,7 @@ def test_semente_e_valida_e_so_afirma_o_que_a_evidencia_sustenta():
 
 def test_semente_batman_arkham_knight_tem_mais_de_um_cusa_e_nao_inventa_idioma_nem_regiao():
     d = semente()
+    d["versoes"] = [r for r in d["versoes"] if r["qid"] == "Q15891648"]
     assert {r["cusa"] for r in d["versoes"]} == {"CUSA00133", "CUSA00135"} and len([r for r in d["versoes"] if r["cusa"] == "CUSA00133"]) == 2
     por_cid = {r["contentId"]: r for r in d["versoes"]}
     us, eu, asia = (por_cid["UP1018-CUSA00133_00-B000000000001563"], por_cid["EP1018-CUSA00135_00-BAKPREMIUMED0000"], por_cid["UP1018-CUSA00133_00-ASIA000000000003"])
