@@ -19,6 +19,9 @@
     <string name="btn_follow">Seguir</string>
     <string name="btn_click">Destacar</string>
     <string name="btn_use_tab">Usar esta guia</string>
+    <string name="btn_resume_tab">Retomar nesta guia</string>
+    <string name="resume_title">Retomar a análise?</string>
+    <string name="resume_message">Isso inicia uma NOVA etapa nesta guia. O resultado já confirmado é mantido e o novo resultado aparece separado. Alternar entre guias não reinicia nada.</string>
     <string name="btn_resume_human">Já resolvi</string>
     <string name="btn_resume_click">Já cliquei</string>
     <string name="copied">URL copiada</string>

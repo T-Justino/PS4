@@ -26,9 +26,7 @@ class V4ScenarioTest {
         s.pages[base + "tabs/start.html"] = fx("tabs__start__t0")
         s.pages[base + "tabs/etapa2.html"] = fx("tabs__etapa2__t0")
         s.start(base + "tabs/start.html"); s.pump()
-        assertEquals(listOf("Continuar"), s.clicked)                 // clique automático, intenção inequívoca
-        assertEquals(EngineState.RUNNING, s.e.state)
-        s.advance(5_000)                                              // popup sem gesto é bloqueado: nada acontece
+        assertTrue("botão com window.open NUNCA é clicado automaticamente", s.clicked.isEmpty())
         assertEquals(EngineState.WAITING_CLICK, s.e.state)
         assertEquals(listOf("Continuar"), s.highlighted)              // pede o toque humano no botão destacado
         s.userOpensTabs(0, 1 to base + "tabs/etapa2.html")            // o usuário toca: window.open com gesto
@@ -57,10 +55,10 @@ class V4ScenarioTest {
         s.pages[base + "popup-ad/start.html"] = fx("popup-ad__start__t0")
         s.pages[base + "popup-ad/anuncio.html"] = fx("popup-ad__anuncio__t0")
         s.pages[base + "popup-ad/download.html"] = fx("popup-ad__download__t0")
-        s.start(base + "popup-ad/start.html"); s.pump(); s.advance(5_000)
+        s.start(base + "popup-ad/start.html"); s.pump()
         assertEquals(EngineState.WAITING_CLICK, s.e.state)
-        assertEquals(listOf("Continuar"), s.highlighted)              // "Receber prêmio" nunca é clicado
-        assertEquals(listOf("Continuar"), s.clicked)
+        assertEquals(listOf("Continuar"), s.highlighted)              // "Receber prêmio" nunca é destacado nem clicado
+        assertTrue(s.clicked.isEmpty())
         s.userOpensTabs(0, 1 to base + "popup-ad/anuncio.html", 2 to base + "popup-ad/download.html")
         s.pump()
         assertEquals(listOf(1), s.closed)                             // anúncio fechado
@@ -114,16 +112,19 @@ class V4ScenarioTest {
         assertTrue(s.e.isActive)
     }
 
-    @Test fun userCanMoveWorkToAnotherTabAndResumeAfterFinish() {
+    @Test fun interruptedAnalysisDoesNotRestartOnTabSelectionButResumesOnExplicitRequest() {
         val s = sim(); s.holdProbes = true
         s.pages[base + "tabs/start.html"] = fx("tabs__start__t0")
         s.pages[base + "tabs/etapa2.html"] = fx("tabs__etapa2__t0")
-        s.start(base + "tabs/start.html"); s.pump(); s.advance(5_000)
+        s.start(base + "tabs/start.html"); s.pump()
         s.userOpensTabs(0, 1 to base + "tabs/etapa2.html")
         s.holdProbes = false
         s.e.stop(); s.pump()
         assertEquals(EngineState.FINISHED, s.e.state)
-        s.e.setWorkTab(1); s.pump()                       // "Usar esta guia" depois do fim
+        val before = s.result
+        s.e.setWorkTab(1); s.pump()                                     // seleção de guia depois do fim: NÃO reinicia
+        assertEquals(EngineState.FINISHED, s.e.state); assertSame(before, s.result)
+        assertTrue(s.e.resumeOnTab(1)); s.scanNow(1); s.pump()         // retomada EXPLÍCITA
         assertEquals(ResultState.VERIFIED_FILE, s.result?.state)
     }
 

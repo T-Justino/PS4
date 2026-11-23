@@ -14,7 +14,7 @@ object PageScanner {
     const val SCRIPT = """
 (function(){
 try{
-var out={url:location.href,title:document.title||'',cands:[],challenge:null,hint:null,wait:false,cd:0,ad:false};
+var out={url:location.href,title:document.title||'',cands:[],challenge:null,hint:null,wait:false,cd:0,ad:false,wo:false};
 /* observador de mudanças dinâmicas (idempotente; somente leitura do DOM; não toca em relógios nem scripts do site) */
 if(!window.__lrObs){try{
  window.__lrVer=0;
@@ -101,6 +101,7 @@ while((mB=rB.exec(body))){var vB=parseInt(mB[1],10);if(vB>0&&vB<=120&&vB>cdn)cdn
 var tims=document.querySelectorAll('[id*=count],[class*=count],[id*=timer],[class*=timer],[id*=segundos],[id*=seconds]');
 for(var ti=0;ti<tims.length&&ti<10;ti++){var tv=((tims[ti].innerText||'')+'').trim();if(/^\d{1,3}$/.test(tv)){var vT=parseInt(tv,10);if(vT>0&&vT<=120&&vT>cdn)cdn=vT}}
 out.cd=cdn;
+out.wo=false;var sc2=document.querySelectorAll('script:not([src])');for(var si=0;si<sc2.length&&si<30;si++){if(/window\.open\s*\(/.test((sc2[si].textContent||'').slice(0,30000))){out.wo=true;break}}
 out.ad=/(casino|cassino|bet365|apostas?|aposte|b[oô]nus de|ganhe\s+(um\s+)?pr[eê]mio|voc[eê] ganhou|you('ve| have)? won|claim your|click here to claim|vpn gr[aá]tis|free vpn|xxx|viagra)/.test(body);
 out.wait=/(aguarde|please wait|redirecionando|redirecting|seu download (come|inici)|your download (will|is)|gerando (seu )?link|generating (your )?link|countdown|contagem regressiva|segundos|seconds)/.test(body);
 return JSON.stringify(out)
@@ -162,6 +163,7 @@ return JSON.stringify(out)
                 waitHint = o.optBoolean("wait", false),
                 adLike = o.optBoolean("ad", false),
                 countdownSec = o.optInt("cd", 0),
+                opensWindows = o.optBoolean("wo", false),
             )
         } catch (e: Exception) {
             null

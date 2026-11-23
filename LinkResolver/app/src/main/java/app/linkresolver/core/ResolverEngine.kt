@@ -107,6 +107,17 @@ class ResolverEngine(
     private var clickTarget: ScoredCandidate? = null
     private var manualResumes = 0
     private var ignoreChallengeOnPage = false
+    /** Primeiro resultado da análise (um arquivo confirmado NUNCA é substituído por eventos posteriores). */
+    private var primaryResult: ResolveResult? = null
+    private val resumeResults = mutableListOf<ResolveResult>()
+    /** URLs (chave de loop) já confirmadas como arquivo: voltar a elas não é loop. */
+    private val confirmedKeys = HashSet<String>()
+    /** Estamos numa retomada EXPLÍCITA (pedida pelo usuário) depois de a análise terminar. */
+    private var inResume = false
+    /** O botão destacado abre nova guia (window.open): só o gesto humano + a guia nova provam o efeito, não o DOM. */
+    private var expectTab = false
+    private var lastOpensWindows = false
+    private var probingUrlKey: String? = null
 
     val isActive: Boolean get() = state != EngineState.IDLE && state != EngineState.FINISHED
     val currentDepth: Int get() = depth
@@ -163,6 +174,7 @@ class ResolverEngine(
         workTab = 0; tabInfos.clear(); popupsOnPage.clear(); popupsTotal = 0; scansOnPage = 0; lastScanAt = 0; lastScanUrl = ""
         lastCountdown = 0; pageWaitStart = 0; autoClicks = 0; clickedKeys.clear(); pendingClick = null; clickTarget = null
         manualResumes = 0; ignoreChallengeOnPage = false
+        primaryResult = null; resumeResults.clear(); confirmedKeys.clear(); inResume = false; expectTab = false; lastOpensWindows = false
     }
 
     private fun resetPageCounters() {
@@ -293,6 +305,11 @@ class ResolverEngine(
 
     /** Uma guia foi criada (window.open / target=_blank). Abrir guia NÃO é evidência de arquivo. */
     fun onTabOpened(tabId: Int, openerId: Int, openerUrl: String?) {
+        if (!isActive) {
+            // Análise concluída: guias abertas pelo usuário NÃO alteram o resultado, o caminho nem o estado.
+            step(StepKind.TAB, openerUrl, "guia $tabId aberta pelo usuário após o fim da análise (resultado preservado)")
+            return
+        }
         val idx = path.size
         if (path.size < 80) {
             path += PathEntry(
@@ -304,11 +321,13 @@ class ResolverEngine(
         tabInfos[tabId] = TabInfo(openerId, openerUrl, idx)
         step(StepKind.TAB, openerUrl, "guia $tabId aberta pela guia $openerId")
         noteEffect("nova guia")
+        expectTab = false
         if (state == EngineState.WAITING_CLICK) resumeFromClick("o toque abriu uma nova guia")
     }
 
     fun onTabClosed(tabId: Int) {
         val info = tabInfos.remove(tabId) ?: return
+        if (!isActive) { step(StepKind.TAB, null, "guia $tabId fechada (análise já concluída; resultado preservado)"); return }
         step(StepKind.TAB, null, "guia $tabId fechada")
         if (workTab == tabId) {
             workTab = info.openerId ?: 0
@@ -362,19 +381,42 @@ class ResolverEngine(
         listener.onWorkTabChanged(tabId)
     }
 
-    /** O usuário escolheu continuar a análise em [tabId] (qualquer guia autorizada). */
+    /**
+     * Durante uma análise ATIVA, o usuário escolhe em qual guia ela deve continuar. Depois de concluída, NÃO faz nada:
+     * alternar/selecionar guias é só visual. Para continuar depois do fim use [resumeOnTab] (ação explícita).
+     */
     fun setWorkTab(tabId: Int) {
-        if (!isActive && state != EngineState.FINISHED) return
-        if (state == EngineState.FINISHED) {
-            if (manualResumes >= limits.maxManualResumes) { step(StepKind.BLOCKED, null, "limite de retomadas manuais"); return }
-            manualResumes++
-            startedAt = clock(); pausedMs = 0; pauseStart = 0; stepStartedAt = clock(); scanAttempts = 0
-            networkFailure = null; failedUrl = null; mainFrameError = false
-            setState(EngineState.RUNNING, "Retomado na guia $tabId")
-        } else if (state == EngineState.WAITING_CONFIRMATION) return
+        if (!isActive) {
+            if (state == EngineState.FINISHED) step(StepKind.TAB, null, "seleção de guia ignorada: a análise já terminou (use Retomar para continuar)")
+            return
+        }
+        if (state == EngineState.WAITING_CONFIRMATION) return
         tabInfos[tabId]?.relevant = true
         promoteTab(tabId, "escolhida pelo usuário")
         listener.requestRescan(tabId, 300)
+    }
+
+    /** Pode haver retomada explícita (a análise terminou e ainda há orçamento de retomadas)? */
+    fun canResume(): Boolean = state == EngineState.FINISHED && manualResumes < limits.maxManualResumes &&
+        lastResult?.message?.contains("Safe Browsing") != true
+
+    /**
+     * AÇÃO EXPLÍCITA: retomar a análise na guia [tabId] depois do fim. Inicia uma nova etapa controlada e seu
+     * resultado é apresentado SEPARADAMENTE; um resultado de arquivo confirmado anterior é mantido.
+     */
+    fun resumeOnTab(tabId: Int): Boolean {
+        if (!canResume()) { step(StepKind.BLOCKED, null, "retomada não permitida (limite, Safe Browsing ou análise ainda ativa)"); return false }
+        manualResumes++; inResume = true
+        startedAt = clock(); pausedMs = 0; pauseStart = 0; stepStartedAt = clock(); scanAttempts = 0
+        networkFailure = null; failedUrl = null; mainFrameError = false; probingUrl = null; pending = null
+        pendingClick = null; clickTarget = null; expectTab = false
+        depth = minOf(depth, limits.maxDepth - 1)
+        step(StepKind.RESUME, null, "retomada manual #$manualResumes na guia $tabId (pedida pelo usuário)")
+        setState(EngineState.RUNNING, "Retomado na guia $tabId")
+        tabInfos[tabId]?.relevant = true
+        promoteTab(tabId, "retomada explícita pelo usuário")
+        listener.requestRescan(tabId, 300)
+        return true
     }
 
     /** Efeito observável de um clique automático (navegação, nova guia, mudança no DOM...). */
@@ -387,7 +429,7 @@ class ResolverEngine(
 
     private fun resumeFromClick(reason: String) {
         if (state != EngineState.WAITING_CLICK) return
-        endPause(); clickTarget = null
+        endPause(); clickTarget = null; expectTab = false
         step(StepKind.RESUME, null, "retomando: $reason")
         stepStartedAt = clock(); scanAttempts = 0
         setState(EngineState.RUNNING, "Retomado")
@@ -397,7 +439,7 @@ class ResolverEngine(
     fun onDomChanged(tabId: Int = workTab) {
         if (!isActive || state == EngineState.WAITING_CONFIRMATION || probingUrl != null) return
         if (tabId != workTab && tabInfos[tabId]?.relevant != null) return
-        noteEffect("a página foi modificada")
+        if (!expectTab) noteEffect("a página foi modificada") // alteração do DOM NÃO prova que uma guia abriu
         if (tabId == workTab && scansOnPage >= limits.maxScansPerPage) return
         val sinceLast = clock() - lastScanAt
         listener.requestRescan(tabId, maxOf(700L, limits.minScanIntervalMs - sinceLast))
@@ -426,8 +468,9 @@ class ResolverEngine(
     private fun clickKey(c: ScoredCandidate) = "$workTab|${UrlSafety.loopKey(lastScanUrl)}|${c.raw.text}|${c.raw.tag}"
 
     /** Exige gesto humano real: destaca o botão (ou pede escolha, se ambíguo) e espera. */
-    private fun humanClick(c: ScoredCandidate?, reason: String) {
+    private fun humanClick(c: ScoredCandidate?, reason: String, opensTab: Boolean = false) {
         clickTarget = c
+        expectTab = opensTab
         beginPause()
         val msg = if (c != null) "Toque no botão destacado «${c.raw.text.take(40)}» na página ($reason)."
         else "Vários botões possíveis ($reason): escolha na aba Candidatos (Destacar) ou toque na página."
@@ -458,7 +501,7 @@ class ResolverEngine(
         if (!c.safe || c.ad) { step(StepKind.BLOCKED, url, "candidato inseguro ou de anúncio não pode ser retomado"); return false }
         if (lastResult?.message?.contains("Safe Browsing") == true) { step(StepKind.BLOCKED, url, "análise encerrada pelo Safe Browsing: não retomável"); return false }
         if (manualResumes >= limits.maxManualResumes) { step(StepKind.BLOCKED, url, "limite de ${limits.maxManualResumes} retomadas manuais atingido"); return false }
-        manualResumes++
+        manualResumes++; inResume = true; expectTab = false
         val key = UrlSafety.loopKey(url)
         visits.remove(key); rejected.remove(key); probed.remove(key); candidateStatus.remove(key)
         startedAt = clock(); pausedMs = 0; pauseStart = 0; stepStartedAt = clock()
@@ -553,6 +596,7 @@ class ResolverEngine(
         probingUrl = null
         val cand = probingCandidate; probingCandidate = null
         val key = UrlSafety.loopKey(url)
+        probingUrlKey = key
         diag.take(60).forEach { diagnostics += UrlSafety.scrubText(it) }
         hops.take(10).forEach { h ->
             step(StepKind.REDIRECT, h.to, "HTTP ${h.code} observado na verificação (OkHttp): ${UrlSafety.host(h.from) ?: "?"} → ${UrlSafety.host(h.to) ?: "?"}")
@@ -630,6 +674,9 @@ class ResolverEngine(
     }
 
     private fun confirmFile(url: String, mime: String?, name: String?, size: Long?, how: String) {
+        confirmedKeys += UrlSafety.loopKey(url)
+        followedUrl?.let { confirmedKeys += UrlSafety.loopKey(it) }
+        probingUrlKey?.let { confirmedKeys += it }
         setDecision("arquivo identificado — ${how.trim()}")
         addPath(PathKind.FILE, url, how.trim(), LinkClass.CONFIRMED_FILE)
         val large = size != null && size >= limits.largeFileBytes
@@ -691,6 +738,7 @@ class ResolverEngine(
         lastScored = scored
         lastWaitHint = scan.waitHint
         lastCountdown = scan.countdownSec
+        lastOpensWindows = scan.opensWindows
         lastIntermediate = scan.waitHint || scan.countdownSec > 0 ||
             scored.count { it.safe && !it.ad && it.url != null && it.raw.visible } <= limits.maxIntermediateCandidates
         scored.forEach { c ->
@@ -731,7 +779,15 @@ class ResolverEngine(
         val usable = lastScored.filter {
             it.safe && !it.ad && it.url != null && UrlSafety.loopKey(it.url!!) !in rejected
         }
-        val unvisited = usable.filter { (visits[UrlSafety.loopKey(it.url!!)] ?: 0) == 0 && !it.raw.disabled }
+        usable.firstOrNull { UrlSafety.loopKey(it.url!!) in confirmedKeys }?.let { known ->
+            if (inResume) {   // retomada que volta a um arquivo já confirmado: sucesso, não loop
+                val prev = primaryResult
+                step(StepKind.SCAN, known.url, "URL já confirmada como arquivo nesta sessão: voltar a ela não é loop")
+                finish(ResultState.VERIFIED_FILE, known.url, "Arquivo já confirmado anteriormente (mesma URL); nada foi baixado.", prev?.mimeType, prev?.fileName, prev?.sizeBytes)
+                return
+            }
+        }
+        val unvisited = usable.filter { (visits[UrlSafety.loopKey(it.url!!)] ?: 0) == 0 && !it.raw.disabled && UrlSafety.loopKey(it.url!!) !in confirmedKeys }
         var next = unvisited.firstOrNull { it.score >= limits.autoScoreThreshold }
         var tag = ""
         if (next == null && lastIntermediate) {
@@ -753,10 +809,18 @@ class ResolverEngine(
             val t = clickTarget
             val stillThere = if (t != null) eligible.any { it.raw.text == t.raw.text && it.raw.tag == t.raw.tag } else eligible.size > 1
             if (stillThere) return // continua aguardando o toque humano
+            if (expectTab) return  // esperava uma NOVA GUIA: mudança no DOM sozinha não prova que ela abriu
             resumeFromClick("a página mudou (o botão não está mais disponível)")
         }
         val clickable = eligible.filter { clickKey(it) !in clickedKeys }
         if (clickable.size == 1 && pendingClick == null) {
+            val c = clickable[0]
+            if (lastOpensWindows || c.raw.opensTab) {
+                // window.open exige gesto humano real: um clique programático seria bloqueado. Não tenta.
+                clickedKeys += clickKey(c)
+                humanClick(c, "este botão abre uma nova guia (window.open): o navegador exige um gesto humano real", opensTab = true)
+                return
+            }
             if (autoClicks < limits.maxAutoClicks) doAutoClick(clickable[0])
             else humanClick(clickable[0], "limite de ${limits.maxAutoClicks} cliques automáticos")
             return
@@ -770,6 +834,7 @@ class ResolverEngine(
         }
         if (revisit.isNotEmpty()) {
             step(StepKind.BLOCKED, revisit.first().url, "loop: o único caminho leva a página já visitada")
+            if (primaryResult?.let { isConfirmed(it) } == true && !inResume) return   // resultado confirmado nunca é substituído
             finish(ResultState.LOOP_DETECTED, null, "Loop de navegação detectado: ${pathSummary()} → ${UrlSafety.host(revisit.first().url!!) ?: "?"} (já visitada)")
             return
         }
@@ -954,6 +1019,7 @@ class ResolverEngine(
 
     private fun registerVisit(url: String): Boolean {
         val key = UrlSafety.loopKey(url)
+        if (key in confirmedKeys) return true // voltar a uma URL já confirmada como arquivo nunca é loop
         val n = (visits[key] ?: 0) + 1
         visits[key] = n
         val allowed = if (humanAuthHappened) limits.maxVisitsPerUrl + 1 else limits.maxVisitsPerUrl
@@ -1010,6 +1076,12 @@ class ResolverEngine(
             h + (UrlSafety.parse(entry.url!!)?.path?.takeIf { it.length > 1 }?.let { it.takeLast(24) } ?: "")
         } ?: "?" }
 
+    private fun isConfirmed(r: ResolveResult) =
+        (r.state == ResultState.VERIFIED_FILE || r.state == ResultState.REQUIRES_SESSION) && r.evidence.isNotEmpty()
+
+    /** Resultado principal (o primeiro; arquivo confirmado nunca é substituído) e retomadas posteriores. */
+    val results: List<ResolveResult> get() = listOfNotNull(primaryResult) + resumeResults
+
     private fun allCandsSorted(): List<ScoredCandidate> = allCands.values.sortedByDescending { it.score }
 
     /**
@@ -1063,6 +1135,8 @@ class ResolverEngine(
         mime: String? = null, name: String? = null, size: Long? = null, errorInfo: String? = null,
     ) {
         if (state == EngineState.FINISHED) return
+        val prim = primaryResult
+        if (prim != null && isConfirmed(prim) && !inResume) return // arquivo confirmado: nenhum evento posterior o substitui
         endPause()
         probingUrl?.let { u ->   // verificação interrompida: o candidato volta a ser "não visitado" (permite retomar)
             val k = UrlSafety.loopKey(u); visits.remove(k); probed.remove(k)
@@ -1088,10 +1162,15 @@ class ResolverEngine(
             diagnostics = diagnostics.toList(),
             errorInfo = errorInfo,
             path = path.toList(),
+            isResume = false,
         )
-        lastResult = result
+        // Retomada explícita: se já havia arquivo confirmado, o novo resultado é apresentado SEPARADAMENTE.
+        val asExtra = inResume && prim != null && isConfirmed(prim)
+        val published = if (inResume) result.copy(isResume = asExtra, resumeIndex = manualResumes) else result
+        if (asExtra) resumeResults += published else { primaryResult = published; lastResult = published }
+        inResume = false; expectTab = false
         finishedAt = clock()
         setState(EngineState.FINISHED, rs.label)
-        listener.onResult(result)
+        listener.onResult(published)
     }
 }

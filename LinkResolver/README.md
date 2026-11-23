@@ -22,7 +22,7 @@ A versão e o commit aparecem no rodapé do app (`BuildConfig.VERSION_NAME` / `G
    URLs com cara de arquivo são validadas (cliente **OkHttp**) por **HEAD** (ou **GET com `Range: bytes=0-0`**) antes de navegar — só cabeçalhos, sem baixar o corpo, sem cookies, com checagem de IP interno a cada salto. O `DownloadListener` é evidência adicional. Páginas de erro do navegador (`chrome-error://`) nunca são analisadas. *Copiar URL* copia a URL completa (se tiver token/assinatura, o app avisa e marca a área de transferência como sensível no Android 13+).
 
 ## Como testar
-**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 116 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
+**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 126 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
 
 **Manuais no aparelho** (o app só aceita HTTPS público; `localhost`/IPs privados são bloqueados de propósito, então hospede `testpages/` em HTTPS — p.ex. GitHub Pages — ou use um túnel HTTPS):
 | Página | Esperado |
@@ -117,3 +117,14 @@ Publicadas na branch `gh-pages` pelo workflow *LinkResolver test pages*; as pág
 | Pausa humana simulada | `v4/human/start.html` | pausa; toque "Sou humano" (ou "Já resolvi") ⇒ retoma |
 | Combinado | `v4/combo/start.html` | botão ⇒ nova guia ⇒ temporizador ⇒ pausa humana ⇒ arquivo |
 | Popup repetitivo | `v4/popup-flood/start.html` | popups sem gesto bloqueados; se você tocar na página, no máx. 3 abrem e são fechados; segue o link legítimo |
+
+
+## v0.4.1 — correção: resultado confirmado preservado ao alternar guias
+Bug do teste real (`v4/tabs/start.html`): depois de **Arquivo confirmado**, alternar/usar guias reiniciava a análise (`setWorkTab` religava uma análise concluída), a página já visitada contava como loop e o resultado virava **Loop detectado**.
+- **Resultado confirmado é imutável:** nenhum evento posterior (navegação, guia aberta/fechada, mudança no DOM, seleção de guia) o substitui.
+- **Selecionar ≠ retomar:** tocar nos chips só muda a guia visível. Depois do fim, "Usar esta guia" virou **Retomar nesta guia**, uma ação explícita com confirmação; durante a análise ativa continua sendo "Usar esta guia".
+- **Retomada explícita:** inicia uma nova etapa; se já havia arquivo confirmado, o novo resultado aparece **separado** ("Retomada #n") e o confirmado é mantido. Se o resultado anterior era só um candidato, o novo o substitui.
+- **URL já confirmada não é loop:** voltar a ela (inclusive numa retomada) conta como sucesso ("já confirmado"), nunca como loop.
+- **`window.open` exige gesto humano:** páginas cujos scripts chamam `window.open` (ou botões/links que abrem guia) **nunca recebem clique automático**; o app destaca o botão direto e espera o toque.
+- **DOM ≠ nova guia:** uma alteração do DOM não retoma a espera nem conta como "guia aberta"; só a guia criada (ou uma navegação) prova o efeito.
+- Guias abertas/fechadas depois do fim não alteram resultado, caminho nem estado.

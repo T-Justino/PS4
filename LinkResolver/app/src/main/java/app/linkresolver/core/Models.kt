@@ -142,6 +142,8 @@ data class PageScan(
     val adLike: Boolean = false,
     /** Maior contagem regressiva visível (segundos); 0 = nenhuma. */
     val countdownSec: Int = 0,
+    /** Algum script da página chama window.open (botões podem exigir gesto humano real). */
+    val opensWindows: Boolean = false,
 )
 
 data class DownloadInfo(
@@ -189,4 +191,7 @@ data class ResolveResult(
     val diagnostics: List<String> = emptyList(),
     val errorInfo: String? = null,
     val path: List<PathEntry> = emptyList(),
+    /** Resultado de uma retomada explícita, apresentado separadamente do resultado confirmado anterior. */
+    val isResume: Boolean = false,
+    val resumeIndex: Int = 0,
 )

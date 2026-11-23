@@ -50,7 +50,11 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
     private val handler = Handler(Looper.getMainLooper())
     private val timeFmt = SimpleDateFormat("HH:mm:ss", Locale.US)
     private val logBuf = StringBuilder()
+    /** Resultado principal (um arquivo confirmado nunca é substituído). */
     private var lastResult: ResolveResult? = null
+    /** Resultados de retomadas explícitas, mostrados separadamente. */
+    private val extraResults = mutableListOf<ResolveResult>()
+    private var mainDetails = ""
     private var lastPollAt = 0L
     /** Última versão do observador de DOM vista em cada guia (MutationObserver injetado pelo scanner). */
     private val domVersions = HashMap<Int, Int>()
@@ -105,7 +109,11 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         }
         b.btnStop.setOnClickListener { engine.stop() }
         b.btnResume.setOnClickListener { engine.userConfirmedResume() } // confirmação humana: retoma e ignora o desafio nesta página
-        b.btnUseTab.setOnClickListener { tabs.active?.let { engine.setWorkTab(it.id); startTicker() } }
+        b.btnUseTab.setOnClickListener {
+            val t = tabs.active ?: return@setOnClickListener
+            if (engine.state == EngineState.FINISHED) confirmResume(t)            // ação explícita, com confirmação
+            else { engine.setWorkTab(t.id); startTicker() }                       // análise ativa: escolhe a guia de trabalho
+        }
         b.btnClearSession.setOnClickListener {
             clearSession()
             toast("Cookies e dados do site apagados")
@@ -179,7 +187,7 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         tabs.closePopups()
         logBuf.setLength(0); b.logText.text = ""
         adapter.submit(emptyList()); b.candEmpty.visibility = View.VISIBLE
-        lastResult = null
+        lastResult = null; extraResults.clear(); mainDetails = ""
         b.resState.setText(R.string.no_result); b.resDetails.text = ""; b.resSteps.text = ""; b.btnCopy.isEnabled = false
         showPane(0)
         engine.start(input)
@@ -318,41 +326,55 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
     }
 
     override fun onResult(result: ResolveResult) {
-        lastResult = result
         handler.removeCallbacks(ticker); cancelRescans()
-        b.resState.text = result.state.label
         adapter.setStatuses(result.candidates.map { it.status })
-        b.resDetails.text = buildString {
-            if (result.url != null && result.state != ResultState.VERIFIED_FILE) {
-                append("⚠ LINK NÃO VERIFICADO — os metadados do arquivo não foram confirmados. Use “Copiar URL” e teste manualmente.\n\n")
+        if (result.isResume) {
+            // Retomada explícita: o resultado confirmado anterior é MANTIDO; este aparece separado.
+            extraResults += result
+        } else {
+            lastResult = result; extraResults.clear()
+            b.resState.text = result.state.label
+            mainDetails = renderDetails(result)
+            val sdf = timeFmt
+            b.resSteps.text = "Histórico de etapas (${result.steps.size}):\n" + result.steps.joinToString("\n") {
+                "${sdf.format(Date(it.timeMs))} [${it.kind}] ${it.url ?: ""} — ${it.note}"
             }
-            append("URL: ").append(result.displayUrl ?: "—").append('\n')
-            if (result.urlHasSensitiveParams) append("(valores sensíveis mascarados aqui; “Copiar URL” copia a URL completa)\n")
-            append("Host: ").append(result.host ?: "—").append('\n')
-            append("Tipo MIME: ").append(result.mimeType ?: "—").append('\n')
-            append("Nome estimado: ").append(result.fileName ?: "—").append('\n')
-            append("Tamanho: ").append(DownloadHeuristics.formatSize(result.sizeBytes)).append('\n')
-            result.candidateScore?.let { append("Pontuação do candidato: ").append(it).append('\n') }
-            append('\n').append(result.message)
-            result.errorInfo?.let { append("\n\nErro: ").append(it) }
-            if (result.evidence.isNotEmpty()) append("\n\nEvidências:\n").append(result.evidence.joinToString("\n") { "• $it" })
-            if (result.diagnostics.isNotEmpty()) append("\n\nDiagnóstico:\n").append(result.diagnostics.joinToString("\n") { "• $it" })
-            if (result.path.isNotEmpty()) {
-                append("\n\nCaminho percorrido (${result.path.size}):\n")
-                append(result.path.joinToString("\n") { it.format() })
-            }
-            if (result.candidates.isNotEmpty()) {
-                append("\n\nCandidatos (${result.candidates.size}):\n")
-                append(result.candidates.joinToString("\n") { "• [${it.score}] ${it.kind.label}: ${it.text.ifBlank { "(sem texto)" }} — ${it.displayUrl} — ${it.status}" })
-            }
+            b.btnCopy.isEnabled = result.url != null
         }
-        val sdf = timeFmt
-        b.resSteps.text = "Histórico de etapas (${result.steps.size}):\n" + result.steps.joinToString("\n") {
-            "${sdf.format(Date(it.timeMs))} [${it.kind}] ${it.url ?: ""} — ${it.note}"
+        b.resDetails.text = mainDetails + extraResults.joinToString("") { r ->
+            "\n\n══ Retomada #${r.resumeIndex} (resultado SEPARADO; o anterior foi mantido) ══\n${r.state.label}\n" +
+                "URL: ${r.displayUrl ?: "—"}\n${r.message}" +
+                (if (r.url != null && r.state != ResultState.VERIFIED_FILE) "\n⚠ LINK NÃO VERIFICADO" else "")
         }
-        b.btnCopy.isEnabled = result.url != null
         showPane(3)
+        refreshUseTab()
     }
+
+    private fun renderDetails(result: ResolveResult): String = buildString {
+        if (result.url != null && result.state != ResultState.VERIFIED_FILE) {
+            append("⚠ LINK NÃO VERIFICADO — os metadados do arquivo não foram confirmados. Use “Copiar URL” e teste manualmente.\n\n")
+        }
+        append("URL: ").append(result.displayUrl ?: "—").append('\n')
+        if (result.urlHasSensitiveParams) append("(valores sensíveis mascarados aqui; “Copiar URL” copia a URL completa)\n")
+        append("Host: ").append(result.host ?: "—").append('\n')
+        append("Tipo MIME: ").append(result.mimeType ?: "—").append('\n')
+        append("Nome estimado: ").append(result.fileName ?: "—").append('\n')
+        append("Tamanho: ").append(DownloadHeuristics.formatSize(result.sizeBytes)).append('\n')
+        result.candidateScore?.let { append("Pontuação do candidato: ").append(it).append('\n') }
+        append('\n').append(result.message)
+        result.errorInfo?.let { append("\n\nErro: ").append(it) }
+        if (result.evidence.isNotEmpty()) append("\n\nEvidências:\n").append(result.evidence.joinToString("\n") { "• $it" })
+        if (result.diagnostics.isNotEmpty()) append("\n\nDiagnóstico:\n").append(result.diagnostics.joinToString("\n") { "• $it" })
+        if (result.path.isNotEmpty()) {
+            append("\n\nCaminho percorrido (${result.path.size}):\n")
+            append(result.path.joinToString("\n") { it.format() })
+        }
+        if (result.candidates.isNotEmpty()) {
+            append("\n\nCandidatos (${result.candidates.size}):\n")
+            append(result.candidates.joinToString("\n") { "• [${it.score}] ${it.kind.label}: ${it.text.ifBlank { "(sem texto)" }} — ${it.displayUrl} — ${it.status}" })
+        }
+    }
+
 
     override fun requestProbe(url: String, trustedDomains: Set<String>) {
         probeExecutor.execute {
@@ -393,7 +415,22 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
 
     private fun refreshUseTab() {
         val a = tabs.active
-        b.btnUseTab.visibility = if (a != null && tabs.all.size > 1 && engine.state != EngineState.IDLE && a.id != engine.workTab) View.VISIBLE else View.GONE
+        val st = engine.state
+        val choose = a != null && tabs.all.size > 1 && engine.isActive && st != EngineState.WAITING_CONFIRMATION && a.id != engine.workTab
+        val resume = a != null && tabs.all.size > 1 && st == EngineState.FINISHED && engine.canResume()
+        b.btnUseTab.visibility = if (choose || resume) View.VISIBLE else View.GONE
+        b.btnUseTab.setText(if (st == EngineState.FINISHED) R.string.btn_resume_tab else R.string.btn_use_tab)
+    }
+
+    private fun confirmResume(t: BrowserTab) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.resume_title)
+            .setMessage(R.string.resume_message)
+            .setPositiveButton(R.string.btn_resume_tab) { _, _ ->
+                if (engine.resumeOnTab(t.id)) { showPane(0); startTicker() } else toast("Retomada não permitida")
+            }
+            .setNegativeButton(R.string.confirm_deny, null)
+            .show()
     }
 
     // ------------------------------------------------------------------ TabManager.Callbacks
