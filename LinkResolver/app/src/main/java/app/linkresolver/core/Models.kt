@@ -11,10 +11,12 @@ enum class ResultState(val label: String) {
     REQUIRES_SESSION("Exige sessão"),
     NETWORK_ERROR("Erro de rede"),
     NO_CANDIDATE("Nenhum candidato encontrado"),
+    LOOP_DETECTED("Loop detectado"),
     BLOCKED("Bloqueado"),
 }
 
-enum class EngineState { IDLE, RUNNING, WAITING_CONFIRMATION, WAITING_HUMAN, FINISHED }
+/** WAITING_CLICK: a página exige um toque humano real (ou há vários botões ambíguos). */
+enum class EngineState { IDLE, RUNNING, WAITING_CONFIRMATION, WAITING_HUMAN, WAITING_CLICK, FINISHED }
 
 enum class ChallengeKind(val label: String) {
     CAPTCHA("CAPTCHA"),
@@ -31,7 +33,7 @@ enum class LinkClass(val label: String) {
 
 enum class PathKind(val label: String) {
     START("INÍCIO"), PAGE("PÁGINA"), HTTP_REDIRECT("REDIRECIONAMENTO HTTP"), JS_REDIRECT("REDIRECIONAMENTO JS"),
-    META_REFRESH("META REFRESH"), NAVIGATION("NAVEGAÇÃO"), FILE("ARQUIVO"),
+    META_REFRESH("META REFRESH"), NAVIGATION("NAVEGAÇÃO"), NEW_TAB("NOVA GUIA"), CLICK("CLIQUE"), FILE("ARQUIVO"),
 }
 
 /** Um nó do caminho percorrido (página, salto de redirecionamento ou arquivo). */
@@ -47,9 +49,11 @@ data class PathEntry(
     val decision: String?,
     val code: Int? = null,
     val title: String? = null,
+    /** Guia (aba) onde ocorreu; 0 = guia principal. */
+    val tabId: Int = 0,
 ) {
     fun format(): String = buildString {
-        append(index).append(". [").append(kind.label).append(code?.let { " $it" } ?: "").append("] ").append(url ?: "—")
+        append(index).append(". [").append(kind.label).append(code?.let { " $it" } ?: "").append(if (tabId != 0) " · guia $tabId" else "").append("] ").append(url ?: "—")
         title?.takeIf { it.isNotBlank() }?.let { append("  «").append(it.take(60)).append("»") }
         append("\n     chegou por: ").append(arrival)
         linkClass?.let { append("\n     classe: ").append(it.label) }
@@ -57,7 +61,7 @@ data class PathEntry(
     }
 }
 
-enum class StepKind { START, NAVIGATE, REDIRECT, PAGE, SCAN, FOLLOW, POPUP, DOWNLOAD, CHALLENGE, RESUME, CONFIRM, BLOCKED, ERROR, END }
+enum class StepKind { START, NAVIGATE, REDIRECT, PAGE, SCAN, FOLLOW, POPUP, TAB, CLICK, DOWNLOAD, CHALLENGE, RESUME, CONFIRM, BLOCKED, ERROR, END }
 
 /** Limites do motor de navegação. */
 data class Limits(
@@ -76,6 +80,17 @@ data class Limits(
     val autoScoreThreshold: Int = 40,
     val largeFileBytes: Long = 200L * 1024 * 1024,
     val maxLogSteps: Int = 500,
+    // --- v0.4.0 ---
+    val maxPopupsPerPage: Int = 3,
+    val maxPopupsTotal: Int = 6,
+    val maxScansPerPage: Int = 20,
+    val minScanIntervalMs: Long = 1500,
+    /** Tempo máximo esperando um temporizador/botão liberar numa mesma página. */
+    val maxPageWaitMs: Long = 40_000,
+    val maxAutoClicks: Int = 6,
+    /** Quanto esperar por um efeito (navegação, nova guia, mudança no DOM) depois de um clique automático. */
+    val clickEffectWaitMs: Long = 4_000,
+    val maxManualResumes: Int = 5,
 )
 
 /** Elemento bruto encontrado pelo script de varredura da página. */
@@ -90,6 +105,12 @@ data class RawCandidate(
     val context: String,
     val elementId: String?,
     val visible: Boolean,
+    /** Botão/link desabilitado (aguardando liberação). */
+    val disabled: Boolean = false,
+    /** Criado ou liberado depois do carregamento (MutationObserver). */
+    val dynamic: Boolean = false,
+    /** Abre nova guia (target=_blank / window.open). */
+    val opensTab: Boolean = false,
 )
 
 data class ScoredCandidate(
@@ -117,6 +138,10 @@ data class PageScan(
     val challengeHint: String?,
     /** Página indica espera/contagem regressiva/geração de link. */
     val waitHint: Boolean = false,
+    /** Texto/elementos típicos de propaganda (cassino, prêmio, VPN…). */
+    val adLike: Boolean = false,
+    /** Maior contagem regressiva visível (segundos); 0 = nenhuma. */
+    val countdownSec: Int = 0,
 )
 
 data class DownloadInfo(

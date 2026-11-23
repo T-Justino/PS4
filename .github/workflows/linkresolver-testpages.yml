@@ -1,7 +1,10 @@
 name: LinkResolver test pages
 
-# Publica LinkResolver/testpages na branch gh-pages. As páginas são servidas por raw.githack.com
-# (HTML) e o arquivo de teste por cdn.jsdelivr.net — sem precisar ativar o GitHub Pages.
+# Publica LinkResolver/testpages na branch gh-pages e verifica as URLs de teste.
+#  - GitHub Pages (https://t-justino.github.io/PS4/): exige ativar UMA vez em Settings → Pages
+#    (Deploy from a branch → gh-pages / root). O GITHUB_TOKEN não tem permissão para ativar (HTTP 403).
+#  - raw.githack.com: serve o HTML da branch gh-pages sem configuração (alternativa imediata).
+#  - cdn.jsdelivr.net: serve o arquivo de teste (HEAD 200 / Range 206).
 on:
   push:
     branches: [claude/link-resolver-android-1vnk2h]
@@ -20,7 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      PAGES: https://raw.githack.com/T-Justino/PS4/gh-pages/v3
+      PAGES: https://t-justino.github.io/PS4
+      GITHACK: https://raw.githack.com/T-Justino/PS4/gh-pages
       FILE: https://cdn.jsdelivr.net/gh/T-Justino/PS4@gh-pages/v3/files/teste.bin
     steps:
       - uses: actions/checkout@v4
@@ -34,36 +38,33 @@ jobs:
           force_orphan: true
           commit_message: "testpages: ${{ github.sha }}"
 
-      - name: Verificar URLs de teste (HTML, arquivo, redirecionamentos reais)
+      - name: Verificar URLs de teste
         run: |
           S=/tmp/summary.md
-          echo "## Páginas de teste do Link Resolver v0.3.0" > $S
-          echo '| URL | HTTP | Content-Type |' >> $S; echo '|---|---|---|' >> $S
-          fail=0
-          for p in index.html abc/a.html abc/b.html abc/c.html meta/start.html meta/destino.html js/start.html js/destino.html \
-                   http/301.html http/302.html http/303.html http/307.html http/308.html http/raw302.html http/destino.html \
-                   loop/a.html loop/b.html dead/start.html dead/fim.html long/1.html long/2.html long/3.html long/4.html ads/start.html; do
-            r=""
-            for i in 1 2 3 4 5 6; do   # a CDN pode levar alguns segundos para ver o commit novo
-              r=$(curl -s -L -o /dev/null -w '%{http_code} %{content_type}' "$PAGES/$p" || true)
-              [ "${r%% *}" = "200" ] && break; sleep 10
+          echo "## Páginas de teste do Link Resolver v0.4.0" > $S
+          PATHS="v4/index.html v4/tabs/start.html v4/tabs/etapa2.html v4/popup-ad/start.html v4/popup-ad/download.html v4/popup-ad/anuncio.html \
+                 v4/timer/start.html v4/timer/destino.html v4/dynamic/start.html v4/dynamic/link.html v4/dynamic/destino.html \
+                 v4/human/start.html v4/human/destino.html v4/combo/start.html v4/combo/timer.html v4/combo/verifica.html \
+                 v4/popup-flood/start.html v4/popup-flood/lixo.html v4/popup-flood/destino.html \
+                 v3/abc/a.html v3/http/302.html v3/loop/a.html"
+          for BASE in "$GITHACK" "$PAGES"; do
+            echo "### $BASE" >> $S; echo '| caminho | HTTP | Content-Type |' >> $S; echo '|---|---|---|' >> $S
+            tries=6; [ "$BASE" = "$PAGES" ] && tries=1   # o Pages só responde depois de ativado manualmente
+            for p in $PATHS; do
+              r=""
+              for i in $(seq 1 $tries); do
+                r=$(curl -s -L -o /dev/null -w '%{http_code} %{content_type}' "$BASE/$p" || true)
+                [ "${r%% *}" = "200" ] && break; [ $i -lt $tries ] && sleep 8
+              done
+              echo "| \`$p\` | ${r%% *} | ${r#* } |" >> $S
             done
-            [ "${r%% *}" = "200" ] || fail=1
-            echo "| \`$PAGES/$p\` | ${r%% *} | ${r#* } |" >> $S
           done
           echo >> $S; echo '### Arquivo de teste (jsDelivr): HEAD e Range 0-0' >> $S; echo '```' >> $S
           curl -sI "$FILE" | tr -d '\r' | grep -iE '^(HTTP|content-type|content-length|accept-ranges)' >> $S || true
           curl -s -o /dev/null -D - -r 0-0 "$FILE" | tr -d '\r' | grep -iE '^(HTTP|content-range)' >> $S || true
           echo '```' >> $S
-          echo '### Redirecionamentos HTTP reais (httpbin.dev)' >> $S; echo '```' >> $S
-          D='https%3A%2F%2Fraw.githack.com%2FT-Justino%2FPS4%2Fgh-pages%2Fv3%2Fhttp%2Fdestino.html'
-          for c in 301 302 303 307 308; do
-            echo "status_code=$c:" >> $S
-            curl -s -o /dev/null -D - -m 20 "https://httpbin.dev/redirect-to?url=$D&status_code=$c" | tr -d '\r' | grep -iE '^(HTTP|location)' >> $S || echo "(sem resposta)" >> $S
-          done
-          echo '```' >> $S
-          echo '### 302 real github.com → raw.githubusercontent.com' >> $S; echo '```' >> $S
-          curl -sI "https://github.com/T-Justino/PS4/raw/gh-pages/v3/files/teste.bin" | tr -d '\r' | grep -iE '^(HTTP|location)' >> $S || true
-          echo '```' >> $S
+          if ! curl -s -o /dev/null -w '%{http_code}' "$PAGES/v4/index.html" | grep -q 200; then
+            echo "::notice::GitHub Pages ainda não está ativo. Ative em Settings → Pages → Deploy from a branch → gh-pages / (root). Enquanto isso use as URLs raw.githack.com."
+            echo '> GitHub Pages ainda **não está ativo**: Settings → Pages → Deploy from a branch → `gh-pages` / `(root)` (uma única vez).' >> $S
+          fi
           cat $S; cat $S >> "$GITHUB_STEP_SUMMARY"
-          [ $fail = 0 ] || echo "::warning::alguma URL de teste não respondeu 200 (veja a tabela)"

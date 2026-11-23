@@ -83,8 +83,23 @@ object DownloadHeuristics {
         if (raw.source == "meta-refresh") { score += 55; reasons += "redirecionamento automático da página (meta refresh)" }
         if (raw.source == "js-redirect") { score += 55; reasons += "redirecionamento automático da página (JavaScript)" }
         if (!raw.visible) { score -= 25; reasons += "elemento oculto" }
+        if (raw.disabled) { score -= 45; reasons += "desabilitado (aguardando liberação)" }
+        if (raw.dynamic) { score += 8; reasons += "criado/liberado dinamicamente" }
+        if (raw.source == "button" && isStepText(raw.text)) { score += 10; reasons += "botão de ação" }
+        if (raw.opensTab) reasons += "abre nova guia"
         return ScoredCandidate(raw, score, reasons, safe, trusted, ad)
     }
+
+    fun isNegativeText(text: String): Boolean = NEGATIVE_WORDS.containsMatchIn(text)
+    fun hasAdContext(raw: RawCandidate): Boolean = AD_CONTEXT.containsMatchIn(raw.context)
+
+    /**
+     * Clique automático só quando a intenção é inequívoca: botão sem URL, visível, habilitado, com texto de ação
+     * (download/continuar/próximo…), sem texto suspeito nem contexto de anúncio.
+     */
+    fun isAutoClickEligible(c: ScoredCandidate, minScore: Int): Boolean =
+        c.raw.url == null && c.raw.elementId != null && c.raw.source == "button" && c.raw.visible && !c.raw.disabled &&
+            !c.ad && c.score >= minScore && isStepText(c.raw.text) && !isNegativeText(c.raw.text) && !hasAdContext(c.raw)
 
     fun isStepText(text: String): Boolean = STEP_WORDS.containsMatchIn(text) || DOWNLOAD_WORDS.containsMatchIn(text)
 

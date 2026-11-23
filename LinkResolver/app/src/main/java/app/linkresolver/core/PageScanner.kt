@@ -14,11 +14,28 @@ object PageScanner {
     const val SCRIPT = """
 (function(){
 try{
-var out={url:location.href,title:document.title||'',cands:[],challenge:null,hint:null,wait:false};
+var out={url:location.href,title:document.title||'',cands:[],challenge:null,hint:null,wait:false,cd:0,ad:false};
+/* observador de mudanças dinâmicas (idempotente; somente leitura do DOM; não toca em relógios nem scripts do site) */
+if(!window.__lrObs){try{
+ window.__lrVer=0;
+ var stl=document.createElement('style');stl.textContent='[data-lr-hl]{outline:4px solid #ff3d00 !important;outline-offset:3px !important;box-shadow:0 0 0 6px rgba(255,61,0,.25) !important}';
+ (document.head||document.documentElement).appendChild(stl);
+ var SEL='a[href],button,input[type=button],input[type=submit],[role=button]';
+ var relv=function(n){return n.nodeType===1&&((n.matches&&n.matches(SEL))||(n.querySelector&&n.querySelector(SEL)))};
+ window.__lrObs=new MutationObserver(function(ms){var bump=false;
+  for(var i=0;i<ms.length;i++){var m=ms[i];
+   if(m.type==='childList'){for(var j=0;j<m.addedNodes.length;j++){var n=m.addedNodes[j];
+     if(relv(n)){bump=true;try{if(n.matches&&n.matches(SEL))n.setAttribute('data-lr-dyn','1');
+      var ds=n.querySelectorAll?n.querySelectorAll(SEL):[];for(var k=0;k<ds.length&&k<20;k++)ds[k].setAttribute('data-lr-dyn','1')}catch(x){}}}}
+   else if(m.type==='attributes'&&m.target.matches&&m.target.matches(SEL)){bump=true;try{m.target.setAttribute('data-lr-dyn','1')}catch(x){}}}
+  if(bump)window.__lrVer++});
+ window.__lrObs.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['disabled','aria-disabled','hidden','class','style','href']});
+}catch(e){window.__lrObs=1;window.__lrVer=0}}
 function abs(u){try{return new URL(u,location.href).href}catch(e){return null}}
 function vis(e){try{var r=e.getBoundingClientRect();var s=getComputedStyle(e);
  return r.width>2&&r.height>2&&s.visibility!=='hidden'&&s.display!=='none'&&s.opacity!=='0'}catch(x){return false}}
 function ctx(e){var s='',n=e,i=0;while(n&&i<4){s+=' '+(n.id||'')+' '+(typeof n.className==='string'?n.className:'');n=n.parentElement;i++}return s.toLowerCase().slice(0,200)}
+function isDis(e){try{return !!(e.disabled||e.getAttribute('aria-disabled')==='true'||/(^|\s)disabled(\s|$)/.test(typeof e.className==='string'?e.className:'')||getComputedStyle(e).pointerEvents==='none')}catch(x){return false}}
 function txt(e){return ((e.innerText||e.value||e.getAttribute('aria-label')||e.title||'')+'').replace(/\s+/g,' ').trim().slice(0,100)}
 var body=(document.body&&document.body.innerText||'').slice(0,5000).toLowerCase();
 var title=(document.title||'').toLowerCase();
@@ -45,7 +62,7 @@ function add(e,url,source,dl){
  var t=txt(e);var key=(url||'')+'|'+t+'|'+source;if(seen[key])return;seen[key]=1;
  var id=null;
  if(!url||source==='button'||true){id=String(++n);try{e.setAttribute('data-lr-id',id)}catch(x){}}
- out.cands.push({url:url,text:t,tag:e.tagName.toLowerCase(),source:source,dl:!!dl,rel:((e.getAttribute&&e.getAttribute('rel'))||'').toLowerCase(),ctx:ctx(e),id:id,vis:vis(e)})}
+ out.cands.push({url:url,text:t,tag:e.tagName.toLowerCase(),source:source,dl:!!dl,rel:((e.getAttribute&&e.getAttribute('rel'))||'').toLowerCase(),ctx:ctx(e),id:id,vis:vis(e),dis:isDis(e),dyn:!!(e.hasAttribute&&e.hasAttribute('data-lr-dyn')),blank:!!(e.getAttribute&&e.getAttribute('target')==='_blank')})}
 var as=document.querySelectorAll('a[href],area[href]');
 for(var k=0;k<as.length;k++){var a=as[k];var h=a.getAttribute('href')||'';
  if(!h||h==='#'||/^javascript:/i.test(h)||/^(mailto|tel):/i.test(h))continue;
@@ -56,11 +73,13 @@ for(var m=0;m<els.length;m++){var e=els[m];var found=false;
  for(var d=0;d<dattrs.length;d++){var v=e.getAttribute(dattrs[d]);
   if(v&&!/^(javascript:|#)/i.test(v)){var u2=abs(v);if(u2&&/^https?:/i.test(u2)){add(e,u2,'data-attr',false);found=true}}}
  var oc=e.getAttribute('onclick')||'';
- if(oc){var mm=oc.match(/https?:\/\/[^'"\s)]+/);if(mm){add(e,mm[0],'onclick',false);found=true}
+ if(oc){var mo=oc.match(/window\.open\(\s*['"]([^'"]+)['"]/);var mm=oc.match(/https?:\/\/[^'"\s)]+/);
+  if(mo){var uo=abs(mo[1]);if(uo&&/^https?:/i.test(uo)){add(e,uo,'onclick',false);out.cands[out.cands.length-1].blank=true;found=true}}
+  else if(mm){add(e,mm[0],'onclick',false);found=true}
   else{var m2=oc.match(/location(?:\.href)?\s*=\s*['"]([^'"]+)['"]/);if(m2){var u3=abs(m2[1]);if(u3){add(e,u3,'onclick',false);found=true}}}}
  if(!found&&e.tagName!=='A'){var f=e.form;
   if(f&&f.action&&(f.method||'get').toLowerCase()==='get'){var fu=abs(f.action);if(fu){add(e,fu,'form',false);found=true}}}
- if(!found&&e.tagName!=='A'&&/(download|baixar|descargar|continue|continuar|get link|obter|gerar|iniciar)/i.test(txt(e)))add(e,null,'button',false)}
+ if(!found&&e.tagName!=='A'&&/(download|baixar|descargar|continue|continuar|get link|obter|gerar|iniciar|pr[oó]ximo|next|prosseguir|avan[cç]ar|liberar|proceed|free download|get file)/i.test(txt(e)))add(e,null,'button',false)}
 var mt=document.querySelector('meta[http-equiv="refresh" i]');
 if(mt){var c2=mt.getAttribute('content')||'';var mr=c2.match(/url\s*=\s*['"]?([^'";]+)/i);
  if(mr){var u4=abs(mr[1].trim());if(u4){add(mt,u4,'meta-refresh',false);out.cands[out.cands.length-1].vis=true;out.cands[out.cands.length-1].text='(meta refresh '+(parseInt(c2,10)||0)+'s)'}}}
@@ -69,8 +88,20 @@ var scs=document.querySelectorAll('script:not([src])');var jr=0;
 var jsre=[/(?:window\.|document\.|top\.|self\.)?location(?:\.href)?\s*=(?!=)\s*['"]([^'"]+)['"]/g,/location\.(?:replace|assign)\(\s*['"]([^'"]+)['"]\s*\)/g];
 for(var q=0;q<scs.length&&q<20&&jr<5;q++){var st=(scs[q].textContent||'').slice(0,20000);
  for(var w=0;w<jsre.length;w++){jsre[w].lastIndex=0;var jm;
-  while((jm=jsre[w].exec(st))&&jr<5){var u5=abs(jm[1]);if(u5&&/^https?:/i.test(u5)&&u5!==location.href){
+  while((jm=jsre[w].exec(st))&&jr<5){
+   var before=st.slice(Math.max(0,jm.index-140),jm.index);
+   /* redirecionamento dentro de handler de clique/função nomeada NÃO é automático: não adianta a espera do site */
+   if(/addEventListener|onclick|\.on[a-z]+\s*=|\.click\s*\(|function\s+[A-Za-z_]\w*\s*\(/.test(before))continue;
+   var u5=abs(jm[1]);if(u5&&/^https?:/i.test(u5)&&u5!==location.href){
    var key5=u5+'|js';if(!seen[key5]){seen[key5]=1;out.cands.push({url:u5,text:'(redirecionamento JavaScript)',tag:'script',source:'js-redirect',dl:false,rel:'',ctx:'',id:null,vis:true});jr++}}}}}
+var cdn=0,rA=/(aguarde|espere|please wait|wait|restam|faltam|remaining|download (?:starts|begins) in|come[cç]a em|inicia em)[^0-9]{0,30}(\d{1,3})/g,mA;
+while((mA=rA.exec(body))){var vA=parseInt(mA[2],10);if(vA>0&&vA<=120&&vA>cdn)cdn=vA}
+var rB=/(\d{1,3})\s*(segundos?|seconds?|secs?)\b/g,mB;
+while((mB=rB.exec(body))){var vB=parseInt(mB[1],10);if(vB>0&&vB<=120&&vB>cdn)cdn=vB}
+var tims=document.querySelectorAll('[id*=count],[class*=count],[id*=timer],[class*=timer],[id*=segundos],[id*=seconds]');
+for(var ti=0;ti<tims.length&&ti<10;ti++){var tv=((tims[ti].innerText||'')+'').trim();if(/^\d{1,3}$/.test(tv)){var vT=parseInt(tv,10);if(vT>0&&vT<=120&&vT>cdn)cdn=vT}}
+out.cd=cdn;
+out.ad=/(casino|cassino|bet365|apostas?|aposte|b[oô]nus de|ganhe\s+(um\s+)?pr[eê]mio|voc[eê] ganhou|you('ve| have)? won|claim your|click here to claim|vpn gr[aá]tis|free vpn|xxx|viagra)/.test(body);
 out.wait=/(aguarde|please wait|redirecionando|redirecting|seu download (come|inici)|your download (will|is)|gerando (seu )?link|generating (your )?link|countdown|contagem regressiva|segundos|seconds)/.test(body);
 return JSON.stringify(out)
 }catch(err){return JSON.stringify({url:location.href,title:'',cands:[],challenge:null,hint:'erro: '+err})}
@@ -78,6 +109,18 @@ return JSON.stringify(out)
 """
 
     /** Script para clique MANUAL (solicitado pelo usuário) em um elemento marcado na varredura. */
+    /** Versão do observador de DOM (muda quando botões/links são criados, habilitados ou alterados); -1 = ainda não instalado. */
+    const val VERSION_SCRIPT = "(function(){return window.__lrVer===undefined?-1:window.__lrVer})()"
+
+    /** Destaca o elemento (contorno + rolagem) para o usuário tocar nele: um gesto humano real. */
+    fun highlightScript(elementId: String): String {
+        val safe = elementId.filter { it.isDigit() }
+        return "(function(){var o=document.querySelectorAll('[data-lr-hl]');for(var i=0;i<o.length;i++)o[i].removeAttribute('data-lr-hl');" +
+            "var e=document.querySelector('[data-lr-id=\"$safe\"]');if(!e)return false;" +
+            "try{e.scrollIntoView({block:'center',behavior:'smooth'})}catch(x){}e.setAttribute('data-lr-hl','1');" +
+            "setTimeout(function(){try{e.removeAttribute('data-lr-hl')}catch(x){}},20000);return true})()"
+    }
+
     fun clickScript(elementId: String): String {
         val safe = elementId.filter { it.isDigit() }
         return "(function(){var e=document.querySelector('[data-lr-id=\"$safe\"]');if(e){e.click();return true}return false})()"
@@ -103,6 +146,9 @@ return JSON.stringify(out)
                     context = c.optString("ctx", ""),
                     elementId = c.optString("id", "").takeIf { it.isNotEmpty() && !c.isNull("id") },
                     visible = c.optBoolean("vis", true),
+                    disabled = c.optBoolean("dis", false),
+                    dynamic = c.optBoolean("dyn", false),
+                    opensTab = c.optBoolean("blank", false),
                 )
             }
             val kind = o.optString("challenge", "").takeIf { !o.isNull("challenge") && it.isNotEmpty() }
@@ -114,6 +160,8 @@ return JSON.stringify(out)
                 challenge = kind,
                 challengeHint = o.optString("hint", "").takeIf { !o.isNull("hint") && it.isNotEmpty() },
                 waitHint = o.optBoolean("wait", false),
+                adLike = o.optBoolean("ad", false),
+                countdownSec = o.optInt("cd", 0),
             )
         } catch (e: Exception) {
             null

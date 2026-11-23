@@ -12,29 +12,37 @@ class ResolverEngine(
     private val listener: Listener,
 ) {
     interface Listener {
-        /** Carregar [url] (já validada) na aba de trabalho. */
-        fun navigate(url: String)
+        /** Carregar [url] (já validada) na guia [tabId]. */
+        fun navigate(tabId: Int, url: String)
         fun askDomain(host: String, url: String, reason: String)
         fun onStateChanged(state: EngineState, message: String)
         fun onStep(step: Step)
         fun onCandidates(candidates: List<ScoredCandidate>)
         fun onResult(result: ResolveResult)
-        /** Pedir nova varredura da página ativa após [delayMs]. */
-        fun requestRescan(delayMs: Long)
-        /** Navegação pendente recusada pelo usuário (a UI pode fechar a aba de popup). */
-        fun onNavigationDenied(url: String)
+        /** Pedir nova varredura da guia [tabId] após [delayMs] (a UI deve juntar pedidos repetidos). */
+        fun requestRescan(tabId: Int, delayMs: Long)
+        /** Navegação pendente recusada pelo usuário (a UI pode fechar a guia de popup). */
+        fun onNavigationDenied(tabId: Int, url: String)
         /**
          * Validar metadados de [url] fora da thread principal (HEAD / Range 0-0, sem baixar) e responder
          * com [onProbeResult] na thread principal.
          */
         fun requestProbe(url: String, trustedDomains: Set<String>)
+        /** Clique programático em um botão inequívoco (pode não valer como gesto humano). */
+        fun requestClick(tabId: Int, elementId: String, text: String) {}
+        /** Destacar o elemento para o usuário tocar (gesto humano real). */
+        fun requestHighlight(tabId: Int, elementId: String, text: String) {}
+        fun closeTab(tabId: Int) {}
+        fun onWorkTabChanged(tabId: Int) {}
     }
 
     private enum class PendingSource { AUTO, NAVIGATION, PROBE }
     private data class Pending(
         val url: String, val host: String, val source: PendingSource, val redirect: Boolean,
-        val candidate: ScoredCandidate?, val origin: String? = null,
+        val candidate: ScoredCandidate?, val origin: String? = null, val tabId: Int = 0,
     )
+    private class TabInfo(val openerId: Int?, val openerUrl: String?, val pathIndex: Int, var relevant: Boolean? = null, var urlSet: Boolean = false)
+    private class ClickAttempt(val c: ScoredCandidate, val at: Long)
 
     var state = EngineState.IDLE
         private set
@@ -81,6 +89,25 @@ class ResolverEngine(
     private val probeExtra = mutableSetOf<String>()
     private var finishedAt = 0L
 
+    // --- v0.4.0: guias, dinamismo, temporizadores, cliques ---
+    /** Guia em que a análise está trabalhando (0 = principal). */
+    var workTab = 0
+        private set
+    private val tabInfos = HashMap<Int, TabInfo>()
+    private val popupsOnPage = HashMap<String, Int>()
+    private var popupsTotal = 0
+    private var scansOnPage = 0
+    private var lastScanAt = 0L
+    private var lastScanUrl = ""
+    private var lastCountdown = 0
+    private var pageWaitStart = 0L
+    private var autoClicks = 0
+    private val clickedKeys = HashSet<String>()
+    private var pendingClick: ClickAttempt? = null
+    private var clickTarget: ScoredCandidate? = null
+    private var manualResumes = 0
+    private var ignoreChallengeOnPage = false
+
     val isActive: Boolean get() = state != EngineState.IDLE && state != EngineState.FINISHED
     val currentDepth: Int get() = depth
 
@@ -113,7 +140,7 @@ class ResolverEngine(
         step(StepKind.START, input, "domínio confiável inicial: ${DomainPolicy.registrable(host)}")
         registerVisit(input)
         addPath(PathKind.START, input, "URL inicial informada pelo usuário", LinkClass.PAGE)
-        listener.navigate(input)
+        listener.navigate(workTab, input)
     }
 
     fun stop() {
@@ -133,6 +160,13 @@ class ResolverEngine(
         startUrl = null; followedUrl = null; probingUrl = null; probingCandidate = null
         mainFrameError = false; networkFailure = null; failedUrl = null
         lastResult = null; finishedAt = 0; probeExtra.clear()
+        workTab = 0; tabInfos.clear(); popupsOnPage.clear(); popupsTotal = 0; scansOnPage = 0; lastScanAt = 0; lastScanUrl = ""
+        lastCountdown = 0; pageWaitStart = 0; autoClicks = 0; clickedKeys.clear(); pendingClick = null; clickTarget = null
+        manualResumes = 0; ignoreChallengeOnPage = false
+    }
+
+    private fun resetPageCounters() {
+        scansOnPage = 0; pageWaitStart = 0; ignoreChallengeOnPage = false; pageScanCounted = false
     }
 
     // ------------------------------------------------------------------ eventos de navegação
@@ -141,12 +175,13 @@ class ResolverEngine(
      * Chamado para cada navegação de quadro principal (links, redirecionamentos, popups).
      * ALLOW = deixar carregar; BLOCK = cancelar; ASK = cancelar e aguardar confirmação do usuário.
      */
-    fun onNavigationRequest(url: String, redirect: Boolean, userGesture: Boolean = false): NavDecision {
+    fun onNavigationRequest(url: String, redirect: Boolean, userGesture: Boolean = false, tabId: Int = workTab): NavDecision {
         if (url == "about:blank") return NavDecision.ALLOW
         val verdict = UrlSafety.check(url)
         if (verdict is UrlSafety.Verdict.Rejected) {
             step(StepKind.BLOCKED, url, verdict.reason)
-            if (isActive && redirect) finish(ResultState.BLOCKED, null, "Redirecionamento bloqueado: ${verdict.reason}")
+            if (isActive && tabId != workTab) closeSecondaryTab(tabId, "URL recusada: ${verdict.reason}")
+            else if (isActive && redirect) finish(ResultState.BLOCKED, null, "Redirecionamento bloqueado: ${verdict.reason}")
             return NavDecision.BLOCK
         }
         if (!isActive) return NavDecision.ALLOW
@@ -157,6 +192,7 @@ class ResolverEngine(
         val host = UrlSafety.host(url)!!
         if (DownloadHeuristics.isAdHost(host)) {
             step(StepKind.BLOCKED, url, "rede de anúncios bloqueada")
+            if (tabId != workTab) closeSecondaryTab(tabId, "guia de rede de anúncios")
             return NavDecision.BLOCK
         }
         if (redirect) {
@@ -172,7 +208,8 @@ class ResolverEngine(
                 finish(ResultState.BLOCKED, null, "Limite de domínios atingido ao tentar ir para $host")
                 return NavDecision.BLOCK
             }
-            ask(Pending(url, host, PendingSource.NAVIGATION, redirect, null), if (redirect) "redirecionamento" else "navegação")
+            ask(Pending(url, host, PendingSource.NAVIGATION, redirect, null, tabId = tabId),
+                (if (tabId != workTab) "guia ${tabId}: " else "") + if (redirect) "redirecionamento" else "navegação")
             return NavDecision.ASK
         }
         if (!registerVisit(url)) return NavDecision.BLOCK
@@ -185,7 +222,14 @@ class ResolverEngine(
             else -> PathKind.NAVIGATION to "navegação iniciada pela página (JS/meta refresh não identificado)"
         }
         step(if (redirect || kind != PathKind.NAVIGATION) StepKind.REDIRECT else StepKind.NAVIGATE, url, arrival)
-        addPath(kind, url, arrival, LinkClass.PAGE)
+        val info = tabInfos[tabId]
+        if (info != null && !info.urlSet) {
+            // primeira navegação de uma guia nova: completa o nó "NOVA GUIA" em vez de criar outro
+            info.urlSet = true
+            if (info.pathIndex in path.indices) path[info.pathIndex] = path[info.pathIndex].copy(url = UrlSafety.redact(url), linkClass = LinkClass.PAGE)
+        } else addPath(kind, url, arrival, LinkClass.PAGE, tabId = tabId)
+        noteEffect("navegação")
+        if (state == EngineState.WAITING_CLICK) resumeFromClick("a página reagiu ao toque (navegação)")
         if (path.count { it.kind != PathKind.FILE } > limits.maxPages) {
             finish(ResultState.BLOCKED, null, "Limite de ${limits.maxPages} páginas/etapas atingido")
             return NavDecision.BLOCK
@@ -193,24 +237,238 @@ class ResolverEngine(
         return NavDecision.ALLOW
     }
 
-    fun onPageStarted(url: String) {
+    fun onPageStarted(url: String, tabId: Int = workTab) {
         if (isErrorUrl(url)) { step(StepKind.PAGE, url, "página interna de erro do navegador (ignorada)"); return }
+        noteEffect("nova página")
+        if (tabId != workTab) { step(StepKind.PAGE, url, "guia $tabId carregando"); return }
         mainFrameError = false
-        pageScanCounted = false
+        resetPageCounters()
         step(StepKind.PAGE, url, "carregando")
     }
 
-    fun onPageFinished(url: String) {
-        if (isErrorUrl(url) || mainFrameError) {
+    fun onPageFinished(url: String, tabId: Int = workTab) {
+        if (isErrorUrl(url) || (mainFrameError && tabId == workTab)) {
             // onPageFinished também dispara depois de um erro: NÃO é sucesso e NÃO deve ser analisada.
             step(StepKind.PAGE, url, "encerrada com erro — não analisada")
             return
         }
-        step(StepKind.PAGE, url, "carregada")
+        step(StepKind.PAGE, url, if (tabId == workTab) "carregada" else "guia $tabId carregada")
+        if (!isActive) return
+        if (tabId != workTab) {
+            if (tabInfos[tabId]?.relevant == null) listener.requestRescan(tabId, 1200) // classificar a guia nova
+            return
+        }
         if (state == EngineState.RUNNING) {
             scanAttempts = 0
-            listener.requestRescan(1200)
+            listener.requestRescan(workTab, 1200)
         }
+    }
+
+    // ------------------------------------------------------------------ guias (popups)
+
+    /**
+     * Decide se um popup pode virar guia. Exige gesto humano, origem confiável, que a origem não seja outra
+     * guia secundária (sem cadeia de popups) e respeita os limites por página e totais.
+     */
+    fun onPopupRequest(openerTab: Int, openerUrl: String?, userGesture: Boolean): Boolean {
+        val host = openerUrl?.let { UrlSafety.host(it) }
+        fun deny(reason: String): Boolean {
+            step(StepKind.POPUP, openerUrl, "popup bloqueado: $reason")
+            return false
+        }
+        if (!userGesture) return deny("sem gesto do usuário")
+        if (host == null) return deny("origem desconhecida")
+        if (isActive && !policy.isTrusted(host)) return deny("origem não confiável ($host)")
+        if (tabInfos.containsKey(openerTab)) return deny("popup aberto por guia secundária (sem cadeia de popups)")
+        val key = UrlSafety.loopKey(openerUrl)
+        val n = popupsOnPage[key] ?: 0
+        if (isActive) {
+            if (n >= limits.maxPopupsPerPage) return deny("excesso de popups nesta página (${n} já abertos): possível página maliciosa")
+            if (popupsTotal >= limits.maxPopupsTotal) return deny("limite de ${limits.maxPopupsTotal} popups por análise")
+        }
+        popupsOnPage[key] = n + 1; popupsTotal++
+        step(StepKind.POPUP, openerUrl, "popup permitido (gesto humano em origem confiável: $host)")
+        return true
+    }
+
+    /** Uma guia foi criada (window.open / target=_blank). Abrir guia NÃO é evidência de arquivo. */
+    fun onTabOpened(tabId: Int, openerId: Int, openerUrl: String?) {
+        val idx = path.size
+        if (path.size < 80) {
+            path += PathEntry(
+                path.size + 1, PathKind.NEW_TAB, null,
+                "aberta pela página ${openerUrl?.let { UrlSafety.redact(it) } ?: "?"} (guia $openerId) via window.open/target=_blank/clique",
+                null, "aguardando classificação (continuação ou propaganda?)", tabId = tabId,
+            )
+        }
+        tabInfos[tabId] = TabInfo(openerId, openerUrl, idx)
+        step(StepKind.TAB, openerUrl, "guia $tabId aberta pela guia $openerId")
+        noteEffect("nova guia")
+        if (state == EngineState.WAITING_CLICK) resumeFromClick("o toque abriu uma nova guia")
+    }
+
+    fun onTabClosed(tabId: Int) {
+        val info = tabInfos.remove(tabId) ?: return
+        step(StepKind.TAB, null, "guia $tabId fechada")
+        if (workTab == tabId) {
+            workTab = info.openerId ?: 0
+            resetPageCounters()
+            listener.onWorkTabChanged(workTab)
+            if (isActive) listener.requestRescan(workTab, 500)
+        }
+    }
+
+    private fun closeSecondaryTab(tabId: Int, reason: String) {
+        if (tabId == 0 || tabId == workTab) return
+        tabInfos[tabId]?.let { i ->
+            i.relevant = false
+            if (i.pathIndex in path.indices) path[i.pathIndex] = path[i.pathIndex].copy(decision = "guia fechada: $reason")
+        }
+        step(StepKind.TAB, null, "guia $tabId fechada: $reason")
+        listener.closeTab(tabId)
+    }
+
+    private fun classifyPopupScan(tabId: Int, scan: PageScan) {
+        val info = tabInfos[tabId] ?: return
+        if (info.relevant != null) return
+        if (isErrorUrl(scan.url)) { closeSecondaryTab(tabId, "página de erro"); return }
+        val pageHost = UrlSafety.host(scan.url) ?: ""
+        val scored = scan.candidates.map { DownloadHeuristics.score(it, pageHost, policy) }.sortedByDescending { it.score }
+        val actionable = scored.any {
+            it.safe && !it.ad && it.url != null && (it.score >= limits.autoScoreThreshold || (isStepLike(it) && it.score >= limits.tier2MinScore))
+        } || scored.any { DownloadHeuristics.isAutoClickEligible(it, limits.tier2MinScore) }
+        val relevant = !scan.adLike && (actionable || scan.countdownSec > 0)
+        if (!relevant) {
+            closeSecondaryTab(tabId, if (scan.adLike) "propaganda (texto de cassino/prêmio/VPN…)" else "sem continuação de download")
+            return
+        }
+        info.relevant = true
+        val canPromote = (state == EngineState.RUNNING || state == EngineState.WAITING_CLICK) && workTab == info.openerId
+        if (!canPromote) {
+            step(StepKind.TAB, scan.url, "guia $tabId parece relevante, mantida em segundo plano (use \"Usar esta guia\" para continuar nela)")
+            if (info.pathIndex in path.indices) path[info.pathIndex] = path[info.pathIndex].copy(decision = "possível continuação, mantida em segundo plano")
+            return
+        }
+        promoteTab(tabId, "continuação do download (${scored.count { it.score >= limits.tier2MinScore }} candidato(s))")
+        onScan(scan, tabId)
+    }
+
+    private fun promoteTab(tabId: Int, why: String) {
+        workTab = tabId
+        resetPageCounters()
+        scanAttempts = 0; stepStartedAt = clock()
+        tabInfos[tabId]?.let { i -> if (i.pathIndex in path.indices) path[i.pathIndex] = path[i.pathIndex].copy(decision = "guia de trabalho: $why") }
+        step(StepKind.TAB, null, "guia $tabId promovida a guia de trabalho: $why")
+        listener.onWorkTabChanged(tabId)
+    }
+
+    /** O usuário escolheu continuar a análise em [tabId] (qualquer guia autorizada). */
+    fun setWorkTab(tabId: Int) {
+        if (!isActive && state != EngineState.FINISHED) return
+        if (state == EngineState.FINISHED) {
+            if (manualResumes >= limits.maxManualResumes) { step(StepKind.BLOCKED, null, "limite de retomadas manuais"); return }
+            manualResumes++
+            startedAt = clock(); pausedMs = 0; pauseStart = 0; stepStartedAt = clock(); scanAttempts = 0
+            networkFailure = null; failedUrl = null; mainFrameError = false
+            setState(EngineState.RUNNING, "Retomado na guia $tabId")
+        } else if (state == EngineState.WAITING_CONFIRMATION) return
+        tabInfos[tabId]?.relevant = true
+        promoteTab(tabId, "escolhida pelo usuário")
+        listener.requestRescan(tabId, 300)
+    }
+
+    /** Efeito observável de um clique automático (navegação, nova guia, mudança no DOM...). */
+    private fun noteEffect(what: String) {
+        if (pendingClick != null) {
+            step(StepKind.CLICK, null, "o clique automático teve efeito: $what")
+            pendingClick = null
+        }
+    }
+
+    private fun resumeFromClick(reason: String) {
+        if (state != EngineState.WAITING_CLICK) return
+        endPause(); clickTarget = null
+        step(StepKind.RESUME, null, "retomando: $reason")
+        stepStartedAt = clock(); scanAttempts = 0
+        setState(EngineState.RUNNING, "Retomado")
+    }
+
+    /** O DOM da guia mudou (botão criado/liberado). Pede nova varredura com limite de frequência. */
+    fun onDomChanged(tabId: Int = workTab) {
+        if (!isActive || state == EngineState.WAITING_CONFIRMATION || probingUrl != null) return
+        if (tabId != workTab && tabInfos[tabId]?.relevant != null) return
+        noteEffect("a página foi modificada")
+        if (tabId == workTab && scansOnPage >= limits.maxScansPerPage) return
+        val sinceLast = clock() - lastScanAt
+        listener.requestRescan(tabId, maxOf(700L, limits.minScanIntervalMs - sinceLast))
+    }
+
+    /** Confirmação humana: o desafio/clique foi resolvido. Retoma e ignora a detecção na página atual. */
+    fun userConfirmedResume() {
+        when (state) {
+            EngineState.WAITING_HUMAN -> {
+                endPause(); ignoreChallengeOnPage = true
+                step(StepKind.RESUME, null, "usuário confirmou que concluiu a verificação — retomando")
+                stepStartedAt = clock(); scanAttempts = 0
+                setState(EngineState.RUNNING, "Retomado pelo usuário")
+                listener.requestRescan(workTab, 300)
+            }
+            EngineState.WAITING_CLICK -> {
+                lastScored.filter { DownloadHeuristics.isAutoClickEligible(it, limits.tier2MinScore) }.forEach { clickedKeys += clickKey(it) }
+                resumeFromClick("usuário confirmou o toque")
+                listener.requestRescan(workTab, 300)
+            }
+            EngineState.RUNNING -> listener.requestRescan(workTab, 0)
+            else -> Unit
+        }
+    }
+
+    private fun clickKey(c: ScoredCandidate) = "$workTab|${UrlSafety.loopKey(lastScanUrl)}|${c.raw.text}|${c.raw.tag}"
+
+    /** Exige gesto humano real: destaca o botão (ou pede escolha, se ambíguo) e espera. */
+    private fun humanClick(c: ScoredCandidate?, reason: String) {
+        clickTarget = c
+        beginPause()
+        val msg = if (c != null) "Toque no botão destacado «${c.raw.text.take(40)}» na página ($reason)."
+        else "Vários botões possíveis ($reason): escolha na aba Candidatos (Destacar) ou toque na página."
+        step(StepKind.CLICK, lastScanUrl.ifEmpty { null }, msg)
+        setDecision(msg)
+        setState(EngineState.WAITING_CLICK, msg)
+        c?.raw?.elementId?.let { listener.requestHighlight(workTab, it, c.raw.text) }
+    }
+
+    private fun doAutoClick(c: ScoredCandidate) {
+        autoClicks++
+        clickedKeys += clickKey(c)
+        val msg = "clicou automaticamente em «${c.raw.text.take(40)}» (botão inequívoco, pontuação ${c.score}: ${c.reasons.joinToString(", ")})"
+        step(StepKind.CLICK, lastScanUrl.ifEmpty { null }, msg)
+        setDecision(msg)
+        pendingClick = ClickAttempt(c, clock())
+        stepStartedAt = clock()
+        listener.requestClick(workTab, c.raw.elementId!!, c.raw.text)
+    }
+
+    /**
+     * Retomada manual de um candidato depois do encerramento da análise: inicia uma NOVA etapa controlada
+     * (novo orçamento de tempo, profundidade com ao menos uma etapa livre), mantendo histórico e candidatos.
+     */
+    fun resumeFromCandidate(c: ScoredCandidate): Boolean {
+        if (state != EngineState.FINISHED) { if (isActive) manualFollow(c); return isActive }
+        val url = c.url ?: return false
+        if (!c.safe || c.ad) { step(StepKind.BLOCKED, url, "candidato inseguro ou de anúncio não pode ser retomado"); return false }
+        if (lastResult?.message?.contains("Safe Browsing") == true) { step(StepKind.BLOCKED, url, "análise encerrada pelo Safe Browsing: não retomável"); return false }
+        if (manualResumes >= limits.maxManualResumes) { step(StepKind.BLOCKED, url, "limite de ${limits.maxManualResumes} retomadas manuais atingido"); return false }
+        manualResumes++
+        val key = UrlSafety.loopKey(url)
+        visits.remove(key); rejected.remove(key); probed.remove(key); candidateStatus.remove(key)
+        startedAt = clock(); pausedMs = 0; pauseStart = 0; stepStartedAt = clock()
+        depth = minOf(depth, limits.maxDepth - 1)
+        networkFailure = null; failedUrl = null; mainFrameError = false; probingUrl = null; pending = null
+        pendingClick = null; clickTarget = null; scanAttempts = 0
+        step(StepKind.RESUME, url, "retomada manual #$manualResumes a partir do candidato «${c.raw.text.take(40)}»")
+        setState(EngineState.RUNNING, "Retomado manualmente")
+        follow(c, manual = true, "retomada manual: ")
+        return true
     }
 
     fun onPopup(opener: String?, url: String?, allowed: Boolean, reason: String) {
@@ -224,8 +482,13 @@ class ResolverEngine(
     }
 
     /** Erro na navegação do quadro principal (rede, DNS, SSL, HTTP 4xx/5xx). */
-    fun onMainFrameError(url: String, code: Int, description: String) {
+    fun onMainFrameError(url: String, code: Int, description: String, tabId: Int = workTab) {
         if (!isActive) return
+        if (tabId != workTab) { // erro numa guia secundária não derruba a análise
+            step(StepKind.ERROR, url, "erro na guia $tabId: ${UrlSafety.scrubText(description)} (código $code)")
+            closeSecondaryTab(tabId, "erro de carregamento")
+            return
+        }
         mainFrameError = true
         val info = UrlSafety.scrubText("$description (código $code)")
         val where = if (url.isBlank() || isErrorUrl(url)) (followedUrl ?: startUrl) else url
@@ -251,6 +514,7 @@ class ResolverEngine(
 
     /** DownloadListener.onDownloadStart: evidência de que a URL entrega um arquivo (nada é baixado). */
     fun onDownload(info: DownloadInfo) {
+        if (isActive) noteEffect("download iniciado")
         val canUpgrade = state == EngineState.FINISHED && isLateDownloadOfCandidate(info.url)
         if (!isActive && !canUpgrade) return
         val verdict = UrlSafety.check(info.url)
@@ -362,7 +626,7 @@ class ResolverEngine(
 
     private fun navigateAfterProbe(url: String) {
         stepStartedAt = clock()
-        listener.navigate(url)
+        listener.navigate(workTab, url)
     }
 
     private fun confirmFile(url: String, mime: String?, name: String?, size: Long?, how: String) {
@@ -383,22 +647,31 @@ class ResolverEngine(
 
     // ------------------------------------------------------------------ varredura
 
-    fun onScan(scan: PageScan) {
-        if (state != EngineState.RUNNING && state != EngineState.WAITING_HUMAN) return
+    fun onScan(scan: PageScan, tabId: Int = workTab) {
+        if (!isActive) return
+        if (tabId != workTab) { classifyPopupScan(tabId, scan); return }
+        if (state != EngineState.RUNNING && state != EngineState.WAITING_HUMAN && state != EngineState.WAITING_CLICK) return
         if (probingUrl != null) return // etapa em andamento (verificação de rede em curso): varredura duplicada é ignorada
         if (isErrorUrl(scan.url) || mainFrameError) {
             step(StepKind.SCAN, scan.url, "varredura ignorada: página de erro")
             return
         }
+        scansOnPage++
+        lastScanAt = clock(); lastScanUrl = scan.url
+        if (scansOnPage > limits.maxScansPerPage) {
+            finishWithBest("Limite de ${limits.maxScansPerPage} verificações nesta página atingido (evita espera infinita)")
+            return
+        }
 
-        if (scan.challenge != null) {
+        if (scan.challenge != null && !ignoreChallengeOnPage) {
             if (state != EngineState.WAITING_HUMAN) {
                 if (scan.challenge == ChallengeKind.LOGIN) humanAuthHappened = true
                 beginPause()
+                pendingClick = null; clickTarget = null
                 step(StepKind.CHALLENGE, scan.url, "${scan.challenge.label} detectado (${scan.challengeHint ?: "-"}) — automação pausada")
                 setState(
                     EngineState.WAITING_HUMAN,
-                    "${scan.challenge.label}: resolva manualmente na página. A automação retoma sozinha quando o desafio sumir.",
+                    "${scan.challenge.label}: resolva manualmente na página. A automação retoma quando a página liberar ou quando você tocar em \"Já resolvi\".",
                 )
             }
             return
@@ -417,7 +690,8 @@ class ResolverEngine(
             .sortedByDescending { it.score }
         lastScored = scored
         lastWaitHint = scan.waitHint
-        lastIntermediate = scan.waitHint ||
+        lastCountdown = scan.countdownSec
+        lastIntermediate = scan.waitHint || scan.countdownSec > 0 ||
             scored.count { it.safe && !it.ad && it.url != null && it.raw.visible } <= limits.maxIntermediateCandidates
         scored.forEach { c ->
             val u = c.url ?: return@forEach
@@ -432,7 +706,9 @@ class ResolverEngine(
         listener.onCandidates(allCandsSorted())
         updateCurrentPage(scan.title)
         step(StepKind.SCAN, scan.url, "${scored.size} candidato(s); melhor pontuação=${scored.firstOrNull()?.score ?: "-"}" +
-            (if (lastIntermediate) "; página intermediária" else "") + (if (scan.waitHint) "; indica espera/contagem" else ""))
+            (if (lastIntermediate) "; página intermediária" else "") + (if (scan.waitHint) "; indica espera" else "") +
+            (if (scan.countdownSec > 0) "; contagem ${scan.countdownSec}s" else "") + (if (scored.any { it.raw.disabled }) "; botão desabilitado" else "") +
+            (if (scored.any { it.raw.dynamic }) "; elementos dinâmicos" else ""))
 
         // Sem progresso: páginas seguidas que não revelam nenhuma URL nova.
         if (!pageScanCounted) {
@@ -455,7 +731,7 @@ class ResolverEngine(
         val usable = lastScored.filter {
             it.safe && !it.ad && it.url != null && UrlSafety.loopKey(it.url!!) !in rejected
         }
-        val unvisited = usable.filter { (visits[UrlSafety.loopKey(it.url!!)] ?: 0) == 0 }
+        val unvisited = usable.filter { (visits[UrlSafety.loopKey(it.url!!)] ?: 0) == 0 && !it.raw.disabled }
         var next = unvisited.firstOrNull { it.score >= limits.autoScoreThreshold }
         var tag = ""
         if (next == null && lastIntermediate) {
@@ -465,30 +741,63 @@ class ResolverEngine(
                 .maxWithOrNull(compareBy<ScoredCandidate>({ if (it.trusted) 1 else 0 }, { it.score }))
             if (next != null) tag = "página intermediária: "
         }
-        if (next == null) {
-            val revisit = usable.filter {
-                (visits[UrlSafety.loopKey(it.url!!)] ?: 0) > 0 &&
-                    (it.score >= limits.autoScoreThreshold || (lastIntermediate && isStepLike(it) && it.score >= limits.tier2MinScore))
-            }
-            if (revisit.isNotEmpty()) {
-                step(StepKind.BLOCKED, revisit.first().url, "loop: o único caminho leva a página já visitada")
-                finish(ResultState.BLOCKED, null, "Loop de navegação detectado: ${pathSummary()} → ${UrlSafety.host(revisit.first().url!!) ?: "?"} (já visitada)")
-                return
-            }
-            scanAttempts++
-            val maxAttempts = limits.maxScanAttempts + if (lastWaitHint) 3 else 0
-            if (scanAttempts < maxAttempts) {
-                listener.requestRescan(if (lastWaitHint) 3000 else 2000)
-            } else {
-                finishWithBest(
-                    if (path.count { it.kind != PathKind.FILE } > 1)
-                        "Página intermediária sem link válido (${pathSummary()})"
-                    else "Nenhum candidato confiável de download encontrado nesta página"
-                )
-            }
+        if (next != null) {
+            if (state == EngineState.WAITING_CLICK) resumeFromClick("apareceu um link seguro para seguir")
+            follow(next, manual = false, tag)
             return
         }
-        follow(next, manual = false, tag)
+
+        // Botões sem URL (acionados por JavaScript): clique automático só se a intenção for inequívoca.
+        val eligible = lastScored.filter { DownloadHeuristics.isAutoClickEligible(it, limits.tier2MinScore) }
+        if (state == EngineState.WAITING_CLICK) {
+            val t = clickTarget
+            val stillThere = if (t != null) eligible.any { it.raw.text == t.raw.text && it.raw.tag == t.raw.tag } else eligible.size > 1
+            if (stillThere) return // continua aguardando o toque humano
+            resumeFromClick("a página mudou (o botão não está mais disponível)")
+        }
+        val clickable = eligible.filter { clickKey(it) !in clickedKeys }
+        if (clickable.size == 1 && pendingClick == null) {
+            if (autoClicks < limits.maxAutoClicks) doAutoClick(clickable[0])
+            else humanClick(clickable[0], "limite de ${limits.maxAutoClicks} cliques automáticos")
+            return
+        }
+        if (clickable.size > 1) { humanClick(null, "ambíguo"); return }
+        if (pendingClick != null) return // aguardando o efeito do clique automático
+
+        val revisit = usable.filter {
+            (visits[UrlSafety.loopKey(it.url!!)] ?: 0) > 0 &&
+                (it.score >= limits.autoScoreThreshold || (lastIntermediate && isStepLike(it) && it.score >= limits.tier2MinScore))
+        }
+        if (revisit.isNotEmpty()) {
+            step(StepKind.BLOCKED, revisit.first().url, "loop: o único caminho leva a página já visitada")
+            finish(ResultState.LOOP_DETECTED, null, "Loop de navegação detectado: ${pathSummary()} → ${UrlSafety.host(revisit.first().url!!) ?: "?"} (já visitada)")
+            return
+        }
+
+        // Temporizador legítimo / botão ainda desabilitado: aguarda sem mexer em relógios nem scripts do site.
+        val waiting = lastWaitHint || lastCountdown > 0 || lastScored.any { it.raw.disabled && !it.ad && isStepLike(it) }
+        if (waiting) {
+            if (pageWaitStart == 0L) pageWaitStart = clock()
+            if (clock() - pageWaitStart > limits.maxPageWaitMs) {
+                finishWithBest("Tempo de espera do temporizador excedido (${limits.maxPageWaitMs / 1000}s)")
+                return
+            }
+            val delay = if (lastCountdown > 0) (lastCountdown * 1000L + 700).coerceIn(1500, 5000) else 3000L
+            step(StepKind.SCAN, lastScanUrl.ifEmpty { null }, "aguardando temporizador/liberação do botão" + (if (lastCountdown > 0) " (${lastCountdown}s)" else "") + "; nova verificação em ${delay / 1000}s")
+            listener.requestRescan(workTab, delay)
+            return
+        }
+
+        scanAttempts++
+        if (scanAttempts < limits.maxScanAttempts) {
+            listener.requestRescan(workTab, 2000)
+        } else {
+            finishWithBest(
+                if (path.count { it.kind != PathKind.FILE } > 1)
+                    "Página intermediária sem link válido (${pathSummary()})"
+                else "Nenhum candidato confiável de download encontrado nesta página"
+            )
+        }
     }
 
     /** Seguimento solicitado explicitamente pelo usuário (ignora o limiar de pontuação). */
@@ -513,7 +822,7 @@ class ResolverEngine(
                 finish(ResultState.BLOCKED, null, "Limite de domínios atingido ao tentar seguir para $host")
                 return
             }
-            ask(Pending(url, host, PendingSource.AUTO, false, c), "candidato (${c.reasons.joinToString(", ")})")
+            ask(Pending(url, host, PendingSource.AUTO, false, c, tabId = workTab), "candidato (${c.reasons.joinToString(", ")})")
             return
         }
         if (path.count { it.kind != PathKind.FILE } >= limits.maxPages) {
@@ -546,7 +855,7 @@ class ResolverEngine(
             step(StepKind.SCAN, url, "verificando destino via HEAD/Range 0-0 (sem baixar; registra redirecionamentos 3xx)")
             listener.requestProbe(url, policy.domains + probeExtra)
         } else {
-            listener.navigate(url)
+            listener.navigate(workTab, url)
         }
     }
 
@@ -595,13 +904,13 @@ class ResolverEngine(
             } else {
                 redirectsInStep = 0; scanAttempts = 0; stepStartedAt = clock()
                 followedUrl = p.url; mainFrameError = false
-                listener.navigate(p.url)
+                listener.navigate(p.tabId, p.url)
             }
         } else {
             step(StepKind.CONFIRM, p.url, "usuário NEGOU ${p.host}")
             rejected += UrlSafety.loopKey(p.url)
             candidateStatus[UrlSafety.loopKey(p.url)] = "domínio recusado"
-            listener.onNavigationDenied(p.url)
+            listener.onNavigationDenied(p.tabId, p.url)
             if (p.redirect) {
                 finish(ResultState.BLOCKED, null, "Redirecionamento para domínio não autorizado (${p.host}) recusado")
             } else {
@@ -619,11 +928,18 @@ class ResolverEngine(
         if (!isActive) return
         val now = clock()
         when (state) {
-            EngineState.WAITING_HUMAN -> if (now - pauseStart > limits.maxHumanWaitMs) {
+            EngineState.WAITING_HUMAN, EngineState.WAITING_CLICK -> if (now - pauseStart > limits.maxHumanWaitMs) {
                 finish(ResultState.BLOCKED, null, "Tempo de espera pela interação humana esgotado")
             }
             EngineState.WAITING_CONFIRMATION -> Unit
             EngineState.RUNNING -> {
+                pendingClick?.let { pc ->
+                    if (now - pc.at > limits.clickEffectWaitMs) {
+                        pendingClick = null
+                        humanClick(pc.c, "o clique automático não teve efeito; o site pode exigir um gesto humano real")
+                        return
+                    }
+                }
                 if (now - startedAt - pausedMs > limits.maxTotalMs) {
                     finishWithBest("Tempo total máximo (${limits.maxTotalMs / 1000}s) excedido")
                 } else if (now - stepStartedAt > limits.maxStepMs) {
@@ -643,7 +959,7 @@ class ResolverEngine(
         val allowed = if (humanAuthHappened) limits.maxVisitsPerUrl + 1 else limits.maxVisitsPerUrl
         if (n > allowed) {
             step(StepKind.BLOCKED, url, "loop detectado (URL visitada $n vezes)")
-            finish(ResultState.BLOCKED, null, "Loop de navegação detectado")
+            finish(ResultState.LOOP_DETECTED, null, "Loop de navegação detectado (${UrlSafety.host(url) ?: "?"} visitado $n vezes)")
             return false
         }
         return true
@@ -665,19 +981,23 @@ class ResolverEngine(
 
     // ------------------------------------------------------------------ caminho / candidatos
 
-    private fun addPath(kind: PathKind, url: String?, arrival: String, cls: LinkClass? = null, code: Int? = null) {
+    private fun addPath(kind: PathKind, url: String?, arrival: String, cls: LinkClass? = null, code: Int? = null, tabId: Int = workTab) {
         val shown = url?.let { UrlSafety.redact(it) }
         val key = url?.let { UrlSafety.loopKey(it) }
         if (kind != PathKind.PAGE && kind != PathKind.START && kind != PathKind.FILE && key != null && probeHopKeys.remove(key)) return // já registrado pela verificação OkHttp
         val last = path.lastOrNull()
         if (last != null && last.url == shown && last.kind == kind) return
         if (path.size >= 80) return
-        path += PathEntry(path.size + 1, kind, shown, UrlSafety.scrubText(arrival), cls, null, code)
+        path += PathEntry(path.size + 1, kind, shown, UrlSafety.scrubText(arrival), cls, null, code, tabId = tabId)
     }
 
     private fun setDecision(text: String) {
         val i = path.indexOfLast { it.kind != PathKind.FILE }
-        if (i >= 0) path[i] = path[i].copy(decision = UrlSafety.scrubText(text))
+        if (i >= 0) {
+            val old = path[i].decision
+            val keep = old?.takeIf { it.startsWith("guia de trabalho") }   // não perde o motivo da promoção da guia
+            path[i] = path[i].copy(decision = UrlSafety.scrubText(if (keep != null) "$keep → $text" else text))
+        }
     }
 
     private fun updateCurrentPage(title: String) {
@@ -744,7 +1064,11 @@ class ResolverEngine(
     ) {
         if (state == EngineState.FINISHED) return
         endPause()
-        probingUrl = null; probingCandidate = null
+        probingUrl?.let { u ->   // verificação interrompida: o candidato volta a ser "não visitado" (permite retomar)
+            val k = UrlSafety.loopKey(u); visits.remove(k); probed.remove(k)
+        }
+        probingUrl = null; probingCandidate = null; pendingClick = null; clickTarget = null
+        candidateStatus.replaceAll { _, v -> if (v == "verificando metadados") "verificação interrompida (não verificado)" else v }
         val scoreOfUrl = url?.let { u -> allCands[UrlSafety.loopKey(u)]?.score }
         step(StepKind.END, url, "${rs.label}: $message")
         val result = ResolveResult(

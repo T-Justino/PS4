@@ -22,7 +22,7 @@ A versão e o commit aparecem no rodapé do app (`BuildConfig.VERSION_NAME` / `G
    URLs com cara de arquivo são validadas (cliente **OkHttp**) por **HEAD** (ou **GET com `Range: bytes=0-0`**) antes de navegar — só cabeçalhos, sem baixar o corpo, sem cookies, com checagem de IP interno a cada salto. O `DownloadListener` é evidência adicional. Páginas de erro do navegador (`chrome-error://`) nunca são analisadas. *Copiar URL* copia a URL completa (se tiver token/assinatura, o app avisa e marca a área de transferência como sensível no Android 13+).
 
 ## Como testar
-**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 84 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
+**Unitários (JVM, sem emulador):** `./gradlew testDebugUnitTest` — 116 testes (segurança de URL, heurísticas, scanner, motor: loops, limites, domínios, CAPTCHA, sessão). Estes testes também foram executados na JVM durante o desenvolvimento.
 
 **Manuais no aparelho** (o app só aceita HTTPS público; `localhost`/IPs privados são bloqueados de propósito, então hospede `testpages/` em HTTPS — p.ex. GitHub Pages — ou use um túnel HTTPS):
 | Página | Esperado |
@@ -94,3 +94,26 @@ Base: `https://raw.githack.com/T-Justino/PS4/gh-pages/v3/`
 | Anúncios | `…/v3/ads/start.html` | ignora anúncios e segue "Continuar" |
 
 (`…` = `https://raw.githack.com/T-Justino/PS4/gh-pages`.) Observação: `raw.githack.com` recusa HEAD (403) em alguns arquivos; a verificação cai para GET `Range: bytes=0-0`, e páginas continuam sendo navegadas normalmente. `httpbin.org` e `httpbingo.org` bloqueiam IPs de datacenter, por isso foram trocados.
+
+
+## v0.4.0 — navegação assistida em múltiplas guias
+- **Guias:** `window.open`/`target=_blank` só abrem com **gesto humano**, em **origem confiável**, sem popup dentro de popup, com limite por página (3) e por análise (6) e no máximo 4 guias. Cada guia nova entra no caminho com a página que a originou. Depois de carregar, a guia é **classificada**: tem continuação (link/botão de download-etapa) ⇒ vira a *guia de trabalho* (★ no chip); propaganda (cassino/prêmio/VPN…) ou sem continuação ⇒ **fechada**. Abrir guia nunca confirma arquivo. Você pode alternar/fechar guias e tocar em **Usar esta guia** para continuar manualmente em qualquer uma (inclusive depois do fim). Domínio desconhecido em qualquer guia continua pedindo confirmação.
+- **Botões dinâmicos:** o scanner instala um `MutationObserver` (somente leitura) que conta mudanças relevantes (links/botões criados, habilitados, mostrados). O app lê o contador a cada 1 s e reescaneia com limite de frequência (≥ 1,5 s, ≤ 20 varreduras por página). Elementos criados/liberados depois do carregamento ganham bônus; desabilitados perdem pontos e nunca são clicados.
+- **Cliques:** botão sem URL só é clicado automaticamente se a intenção for **inequívoca** (único botão visível, habilitado, com texto de ação como *Continuar/Próximo/Baixar*, sem texto suspeito nem contexto de anúncio; no máx. 6 por análise). Como o clique programático não vale como gesto humano, se nada acontecer em 4 s o app **destaca o botão** (contorno vermelho + rolagem) e espera **você tocar nele**. Com 2+ botões possíveis (ambíguo), nada é clicado: use *Destacar* na aba Candidatos.
+- **Temporizadores:** contagens regressivas ("aguarde 6 segundos", "seu download começa em…") e botões desabilitados fazem o app **esperar** (até 40 s por página) e reescanear quando o botão for liberado. O app **não altera relógios, scripts nem atributos do site**; redirecionamentos JS dentro de *handlers* de clique não são seguidos adiantadamente (isso burlaria a espera).
+- **Verificação humana:** CAPTCHA/anti-robô/login pausam a automação; a página fica aberta com sua sessão e cookies. Retoma sozinho quando a página libera, ou quando você toca em **Já resolvi** (que também ignora a detecção nessa página, caso ela persista). Nada é resolvido, contornado ou falsificado.
+- **Motor:** novo estado **Loop detectado**; candidato pode ser **retomado manualmente após o fim** (*Seguir* na aba Candidatos inicia nova etapa controlada, até 5 vezes, com novo orçamento de tempo e histórico preservado); candidatos nunca ficam "verificando metadados" depois de concluir.
+
+### Páginas de teste v0.4.0 (HTTPS)
+Publicadas na branch `gh-pages` pelo workflow *LinkResolver test pages*; as páginas usam links relativos e funcionam em qualquer host. **GitHub Pages** (preferido): ative uma única vez em *Settings → Pages → Deploy from a branch → `gh-pages` / `(root)`* (o token do CI não consegue ativar — HTTP 403) e use `https://t-justino.github.io/PS4/v4/…`. **Já funciona sem configurar:** `https://raw.githack.com/T-Justino/PS4/gh-pages/v4/…`. O arquivo (200 KB) fica em `cdn.jsdelivr.net` (o app pede confirmação desse domínio).
+
+| Teste | Caminho (depois da base) | Esperado |
+|---|---|---|
+| Botão que abre nova guia | `v4/tabs/start.html` | tenta clicar; sem efeito ⇒ destaca "Continuar"; ao tocar, abre guia que vira a de trabalho ⇒ arquivo confirmado |
+| Popup de anúncio × guia legítima | `v4/popup-ad/start.html` | "Receber prêmio" abre propaganda ⇒ fechada sozinha; "Continuar" abre a guia legítima |
+| Botão após contagem | `v4/timer/start.html` | espera ~6 s; clica só quando o botão é liberado |
+| Botão dinâmico | `v4/dynamic/start.html` | botão aparece após ~2,5 s ⇒ clique ⇒ arquivo |
+| Link dinâmico | `v4/dynamic/link.html` | link aparece após ~2,5 s ⇒ verificação ⇒ arquivo |
+| Pausa humana simulada | `v4/human/start.html` | pausa; toque "Sou humano" (ou "Já resolvi") ⇒ retoma |
+| Combinado | `v4/combo/start.html` | botão ⇒ nova guia ⇒ temporizador ⇒ pausa humana ⇒ arquivo |
+| Popup repetitivo | `v4/popup-flood/start.html` | popups sem gesto bloqueados; se você tocar na página, no máx. 3 abrem e são fechados; segue o link legítimo |

@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste: botão liberado após contagem regressiva</title>
+<style>body{font-family:sans-serif;max-width:40em;margin:1em auto;padding:0 1em}button{font-size:1.1em;padding:.6em 1.2em}.box{width:304px;height:78px;border:1px solid #888;padding:6px;box-sizing:border-box}</style></head>
+<body>
+<h1>Teste: botão liberado após contagem regressiva</h1>
+<p id="msg">Seu download começa em <span id="count">6</span> segundos…</p><button id="dl" disabled>Baixar arquivo</button><script>var n=6,t=setInterval(function(){n--;document.getElementById("count").textContent=n;if(n<=0){clearInterval(t);document.getElementById("dl").disabled=false;document.getElementById("msg").textContent="Pronto!";}},1000);document.getElementById("dl").addEventListener("click",function(){location.href="destino.html";});</script>
+<hr><small>Página de teste do Link Resolver v0.4.0 — conteúdo inofensivo.</small>
+</body></html>

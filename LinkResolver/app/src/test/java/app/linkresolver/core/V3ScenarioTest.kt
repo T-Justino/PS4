@@ -133,7 +133,7 @@ class V3ScenarioTest {
         s.page("$site/a", link("$site/b", "Continuar"))
         s.page("$site/b", link("$site/a", "Continuar"))
         val r = s.run("$site/a")
-        assertEquals(ResultState.BLOCKED, r.state)
+        assertEquals(ResultState.LOOP_DETECTED, r.state)
         assertTrue(r.message, r.message.contains("Loop"))
         assertTrue(s.navigated.size <= 3)
     }
@@ -142,7 +142,7 @@ class V3ScenarioTest {
         val s = Sim(); val e = ResolverEngine(Limits(), { 0L }, s); s.e = e
         e.start("$site/a")
         repeat(5) { e.onNavigationRequest("$site/b", true); e.onNavigationRequest("$site/a", true) }
-        assertEquals(ResultState.BLOCKED, s.result?.state)
+        assertEquals(ResultState.LOOP_DETECTED, s.result?.state)
     }
 
     @Test fun intermediatePageWithoutValidLinkEndsWithPreservedCandidates() {
@@ -151,10 +151,19 @@ class V3ScenarioTest {
         s.page("$site/b", link("$site/privacidade", "Política de privacidade"), wait = true)
         val r = s.run("$site/a")
         assertEquals(ResultState.NO_CANDIDATE, r.state)
-        assertTrue(r.message, r.message.contains("sem link válido"))
+        assertTrue(r.message, r.message.contains("Tempo de espera"))      // página diz "aguarde": espera o limite e para
         val kept = r.candidates.firstOrNull { it.url == "$site/privacidade" }
         assertNotNull("candidato preservado para cópia", kept)
         assertTrue(r.path.size >= 2)
+    }
+
+    @Test fun staticIntermediatePageWithoutValidLinkSaysSo() {
+        val s = Sim()
+        s.page("$site/a", link("$site/b", "Continuar"))
+        s.page("$site/b", link("$site/privacidade", "Política de privacidade"))
+        val r = s.run("$site/a")
+        assertEquals(ResultState.NO_CANDIDATE, r.state)
+        assertTrue(r.message, r.message.contains("sem link válido"))
     }
 
     @Test fun noProgressStopsPagesThatRevealNothingNew() {

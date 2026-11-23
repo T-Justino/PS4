@@ -11,14 +11,14 @@ class ResolverEngineTest {
         var rescans = 0
         var denied = 0
         val probes = mutableListOf<String>()
-        override fun navigate(url: String) { navigated += url }
+        override fun navigate(tabId: Int, url: String) { navigated += url }
         override fun askDomain(host: String, url: String, reason: String) { asked += host }
         override fun onStateChanged(state: EngineState, message: String) {}
         override fun onStep(step: Step) {}
         override fun onCandidates(candidates: List<ScoredCandidate>) {}
         override fun onResult(result: ResolveResult) { this.result = result }
-        override fun requestRescan(delayMs: Long) { rescans++ }
-        override fun onNavigationDenied(url: String) { denied++ }
+        override fun requestRescan(tabId: Int, delayMs: Long) { rescans++ }
+        override fun onNavigationDenied(tabId: Int, url: String) { denied++ }
         override fun requestProbe(url: String, trustedDomains: Set<String>) { probes += url }
     }
 
@@ -161,7 +161,7 @@ class ResolverEngineTest {
             e.onNavigationRequest("https://site.com/b", true)
             e.onNavigationRequest("https://site.com/a", true)
         }
-        assertEquals(ResultState.BLOCKED, f.result?.state)
+        assertEquals(ResultState.LOOP_DETECTED, f.result?.state)
         assertTrue(f.result!!.message.contains("Loop"))
     }
 

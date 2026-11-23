@@ -98,13 +98,13 @@ class RealPagesFixtureTest {
 
     @Test fun loopOnRealPages() {
         val r = sim("loop/a.html", "loop/b.html").run(base + "loop/a.html")
-        assertEquals(ResultState.BLOCKED, r.state); assertTrue(r.message.contains("Loop"))
+        assertEquals(ResultState.LOOP_DETECTED, r.state); assertTrue(r.message.contains("Loop"))
     }
 
     @Test fun deadEndOnRealPages() {
         val r = sim("dead/start.html", "dead/fim.html").run(base + "dead/start.html")
         assertEquals(r.message, ResultState.NO_CANDIDATE, r.state)
-        assertTrue(r.message.contains("sem link válido"))
+        assertTrue(r.message, r.message.contains("Tempo de espera"))   // a página diz "aguarde": espera o limite do temporizador
         assertTrue(r.candidates.any { it.url == "${base}dead/privacidade.html" })
     }
 

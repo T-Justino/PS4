@@ -51,20 +51,22 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
     private val timeFmt = SimpleDateFormat("HH:mm:ss", Locale.US)
     private val logBuf = StringBuilder()
     private var lastResult: ResolveResult? = null
-    /** Aba que originou uma navegação pendente de confirmação (ex.: popup). */
-    private var navTab: BrowserTab? = null
     private var lastPollAt = 0L
+    /** Última versão do observador de DOM vista em cada guia (MutationObserver injetado pelo scanner). */
+    private val domVersions = HashMap<Int, Int>()
+    private val rescanRunnables = HashMap<Int, Runnable>()
     private val probeExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private val probe by lazy { HttpFileProbe(android.webkit.WebSettings.getDefaultUserAgent(this)) }
 
     private val ticker = object : Runnable {
         override fun run() {
             engine.tick()
-            if (engine.state == EngineState.WAITING_HUMAN && System.currentTimeMillis() - lastPollAt >= 2500) scanNow()
+            val st = engine.state
+            if ((st == EngineState.WAITING_HUMAN || st == EngineState.WAITING_CLICK) && System.currentTimeMillis() - lastPollAt >= 2500) scanTab(engine.workTab)
+            if (st == EngineState.RUNNING || st == EngineState.WAITING_HUMAN || st == EngineState.WAITING_CLICK) pollDomVersions()
             if (engine.isActive) handler.postDelayed(this, 1000)
         }
     }
-    private val scanRunnable = Runnable { scanNow() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,7 +104,8 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
             if (id == EditorInfo.IME_ACTION_GO) { startAnalysis(); true } else false
         }
         b.btnStop.setOnClickListener { engine.stop() }
-        b.btnResume.setOnClickListener { scanNow() } // só retoma se a página não tiver mais desafio
+        b.btnResume.setOnClickListener { engine.userConfirmedResume() } // confirmação humana: retoma e ignora o desafio nesta página
+        b.btnUseTab.setOnClickListener { tabs.active?.let { engine.setWorkTab(it.id); startTicker() } }
         b.btnClearSession.setOnClickListener {
             clearSession()
             toast("Cookies e dados do site apagados")
@@ -172,39 +175,64 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         if (input.isEmpty()) { toast("Informe uma URL"); return }
         if (!input.contains("://") && !input.contains(':')) input = "https://$input"
         (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(b.urlInput.windowToken, 0)
-        handler.removeCallbacks(scanRunnable)
+        cancelRescans(); domVersions.clear()
         tabs.closePopups()
-        navTab = null
         logBuf.setLength(0); b.logText.text = ""
         adapter.submit(emptyList()); b.candEmpty.visibility = View.VISIBLE
         lastResult = null
         b.resState.setText(R.string.no_result); b.resDetails.text = ""; b.resSteps.text = ""; b.btnCopy.isEnabled = false
         showPane(0)
         engine.start(input)
+        startTicker()
+    }
+
+    private fun startTicker() {
         handler.removeCallbacks(ticker)
         if (engine.isActive) handler.postDelayed(ticker, 1000)
     }
 
-    private fun scanNow() {
-        if (engine.state != EngineState.RUNNING && engine.state != EngineState.WAITING_HUMAN) return
-        val tab = tabs.active ?: return
+    private fun cancelRescans() {
+        rescanRunnables.values.forEach { handler.removeCallbacks(it) }
+        rescanRunnables.clear()
+    }
+
+    private fun scanTab(tabId: Int) {
+        if (!engine.isActive) return
+        val tab = tabs.byId(tabId) ?: return
         if (ResolverEngine.isErrorUrl(tab.webView.url)) return // nunca varrer páginas internas de erro
         lastPollAt = System.currentTimeMillis()
         tab.webView.evaluateJavascript(PageScanner.SCRIPT) { raw ->
-            PageScanner.parse(raw)?.let { engine.onScan(it) }
+            PageScanner.parse(raw)?.let { engine.onScan(it, tabId) }
+        }
+    }
+
+    /** Lê o contador do MutationObserver de cada guia: mudou ⇒ botão criado/liberado ⇒ nova varredura (com limite). */
+    private fun pollDomVersions() {
+        for (t in tabs.all.toList()) {
+            t.webView.evaluateJavascript(PageScanner.VERSION_SCRIPT) { raw ->
+                val v = raw?.trim()?.toIntOrNull() ?: return@evaluateJavascript
+                val old = domVersions.put(t.id, v)
+                if (old != null && v != old && v >= 0) engine.onDomChanged(t.id)
+            }
         }
     }
 
     private fun onCandidateAction(c: ScoredCandidate) {
         if (c.url != null) {
-            if (!engine.isActive) { toast("Inicie uma análise primeiro"); return }
-            engine.manualFollow(c)
+            when {
+                engine.state == EngineState.FINISHED -> {
+                    // Retomada manual após o fim: nova etapa controlada, mantendo histórico e candidatos.
+                    if (engine.resumeFromCandidate(c)) { showPane(0); startTicker() } else toast("Não foi possível retomar este candidato")
+                }
+                engine.isActive -> engine.manualFollow(c)
+                else -> toast("Inicie uma análise primeiro")
+            }
         } else if (c.raw.elementId != null) {
-            // Clique manual solicitado pelo usuário em um botão sem URL.
-            logLine(Step(System.currentTimeMillis(), StepKind.FOLLOW, null, "clique manual em \"${c.raw.text}\""))
-            tabs.active?.webView?.evaluateJavascript(PageScanner.clickScript(c.raw.elementId!!), null)
-            showPane(0)
-            handler.postDelayed(scanRunnable, 2000)
+            // Botão sem URL: destaca para o usuário tocar (gesto humano real). Nunca clica sozinho aqui.
+            val tab = tabs.byId(engine.workTab) ?: tabs.active ?: return
+            tab.webView.evaluateJavascript(PageScanner.highlightScript(c.raw.elementId!!), null)
+            tabs.select(tab); showPane(0)
+            toast("Toque no botão destacado na página")
         }
     }
 
@@ -212,7 +240,7 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         b.tabChips.removeAllViews()
         for (t in tabs.all) {
             val chip = Chip(this).apply {
-                text = t.title.take(20)
+                text = (if (engine.isActive && t.id == engine.workTab) "★ " else "") + t.title.take(20)
                 isCheckable = true
                 isChecked = t === tabs.active
                 isCloseIconVisible = t.openerId != null
@@ -257,9 +285,8 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
 
     // ------------------------------------------------------------------ ResolverEngine.Listener
 
-    override fun navigate(url: String) {
-        val t = navTab?.takeIf { !it.closed } ?: tabs.active ?: tabs.main
-        navTab = null
+    override fun navigate(tabId: Int, url: String) {
+        val t = tabs.byId(tabId) ?: tabs.byId(engine.workTab) ?: tabs.active ?: tabs.main
         t.webView.loadUrl(url)
     }
 
@@ -277,8 +304,10 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
     override fun onStateChanged(state: EngineState, message: String) {
         b.statusText.text = message
         b.btnStop.visibility = if (engine.isActive) View.VISIBLE else View.GONE
-        b.btnResume.visibility = if (state == EngineState.WAITING_HUMAN) View.VISIBLE else View.GONE
-        if (state == EngineState.WAITING_HUMAN) showPane(0)
+        b.btnResume.visibility = if (state == EngineState.WAITING_HUMAN || state == EngineState.WAITING_CLICK) View.VISIBLE else View.GONE
+        b.btnResume.setText(if (state == EngineState.WAITING_CLICK) R.string.btn_resume_click else R.string.btn_resume_human)
+        if (state == EngineState.WAITING_HUMAN || state == EngineState.WAITING_CLICK) showPane(0)
+        refreshUseTab(); refreshChips()
     }
 
     override fun onStep(step: Step) = logLine(step)
@@ -290,7 +319,7 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
 
     override fun onResult(result: ResolveResult) {
         lastResult = result
-        handler.removeCallbacks(ticker); handler.removeCallbacks(scanRunnable)
+        handler.removeCallbacks(ticker); cancelRescans()
         b.resState.text = result.state.label
         adapter.setStatuses(result.candidates.map { it.status })
         b.resDetails.text = buildString {
@@ -332,43 +361,64 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         }
     }
 
-    override fun requestRescan(delayMs: Long) {
-        handler.removeCallbacks(scanRunnable)
-        handler.postDelayed(scanRunnable, delayMs)
+    /** Junta pedidos repetidos por guia (debounce): só a última varredura agendada roda. */
+    override fun requestRescan(tabId: Int, delayMs: Long) {
+        rescanRunnables.remove(tabId)?.let { handler.removeCallbacks(it) }
+        val r = Runnable { rescanRunnables.remove(tabId); scanTab(tabId) }
+        rescanRunnables[tabId] = r
+        handler.postDelayed(r, delayMs)
     }
 
-    override fun onNavigationDenied(url: String) {
-        navTab?.let { if (it.openerId != null) tabs.close(it) }
-        navTab = null
+    override fun requestClick(tabId: Int, elementId: String, text: String) {
+        // Clique PROGRAMÁTICO (sem gesto humano): sites podem ignorá-lo; nesse caso o motor pede o toque humano.
+        tabs.byId(tabId)?.webView?.evaluateJavascript(PageScanner.clickScript(elementId), null)
+    }
+
+    override fun requestHighlight(tabId: Int, elementId: String, text: String) {
+        val tab = tabs.byId(tabId) ?: return
+        tab.webView.evaluateJavascript(PageScanner.highlightScript(elementId), null)
+        tabs.select(tab); showPane(0)
+    }
+
+    override fun closeTab(tabId: Int) { tabs.byId(tabId)?.let { if (it.openerId != null) tabs.close(it) } }
+
+    override fun onWorkTabChanged(tabId: Int) {
+        tabs.byId(tabId)?.let { tabs.select(it) }
+        refreshUseTab(); refreshChips()
+    }
+
+    override fun onNavigationDenied(tabId: Int, url: String) {
+        tabs.byId(tabId)?.let { if (it.openerId != null) tabs.close(it) }
+    }
+
+    private fun refreshUseTab() {
+        val a = tabs.active
+        b.btnUseTab.visibility = if (a != null && tabs.all.size > 1 && engine.state != EngineState.IDLE && a.id != engine.workTab) View.VISIBLE else View.GONE
     }
 
     // ------------------------------------------------------------------ TabManager.Callbacks
 
-    override fun onNavigationRequest(tab: BrowserTab, url: String, redirect: Boolean, hasGesture: Boolean): NavDecision {
-        val d = engine.onNavigationRequest(url, redirect, hasGesture)
-        if (d == NavDecision.ASK) navTab = tab
-        return d
-    }
+    override fun onNavigationRequest(tab: BrowserTab, url: String, redirect: Boolean, hasGesture: Boolean): NavDecision =
+        engine.onNavigationRequest(url, redirect, hasGesture, tab.id)
 
     override fun onPageStarted(tab: BrowserTab, url: String) {
         if (!engine.isActive) return
         // Rede de segurança: a 1ª navegação de um popup pode não passar por shouldOverrideUrlLoading.
         if (tab.openerId != null && url != "about:blank") {
             val host = UrlSafety.host(url)
-            if (host == null) {
-                tab.webView.stopLoading(); tabs.close(tab); return
-            }
+            if (host == null) { tab.webView.stopLoading(); tabs.close(tab); return }
             if (!engine.policy.isTrusted(host)) {
                 tab.webView.stopLoading()
-                if (engine.onNavigationRequest(url, false) == NavDecision.ASK) navTab = tab else tabs.close(tab)
+                if (engine.onNavigationRequest(url, false, false, tab.id) != NavDecision.ASK) tabs.close(tab)
                 return
             }
         }
-        engine.onPageStarted(url)
+        domVersions.remove(tab.id)
+        engine.onPageStarted(url, tab.id)
     }
 
     override fun onPageFinished(tab: BrowserTab, url: String) {
-        if (engine.isActive && tab === tabs.active) engine.onPageFinished(url)
+        if (engine.isActive) engine.onPageFinished(url, tab.id)
     }
 
     override fun onProgress(tab: BrowserTab, percent: Int) {
@@ -384,27 +434,28 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         if (tab.openerId != null) tabs.close(tab)
     }
 
-    override fun onHttpError(tab: BrowserTab, url: String, code: Int) { if (engine.isActive) engine.onHttpError(url, code) }
+    override fun onHttpError(tab: BrowserTab, url: String, code: Int) { if (engine.isActive && tab.id == engine.workTab) engine.onHttpError(url, code) }
     override fun onMainFrameError(tab: BrowserTab, url: String, code: Int, description: String) {
-        if (tab === tabs.active || tab.openerId == null) engine.onMainFrameError(url, code, description)
+        engine.onMainFrameError(url, code, description, tab.id)
     }
 
     override fun onSafeBrowsingHit(tab: BrowserTab, url: String, threat: String) {
         if (engine.isActive) engine.onSafeBrowsingHit(url, threat) else toast("Safe Browsing bloqueou a página ($threat)")
     }
 
-    override fun allowPopup(opener: BrowserTab, userGesture: Boolean): Boolean {
-        val openerUrl = opener.webView.url
-        val host = openerUrl?.let { UrlSafety.host(it) }
-        val trusted = host != null && (!engine.isActive || engine.policy.isTrusted(host))
-        val allowed = userGesture && trusted
-        val reason = when {
-            !userGesture -> "sem gesto do usuário"
-            !trusted -> "origem não confiável (${host ?: "?"})"
-            else -> "gesto do usuário em origem confiável (${host})"
-        }
-        engine.onPopup(openerUrl, null, allowed, reason)
-        return allowed
+    override fun allowPopup(opener: BrowserTab, userGesture: Boolean): Boolean =
+        engine.onPopupRequest(opener.id, opener.webView.url, userGesture)
+
+    override fun onTabOpened(tab: BrowserTab, opener: BrowserTab) {
+        engine.onTabOpened(tab.id, opener.id, opener.webView.url)
+        refreshUseTab()
+    }
+
+    override fun onTabClosed(tab: BrowserTab) {
+        domVersions.remove(tab.id)
+        rescanRunnables.remove(tab.id)?.let { handler.removeCallbacks(it) }
+        engine.onTabClosed(tab.id)
+        refreshUseTab()
     }
 
     override fun onPopupBlocked(reason: String) = engine.onPopup(null, null, false, reason)
@@ -413,5 +464,5 @@ class MainActivity : AppCompatActivity(), TabManager.Callbacks, ResolverEngine.L
         if (engine.isActive) logLine(Step(System.currentTimeMillis(), StepKind.BLOCKED, UrlSafety.redact(url), "sub-recurso bloqueado: $reason"))
     }
 
-    override fun onTabsChanged() = refreshChips()
+    override fun onTabsChanged() { refreshChips(); refreshUseTab() }
 }

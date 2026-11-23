@@ -54,3 +54,53 @@ class HeuristicsTest {
         assertNull(PageScanner.parse("null"))
     }
 }
+
+class HeuristicsV4Test {
+    private val policy = DomainPolicy().also { it.trust("site.com") }
+    private fun scored(c: RawCandidate) = DownloadHeuristics.score(c, "site.com", policy)
+    private fun button(text: String, dis: Boolean = false, dyn: Boolean = false, vis: Boolean = true, ctx: String = "") =
+        RawCandidate(null, text, "button", "button", false, "", ctx, "1", vis, dis, dyn)
+
+    @Test fun disabledButtonScoresLowAndIsNotEligible() {
+        val d = scored(button("Baixar arquivo", dis = true)); val e = scored(button("Baixar arquivo"))
+        assertTrue(d.score < e.score - 40)
+        assertFalse(DownloadHeuristics.isAutoClickEligible(d, 20)); assertTrue(DownloadHeuristics.isAutoClickEligible(e, 20))
+    }
+
+    @Test fun dynamicBonusAndReasons() {
+        val c = scored(button("Continuar", dyn = true))
+        assertTrue(c.reasons.any { it.contains("dinamicamente") }); assertTrue(c.score >= 20)
+    }
+
+    @Test fun eligibilityRules() {
+        assertTrue(DownloadHeuristics.isAutoClickEligible(scored(button("Continuar")), 20))
+        assertFalse(DownloadHeuristics.isAutoClickEligible(scored(button("Sou humano")), 20))
+        assertFalse(DownloadHeuristics.isAutoClickEligible(scored(button("Continuar", ctx = " ad banner")), 20))
+        assertFalse(DownloadHeuristics.isAutoClickEligible(scored(button("Continuar", vis = false)), 20))
+        assertFalse(DownloadHeuristics.isAutoClickEligible(scored(button("Assine premium e baixe")), 20))
+        val link = scored(RawCandidate("https://site.com/x", "Continuar", "a", "href", false, "", "", "1", true))
+        assertFalse("link com URL não é clique", DownloadHeuristics.isAutoClickEligible(link, 20))
+    }
+
+    @Test fun portugueseAndEnglishStepWords() {
+        for (t in listOf("Continuar", "Próximo", "Prosseguir", "Baixar arquivo", "Download", "Next", "Continue", "Proceed")) {
+            assertTrue(t, DownloadHeuristics.isStepText(t))
+        }
+        assertFalse(DownloadHeuristics.isStepText("Política de privacidade"))
+    }
+
+    @Test fun scannerParsesNewFields() {
+        val raw = "\"" + """{"url":"https://s.com/","title":"t","cands":[{"url":null,"text":"Baixar","tag":"button","source":"button","dl":false,"rel":"","ctx":"","id":"1","vis":true,"dis":true,"dyn":true,"blank":true}],"challenge":null,"hint":null,"wait":true,"cd":7,"ad":true}""".replace("\"", "\\\"") + "\""
+        val s = PageScanner.parse(raw)!!
+        assertEquals(7, s.countdownSec); assertTrue(s.adLike); assertTrue(s.waitHint)
+        val c = s.candidates.single(); assertTrue(c.disabled && c.dynamic && c.opensTab)
+    }
+
+    @Test fun realTimerFixtureHasCountdownAndDisabledButton() {
+        val t0 = PageScanner.parse(javaClass.classLoader!!.getResource("scans/v4__timer__start__t0.json")!!.readText())!!
+        assertTrue(t0.countdownSec >= 5); assertTrue(t0.waitHint)
+        assertTrue(t0.candidates.single { it.text == "Baixar arquivo" }.disabled)
+        val t8 = PageScanner.parse(javaClass.classLoader!!.getResource("scans/v4__timer__start__t8.json")!!.readText())!!
+        val b = t8.candidates.single { it.text == "Baixar arquivo" }; assertFalse(b.disabled); assertTrue(b.dynamic)
+    }
+}

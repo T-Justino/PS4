@@ -53,6 +53,9 @@ class TabManager(
         fun onPopupBlocked(reason: String)
         fun onBlockedSubresource(url: String, reason: String)
         fun onTabsChanged()
+        /** Uma guia foi criada por window.open/target=_blank (já aberta e selecionada). */
+        fun onTabOpened(tab: BrowserTab, opener: BrowserTab)
+        fun onTabClosed(tab: BrowserTab)
     }
 
     companion object {
@@ -66,6 +69,7 @@ class TabManager(
     var active: BrowserTab? = null
         private set
     val main: BrowserTab get() = all.first()
+    fun byId(id: Int): BrowserTab? = all.firstOrNull { it.id == id && !it.closed }
 
     fun openMain(): BrowserTab = create(null).also { select(it) }
 
@@ -122,6 +126,7 @@ class TabManager(
             tab.webView.webViewClient = WebViewClient()
             tab.webView.destroy()
         }
+        cb.onTabClosed(tab)
         if (wasActive) select(all.firstOrNull { it.id == tab.openerId } ?: main) else cb.onTabsChanged()
     }
 
@@ -199,6 +204,7 @@ class TabManager(
             transport.webView = popup.webView
             resultMsg.sendToTarget()
             select(popup)
+            cb.onTabOpened(popup, tab)
             return true
         }
 

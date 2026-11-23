@@ -17,7 +17,10 @@
     <string name="btn_copy_link">Copiar</string>
     <string name="btn_new">Nova análise</string>
     <string name="btn_follow">Seguir</string>
-    <string name="btn_click">Clicar</string>
+    <string name="btn_click">Destacar</string>
+    <string name="btn_use_tab">Usar esta guia</string>
+    <string name="btn_resume_human">Já resolvi</string>
+    <string name="btn_resume_click">Já cliquei</string>
     <string name="copied">URL copiada</string>
     <string name="confirm_title">Domínio desconhecido</string>
     <string name="confirm_allow_domain">Permitir domínio</string>
